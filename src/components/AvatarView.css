@@ -1,0 +1,23 @@
+.avatar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem 0;
+}
+
+.avatar-svg {
+  width: 260px;
+  max-width: 100%;
+  border-radius: 1.25rem;
+  animation: avatar-bob 3.2s ease-in-out infinite;
+}
+
+@keyframes avatar-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}

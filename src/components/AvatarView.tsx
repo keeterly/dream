@@ -1,17 +1,15 @@
 import React from "react";
-import type { AvatarShape } from "../types";
-
 
 interface AvatarViewProps {
-  avatar: AvatarShape;
+  // You can tighten this type later if you like,
+  // but it's not needed for the current SVG rendering.
+  avatar: unknown;
   compact?: boolean;
 }
 
 const AvatarView: React.FC<AvatarViewProps> = ({ avatar, compact }) => {
   const svgClass = compact ? "avatar-svg avatar-svg--compact" : "avatar-svg";
 
-  // This is your existing avatar drawing logic.
-  // I’ll keep it abstract; just make sure the root <svg> uses svgClass.
   return (
     <svg
       className={svgClass}
@@ -25,25 +23,13 @@ const AvatarView: React.FC<AvatarViewProps> = ({ avatar, compact }) => {
           <stop offset="100%" stopColor="#020617" />
         </linearGradient>
       </defs>
-      <rect
-        x="8"
-        y="8"
-        width="104"
-        height="104"
-        rx="24"
-        fill="url(#bg)"
-      />
-      {/* Simple VENIA-ish figure, replace with your actual avatar shapes */}
+      <rect x="8" y="8" width="104" height="104" rx="24" fill="url(#bg)" />
+
+      {/* Simple VENIA-ish figure */}
       <circle cx="60" cy="44" r="10" fill="#e5e7eb" opacity={0.95} />
-      <path
-        d="M40 86 L60 48 L80 86 Z"
-        fill="#e5e7eb"
-        opacity={0.9}
-      />
-      {/* You can use avatar.traits, colors etc. here if you already had that logic */}
+      <path d="M40 86 L60 48 L80 86 Z" fill="#e5e7eb" opacity={0.9} />
     </svg>
   );
 };
 
 export default AvatarView;
-

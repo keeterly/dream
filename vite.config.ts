@@ -3,8 +3,8 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  base: "/dream/",
+  base: "/dream/",       // <--- MUST BE HERE, MUST MATCH REPO NAME EXACTLY
   build: {
-    target: ["safari13", "es2019"], // <-- ADD THIS
+    target: ["es2019", "safari13"],
   },
 });

@@ -1,5 +1,6 @@
 import React from "react";
-import { AvatarShape } from "../types"; // whatever type you use for avatar
+import type { AvatarShape } from "../types";
+
 
 interface AvatarViewProps {
   avatar: AvatarShape;
@@ -45,3 +46,4 @@ const AvatarView: React.FC<AvatarViewProps> = ({ avatar, compact }) => {
 };
 
 export default AvatarView;
+

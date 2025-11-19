@@ -1,19 +1,16 @@
 import React from "react";
-import {
-  DreamselfProfile,
-  TimeOfDayPhase,
-  EnvironmentId,
-} from "../types";
+import { DreamselfProfile, TimeOfDayPhase } from "../types";
 
 interface WorldLaneProps {
   profile: DreamselfProfile | null;
   phase: TimeOfDayPhase;
-  environmentId: EnvironmentId;
+  // we don't need the EnvironmentId type here – a string is enough
+  environmentId: string;
   encounterItemName: string | null;
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
-  profile,           // reserved for future use
+  profile, // kept for future use
   phase,
   environmentId,
   encounterItemName,

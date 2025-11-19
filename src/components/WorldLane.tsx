@@ -13,6 +13,7 @@ interface WorldLaneProps {
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
+  profile,           // reserved for future use
   phase,
   environmentId,
   encounterItemName,
@@ -22,19 +23,19 @@ const WorldLane: React.FC<WorldLaneProps> = ({
 
   return (
     <div className={`world-lane ${phaseClass} ${envClass}`}>
-      {/* Background sky */}
+      {/* background sky */}
       <div className="world-lane-sky" />
 
-      {/* Parallax scrolling ground */}
+      {/* parallax scrolling ground */}
       <div className="world-lane-ribbon world-lane-ribbon--back" />
       <div className="world-lane-ribbon world-lane-ribbon--front" />
 
-      {/* Character + spotlight */}
+      {/* figure + light cone */}
       <div className="world-lane-orb" />
       <div className="world-lane-cone" />
       <div className="world-lane-figure" />
 
-      {/* Encounter pulse */}
+      {/* subtle pulse when an item is being encountered */}
       {encounterItemName && (
         <div className="world-lane-encounter-pulse" aria-hidden="true" />
       )}

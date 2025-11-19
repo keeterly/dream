@@ -75,3 +75,17 @@ export interface DreamselfProfile {
 }
 
 export type TimeOfDayPhase = "dawn" | "noon" | "dusk" | "night";
+
+export type ItemRarity = "common" | "rare" | "mythic";
+
+export interface WorldItem {
+  id: string;
+  name: string;
+  description: string;
+  rarity: ItemRarity;
+}
+
+export interface InventoryItem extends WorldItem {
+  acquiredAt: string; // ISO timestamp
+}
+

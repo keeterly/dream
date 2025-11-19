@@ -1,0 +1,40 @@
+{
+  "name": "dusk_valley",
+  "description": "Multi-layer parallax kit for D.R.E.A.M. side-scrolling field biome.",
+  "canvas": {
+    "width": 1920,
+    "height": 1080
+  },
+  "layers": [
+    {
+      "name": "layer_01.png",
+      "order": 0,
+      "depth": 1,
+      "parallaxSpeed": 1.0
+    },
+    {
+      "name": "layer_02.png",
+      "order": 1,
+      "depth": 2,
+      "parallaxSpeed": 0.5
+    },
+    {
+      "name": "layer_03.png",
+      "order": 2,
+      "depth": 3,
+      "parallaxSpeed": 0.333
+    },
+    {
+      "name": "layer_04.png",
+      "order": 3,
+      "depth": 4,
+      "parallaxSpeed": 0.25
+    },
+    {
+      "name": "layer_05.png",
+      "order": 4,
+      "depth": 5,
+      "parallaxSpeed": 0.2
+    }
+  ]
+}

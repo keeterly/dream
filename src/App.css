@@ -535,6 +535,130 @@ body {
   pointer-events: none; /* let clicks reach overlay */
   overflow: visible;    /* don't clip parallax elements */
 }
+/* ---------- WORLD LANE VISUALS (side-scroll walking) ---------- */
+
+.world-lane {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* sky */
+.world-lane-sky {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top, #020617 0, #020617 55%, #000 100%);
+}
+
+/* scrolling ground ribbon */
+.world-lane-ribbon {
+  position: absolute;
+  left: -200%;
+  right: -200%;
+  bottom: 14%;
+  height: 110px;
+  background-image:
+    linear-gradient(
+      to top,
+      rgba(15, 23, 42, 1) 0,
+      rgba(15, 23, 42, 0.2) 40%,
+      transparent 70%
+    ),
+    repeating-linear-gradient(
+      -10deg,
+      rgba(30, 64, 175, 0.5) 0,
+      rgba(30, 64, 175, 0.5) 40px,
+      rgba(15, 23, 42, 0.9) 40px,
+      rgba(15, 23, 42, 0.9) 80px
+    );
+  transform: translate3d(0, 0, 0);
+  animation: world-lane-scroll 40s linear infinite;
+}
+
+.world-lane-ribbon--front {
+  bottom: 10%;
+  opacity: 0.85;
+  animation-duration: 24s; /* slightly faster for parallax */
+}
+
+@keyframes world-lane-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(50%, 0, 0);
+  }
+}
+
+/* character & spotlight – matches the “cone” look you already have */
+
+.world-lane-orb {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 84px;
+  height: 84px;
+  border-radius: 999px;
+  background: radial-gradient(circle, #f9fafb 0, #e5e7eb 40%, transparent 70%);
+  box-shadow: 0 0 40px rgba(248, 250, 252, 0.55);
+}
+
+.world-lane-cone {
+  position: absolute;
+  top: 26%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 110px solid transparent;
+  border-right: 110px solid transparent;
+  border-top: 220px solid rgba(148, 163, 184, 0.18);
+}
+
+.world-lane-figure {
+  position: absolute;
+  bottom: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 120px;
+  border-radius: 40% 40% 12% 12%;
+  background: linear-gradient(135deg, #020617 0, #020617 45%, #111827 100%);
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.9));
+}
+
+/* small pulse when a loot encounter is active */
+.world-lane-encounter-pulse {
+  position: absolute;
+  bottom: 16%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 130px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(56, 189, 248, 0.7);
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.7);
+  opacity: 0;
+  animation: world-lane-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes world-lane-pulse {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scaleX(0.9);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) scaleX(1.1);
+  }
+}
+
+
 
 /* overlay on top of the sky */
 

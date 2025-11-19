@@ -630,7 +630,23 @@ z-index: 1;
   background: linear-gradient(135deg, #020617 0, #020617 45%, #111827 100%);
   filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.9));
 }
+.world-lane-sky {
+  z-index: 0;
+}
 
+.world-lane-ribbon {
+  z-index: 1;
+}
+
+.world-lane-ribbon--front {
+  z-index: 2;
+}
+
+.world-lane-orb,
+.world-lane-cone,
+.world-lane-figure {
+  z-index: 3;
+}
 
 /* small pulse when a loot encounter is active */
 .world-lane-encounter-pulse {

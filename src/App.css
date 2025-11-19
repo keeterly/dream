@@ -535,63 +535,8 @@ body {
   pointer-events: none; /* let clicks reach overlay */
   overflow: visible;    /* don't clip parallax elements */
 }
-/* ---------- WORLD LANE VISUALS (side-scroll walking) ---------- */
 
-.world-lane {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
 
-/* sky */
-.world-lane-sky {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at top, #020617 0, #020617 55%, #000 100%);
-    z-index: 0;
-}
-
-.world-lane-ribbon {
-  position: absolute;
-  left: -200%;
-  right: -200%;
-  bottom: 4%; /* FIXED: was 14% */
-  height: 120px;
-  background-image:
-    linear-gradient(
-      to top,
-      rgba(15, 23, 42, 1) 0,
-      rgba(15, 23, 42, 0.2) 40%,
-      transparent 70%
-    ),
-    repeating-linear-gradient(
-      -10deg,
-      rgba(30, 64, 175, 0.5) 0,
-      rgba(30, 64, 175, 0.5) 40px,
-      rgba(15, 23, 42, 0.9) 40px,
-      rgba(15, 23, 42, 0.9) 80px
-    );
-  transform: translate3d(0, 0, 0);
-  animation: world-lane-scroll 40s linear infinite;
-z-index: 1;
-}
-
-.world-lane-ribbon--front {
-  bottom: 0%; /* FIXED: was 10% */
-  opacity: 0.9;
-  animation-duration: 24s;
-   z-index: 2;
-}
-
-@keyframes world-lane-scroll {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(50%, 0, 0);
-  }
-}
 
 /* character & spotlight – matches the “cone” look you already have */
 

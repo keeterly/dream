@@ -574,13 +574,14 @@ body {
     );
   transform: translate3d(0, 0, 0);
   animation: world-lane-scroll 40s linear infinite;
-
+z-index: 1;
 }
 
 .world-lane-ribbon--front {
   bottom: 0%; /* FIXED: was 10% */
   opacity: 0.9;
   animation-duration: 24s;
+   z-index: 2;
 }
 
 @keyframes world-lane-scroll {
@@ -629,6 +630,7 @@ body {
   background: linear-gradient(135deg, #020617 0, #020617 45%, #111827 100%);
   filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.9));
 }
+
 
 /* small pulse when a loot encounter is active */
 .world-lane-encounter-pulse {

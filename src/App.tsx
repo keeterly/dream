@@ -458,13 +458,7 @@ const WorldStep: React.FC<WorldStepProps> = ({
             </div>
           </div>
 
-          <h1 className="world-title">The world begins to move around you.</h1>
-          <p className="world-copy">
-            Your Dreamself walks a ribbon between worlds while the scenery drifts
-            by, like a quiet save-point run in an old RPG. Time of day shifts the
-            sky; bound VENIA pieces will eventually unlock scenes, items, and
-            companions along this path.
-          </p>
+         
 
           {lastFoundItem && (
             <div className="world-event-toast">

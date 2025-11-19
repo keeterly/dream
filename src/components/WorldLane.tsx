@@ -22,19 +22,19 @@ const WorldLane: React.FC<WorldLaneProps> = ({
 
   return (
     <div className={`world-lane ${phaseClass} ${envClass}`}>
-      {/* sky / background */}
+      {/* Background sky */}
       <div className="world-lane-sky" />
 
-      {/* scrolling ground ribbons */}
+      {/* Parallax scrolling ground */}
       <div className="world-lane-ribbon world-lane-ribbon--back" />
       <div className="world-lane-ribbon world-lane-ribbon--front" />
 
-      {/* figure + light cone (matches what you see in the screenshot) */}
+      {/* Character + spotlight */}
       <div className="world-lane-orb" />
       <div className="world-lane-cone" />
       <div className="world-lane-figure" />
 
-      {/* subtle pulse when an item is being encountered */}
+      {/* Encounter pulse */}
       {encounterItemName && (
         <div className="world-lane-encounter-pulse" aria-hidden="true" />
       )}

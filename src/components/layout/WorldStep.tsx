@@ -1,262 +1,175 @@
-import React, { useState } from "react";
-import type { DreamselfProfile, InventoryItem, JournalEntry } from "../../types";
-import WorldLane from "../WorldLane";
-import { JournalPanel } from "../panels/JournalPanel";
-import { AvatarView } from "../AvatarView";
-import { useBiomeLighting } from "../../hooks/useBiomeLighting";
-import { DreamselfPanel } from "../panels/DreamselfPanel";
-import { MapPanel } from "../panels/MapPanel";
+// --- W O R L D   S T E P   ( fixed version ) ---
 
-type WorldPanelId = "inventory" | "character" | "map" | "journal" | "debug";
+import React, { useEffect, useState, useRef } from "react";
+import { useDreamContext } from "../../state/DreamContext";
+import AvatarView from "../avatar/AvatarView";
+import { getRandomRelic } from "../../system/encounters";
+import { Relic } from "../../types";
 
-interface WorldStepProps {
-  profile: DreamselfProfile;
-  inventory: InventoryItem[];
-  journalEntries: JournalEntry[];
-  onSpawnDebugItem: () => void;
-  encounterItemName: string | null;
-  phase: string;
-  activeEncounterItem?: InventoryItem | null;
-}
+export default function WorldStep() {
+  const { profile, inventory, addRelicToInventory, journal, addJournalEntry } =
+    useDreamContext();
 
-export const WorldStep: React.FC<WorldStepProps> = ({
-  profile,
-  inventory,
-  journalEntries,
-  onSpawnDebugItem,
-  encounterItemName,
-  phase,
-  activeEncounterItem,
-}) => {
-  const isEncounterActive = !!activeEncounterItem;
+  const [isWalking, setIsWalking] = useState(true);
+  const [encounter, setEncounter] = useState<Relic | null>(null);
 
-  const [activePanel, setActivePanel] =
-    useState<WorldPanelId | null>("inventory");
+  const [phase, setPhase] = useState<"dawn" | "day" | "dusk" | "night">("dawn");
 
-  // helper: clicking a button toggles the panel open/closed
-  const togglePanel = (panel: WorldPanelId) => {
-    setActivePanel((prev) => (prev === panel ? null : panel));
+  // Bubble timing
+  const encounterTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  // --- TRIGGER RANDOM ENCOUNTER ---
+  const triggerEncounter = (forced?: boolean) => {
+    if (!isWalking && !forced) return;
+
+    const relic = getRandomRelic();
+
+    setEncounter(relic);
+    setIsWalking(false);
+
+    addRelicToInventory(relic);
+    addJournalEntry({
+      type: "relic",
+      title: `Found relic: ${relic.name}`,
+      body: relic.description,
+    });
+
+    if (encounterTimeout.current) clearTimeout(encounterTimeout.current);
+
+    encounterTimeout.current = setTimeout(() => {
+      setEncounter(null);
+      setIsWalking(true);
+    }, 2400);
   };
 
-  const dominantElement = profile?.traits?.dominantElement ?? null;
+  // Interval-based random find
+  useEffect(() => {
+    if (!isWalking) return;
 
-  const lighting = useBiomeLighting({
-    phase,
-    element: dominantElement,
-  });
+    const timer = setInterval(() => {
+      const chance = Math.random();
+      if (chance < 0.035) triggerEncounter();
+    }, 2200);
+
+    return () => clearInterval(timer);
+  }, [isWalking]);
+
+  // --- CLEANUP ---
+  useEffect(() => {
+    return () => {
+      if (encounterTimeout.current) clearTimeout(encounterTimeout.current);
+    };
+  }, []);
 
   return (
-    <section className="app-screen app-screen-world">
-      <div className={`world-card ${lighting.worldClass}`}>
-        {/* WORLD LANE */}
-        <WorldLane
-            profile={profile}
-            environmentId="dusk_valley"
-            phase={phase}
-            encounterItemName={encounterItemName}
-            isEncounterActive={isEncounterActive}
-        />
+    <div className="world-card">
+      {/* -------------------------------
+          SCROLLING BACKGROUND LAYERS
+      --------------------------------*/}
+      <div className={`world-lane world-lane--phase-${phase} ${!isWalking ? "world-lane--paused" : ""}`}>
+        {/* sky */}
+        <div className="world-lane-sky" />
+        <div className="world-lane-stars" />
 
+        {/* parallax hills */}
+        <div className="world-lane-backdrop world-lane-backdrop--far" />
+        <div className="world-lane-backdrop world-lane-backdrop--near" />
 
-        {/* DREAMSELF AVATAR ON RIBBON */}
-        {profile && (
-            <div
-                className={`world-stage-avatar ${
-                isEncounterActive
-                    ? "world-stage-avatar--paused"
-                    : "world-stage-avatar--walking"
-                } ${lighting.avatarClass}`}
-            >
-            <AvatarView
-            avatar={profile.avatar}
-            traits={profile.traits}
-            dreamName={profile.dreamName}
-            />
+        {/* scrolling ground */}
+        <div className="world-lane-ground world-lane-ground--back" />
+        <div className="world-lane-ground world-lane-ground--front" />
+      </div>
 
-            {activeEncounterItem && (
-            <>
-                {/* little attention marker over the head */}
-                <div className="world-encounter-glyph">!</div>
-
-                {/* speech-bubble style relic text */}
-                <div className="world-encounter-bubble">
-                <div className="world-encounter-label">Relic found</div>
-                <div className="world-encounter-name">
-                    {activeEncounterItem.name}
-                </div>
-                </div>
-            </>
-            )}
+      {/* -------------------------------
+          WORLD STAGE (AVATAR)
+      --------------------------------*/}
+      <div className="world-stage">
+        <div
+          className={`world-stage-avatar ${
+            isWalking ? "world-stage-avatar--walking" : "world-stage-avatar--paused"
+          } world-phase-${phase}`}
+        >
+          <AvatarView profile={profile} size="world" />
         </div>
-        )}
 
+        {/* Floating loot crystal if encounter occurs */}
+        {encounter && <div className="world-lane-crystal" />}
+      </div>
 
-        {/* GLOBAL TINT OVERLAY */}
-        <div className="world-tint-overlay" />
-
-        {/* WORLD OVERLAY (HUD, DOCK, PANELS) */}
-        <div className="world-overlay">
-          {/* HUD */}
-          <div className="world-hud">
-            <div className="world-hud-left">
-              <div className="world-hud-field">
-                <span className="hud-kicker">FIELD — SCROLLING WORLD</span>
-              </div>
-              <div className="world-hud-title-row">
-                <span className="world-hud-title">{profile.dreamName}</span>
-                <span className="world-hud-badge">LV 01</span>
-              </div>
-              <div className="world-hud-meta">
-                <span className="hud-label">DREAMSELF</span>
-                <span className="hud-value">
-                  {profile.traits.primaryArchetype}
-                </span>
-              </div>
+      {/* -------------------------------
+          OVERLAY (HUD + DOCK)
+      --------------------------------*/}
+      <div className="world-overlay">
+        {/* HUD */}
+        <div className="world-hud">
+          <div className="world-hud-left">
+            <div className="hud-kicker">Field — Scrolling World</div>
+            <div className="world-hud-title-row">
+              <div className="world-hud-title">{profile?.dreamName}</div>
+              <div className="world-hud-badge">Lv 01</div>
             </div>
-
-            <div className="world-hud-right">
-              <div className="world-hud-phase">
-                <span className="hud-label">PHASE</span>
-                <span className="hud-value">{phase}</span>
-              </div>
+            <div className="world-hud-meta">
+              <span className="hud-label">Dreamself</span>
+              <span className="hud-value">{profile?.traits.primaryArchetype}</span>
             </div>
           </div>
 
-          {/* DOCK BUTTONS */}
-          <div className="world-dock">
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "inventory" ? " world-dock-button--active" : "")
-              }
-              onClick={() => togglePanel("inventory")}
-            >
-              <span className="world-dock-icon world-dock-icon--inventory" />
-              <span className="world-dock-label">Inventory</span>
-            </button>
-
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "character" ? " world-dock-button--active" : "")
-              }
-              onClick={() => togglePanel("character")}
-            >
-              <span className="world-dock-icon world-dock-icon--dreamself" />
-              <span className="world-dock-label">Dreamself</span>
-            </button>
-
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "map" ? " world-dock-button--active" : "")
-              }
-              onClick={() => togglePanel("map")}
-            >
-              <span className="world-dock-icon world-dock-icon--map" />
-              <span className="world-dock-label">Map</span>
-            </button>
-
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "journal" ? " world-dock-button--active" : "")
-              }
-              onClick={() => togglePanel("journal")}
-            >
-              <span className="world-dock-icon world-dock-icon--journal" />
-              <span className="world-dock-label">Journal</span>
-            </button>
-
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "debug" ? " world-dock-button--active" : "")
-              }
-              onClick={() => togglePanel("debug")}
-            >
-              <span className="world-dock-icon world-dock-icon--debug" />
-              <span className="world-dock-label">Debug</span>
-            </button>
+          <div className="world-hud-right">
+            <div className="world-hud-phase-label">Phase</div>
+            <div className="world-hud-phase-value">{phase.toUpperCase()}</div>
           </div>
+        </div>
 
-          {/* PANELS */}
-          <div className="world-panels">
-            {activePanel === "journal" && (
-              <JournalPanel entries={journalEntries} />
-            )}
+        {/* DOCK BUTTONS */}
+        <div className="world-dock">
+          <button className="world-dock-button">
+            <span className="world-dock-icon world-dock-icon--inventory"></span>
+            <span className="world-dock-label">Inventory</span>
+          </button>
 
-            {activePanel === "inventory" && (
-              <div className="world-panel world-panel-inventory">
-                <h3 className="world-panel-title">Relics</h3>
-                {inventory.length === 0 ? (
-                  <p className="world-panel-empty">
-                    Walk further. Relics tend to find you once they know your
-                    shape.
-                  </p>
-                ) : (
-                  <ul className="inventory-list">
-                    {inventory.map((item) => (
-                      <li
-                        key={item.id + item.acquiredAt}
-                        className={`inventory-item rarity-${item.rarity}`}
-                      >
-                        <div className="inventory-item-icon-wrapper">
-                          <span
-                            className={`inventory-item-icon rarity-${item.rarity}`}
-                            aria-hidden="true"
-                          />
-                        </div>
-                        <div className="inventory-item-content">
-                          <div className="inventory-item-main">
-                            <span className="inventory-item-name">
-                              {item.name}
-                            </span>
-                            <span className="inventory-item-rarity">
-                              {item.rarity}
-                            </span>
-                          </div>
-                          <p className="inventory-item-desc">
-                            {item.description}
-                          </p>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
+          <button className="world-dock-button">
+            <span className="world-dock-icon world-dock-icon--dreamself"></span>
+            <span className="world-dock-label">Dreamself</span>
+          </button>
 
-            {activePanel === "character" && (
-              <DreamselfPanel profile={profile} inventory={inventory} />
-            )}
+          <button className="world-dock-button">
+            <span className="world-dock-icon world-dock-icon--map"></span>
+            <span className="world-dock-label">Map</span>
+          </button>
 
-            {activePanel === "map" && (
-              <MapPanel currentBiomeId="dusk_valley" phase={phase} />
-            )}
+          <button className="world-dock-button world-dock-button--active">
+            <span className="world-dock-icon world-dock-icon--debug"></span>
+            <span className="world-dock-label">Debug</span>
+          </button>
+        </div>
 
-            {activePanel === "debug" && (
-              <div className="world-panel world-panel-debug">
-                <h3 className="world-panel-title">Debug</h3>
-                <p className="world-panel-body">
-                  Spawn a random relic event for testing drops and journal
-                  entries.
-                </p>
-                <button
-                  type="button"
-                  className="world-debug-pill"
-                  onClick={onSpawnDebugItem}
-                >
-                  <span className="world-debug-pill__orb" />
-                  <span className="world-debug-pill__label">
-                    Spawn Random Relic
-                  </span>
-                </button>
-              </div>
-            )}
+        {/* PANELS (inventory/journal/etc.) */}
+        <div className="world-panels">
+          {/* Debug Panel Example */}
+          <div className="world-panel">
+            <div className="world-panel-title">Debug</div>
+
+            <button
+              className="world-debug-pill"
+              onClick={() => triggerEncounter(true)}
+            >
+              <div className="world-debug-pill__orb" />
+              <span className="world-debug-pill__label">Spawn Random Relic</span>
+            </button>
           </div>
         </div>
       </div>
-    </section>
+
+      {/* Encounter Bubble */}
+      {encounter && (
+        <>
+          <div className="world-encounter-glyph">!</div>
+          <div className="world-encounter-bubble">
+            <span className="world-encounter-label">Relic Found</span>
+            <span className="world-encounter-name">{encounter.name}</span>
+          </div>
+        </>
+      )}
+    </div>
   );
-};
+}

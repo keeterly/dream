@@ -3,8 +3,8 @@ import "./AvatarView.css";
 
 interface AvatarViewProps {
   avatar: any;
-  // pass-through traits so we can align archetype/element with visuals
   traits?: any;
+  dreamName?: string;
 }
 
 function normalizeKey(value: unknown): string {
@@ -12,8 +12,21 @@ function normalizeKey(value: unknown): string {
   return value.toString().trim().toLowerCase();
 }
 
-function getElementKey(avatar: any, traits?: any): string {
-  // try avatar-specific fields first, then traits, then fallback
+function splitDreamName(dreamName?: string) {
+  if (!dreamName) return { archetype: "", element: "" };
+  const parts = dreamName.split(" of ");
+  if (parts.length === 2) {
+    return {
+      archetype: normalizeKey(parts[0]),
+      element: normalizeKey(parts[1]),
+    };
+  }
+  return { archetype: "", element: "" };
+}
+
+function getElementKey(avatar: any, traits?: any, dreamName?: string): string {
+  const fromName = splitDreamName(dreamName).element;
+
   const candidates = [
     avatar?.elementKey,
     avatar?.primaryElement,
@@ -21,6 +34,7 @@ function getElementKey(avatar: any, traits?: any): string {
     traits?.primaryElement,
     traits?.elementKey,
     traits?.element,
+    fromName,
   ];
 
   for (const val of candidates) {
@@ -31,7 +45,13 @@ function getElementKey(avatar: any, traits?: any): string {
   return "glass";
 }
 
-function getArchetypeKey(avatar: any, traits?: any): string {
+function getArchetypeKey(
+  avatar: any,
+  traits?: any,
+  dreamName?: string
+): string {
+  const fromName = splitDreamName(dreamName).archetype;
+
   const candidates = [
     avatar?.archetypeKey,
     avatar?.primaryArchetype,
@@ -39,6 +59,7 @@ function getArchetypeKey(avatar: any, traits?: any): string {
     traits?.primaryArchetype,
     traits?.archetypeKey,
     traits?.archetype,
+    fromName,
   ];
 
   for (const val of candidates) {
@@ -86,7 +107,8 @@ function getPalette(elementKey: string) {
     },
   };
 
-  if (elementKey.startsWith("fire")) return palettes.ember;
+  if (elementKey.startsWith("fire") || elementKey === "ember")
+    return palettes.ember;
   if (elementKey.startsWith("glass")) return palettes.glass;
   if (elementKey.startsWith("water") || elementKey.startsWith("tide"))
     return palettes.tide;
@@ -98,37 +120,54 @@ function getPalette(elementKey: string) {
   return palettes[elementKey] || palettes.glass;
 }
 
-function getBodyShape(avatar: any) {
-  const bodyType = normalizeKey(avatar?.bodyType) || "tall";
-  const posture = normalizeKey(avatar?.posture) || "neutral";
+function getBodyShape(archetypeKey: string, avatar: any) {
+  const bodyType = normalizeKey(avatar?.bodyType);
+  const posture = normalizeKey(avatar?.posture);
 
+  // base cloak for archetypes
   let width = 56;
   let height = 72;
   let offsetX = 50;
   let offsetY = 74;
   let lean = 0;
 
-  if (bodyType === "narrow") {
-    width = 48;
-  } else if (bodyType === "broad") {
-    width = 64;
+  if (archetypeKey === "architect") {
+    width = 60;
+    height = 70;
+  } else if (archetypeKey === "seer") {
+    width = 52;
+    height = 76;
+  } else if (archetypeKey === "wanderer") {
+    width = 58;
+    height = 80;
+    lean = 2;
   }
 
-  if (posture === "stoic") {
-    height = 70;
-  } else if (posture === "bowed") {
-    height = 80;
-    lean = -4;
+  if (bodyType === "narrow") {
+    width -= 6;
+  } else if (bodyType === "broad") {
+    width += 6;
+  }
+
+  if (posture === "bowed") {
+    height += 6;
+    lean -= 3;
   } else if (posture === "forward") {
-    lean = 3;
+    lean += 3;
+  } else if (posture === "stoic") {
+    height -= 4;
   }
 
   return { width, height, offsetX, offsetY, lean };
 }
 
-function getCloakStyle(avatar: any): "classic" | "glyph" | "trail" {
-  const style = normalizeKey(avatar?.cloakStyle) || "classic";
+function getCloakStyle(avatar: any, archetypeKey: string): "classic" | "glyph" | "trail" {
+  const style = normalizeKey(avatar?.cloakStyle);
   if (style === "glyph" || style === "trail") return style;
+
+  // archetype defaults
+  if (archetypeKey === "architect") return "glyph";
+  if (archetypeKey === "wanderer") return "trail";
   return "classic";
 }
 
@@ -137,13 +176,20 @@ function hasCompanion(avatar: any): boolean {
   return !!t && t !== "none";
 }
 
-export const AvatarView: React.FC<AvatarViewProps> = ({ avatar, traits }) => {
-  const elementKey = getElementKey(avatar, traits);
-  const archetypeKey = getArchetypeKey(avatar, traits);
+export const AvatarView: React.FC<AvatarViewProps> = ({
+  avatar,
+  traits,
+  dreamName,
+}) => {
+  const elementKey = getElementKey(avatar, traits, dreamName);
+  const archetypeKey = getArchetypeKey(avatar, traits, dreamName);
 
   const palette = getPalette(elementKey);
-  const { width, height, offsetX, offsetY, lean } = getBodyShape(avatar);
-  const cloakStyle = getCloakStyle(avatar);
+  const { width, height, offsetX, offsetY, lean } = getBodyShape(
+    archetypeKey,
+    avatar
+  );
+  const cloakStyle = getCloakStyle(avatar, archetypeKey);
   const companion = hasCompanion(avatar);
 
   const halfW = width / 2;
@@ -210,31 +256,100 @@ export const AvatarView: React.FC<AvatarViewProps> = ({ avatar, traits }) => {
           strokeWidth={1.4}
         />
 
-        {/* mask / face */}
-        <circle
-          cx={offsetX + lean}
-          cy={topY + 10}
-          r={6.4}
-          fill="#05060A"
-          stroke={palette.glow}
-          strokeWidth={0.8}
-        />
-        <circle
-          cx={offsetX + lean - 2.3}
-          cy={topY + 9.6}
-          r={0.9}
-          fill={palette.glow}
-        />
-        <circle
-          cx={offsetX + lean + 2.3}
-          cy={topY + 9.6}
-          r={0.9}
-          fill={palette.glow}
-        />
+        {/* mask / face variants */}
+        {archetypeKey === "architect" && (
+          <>
+            {/* round mask, twin eyes */}
+            <circle
+              cx={offsetX + lean}
+              cy={topY + 10}
+              r={6.4}
+              fill="#05060A"
+              stroke={palette.glow}
+              strokeWidth={0.8}
+            />
+            <circle
+              cx={offsetX + lean - 2.2}
+              cy={topY + 9.5}
+              r={0.9}
+              fill={palette.glow}
+            />
+            <circle
+              cx={offsetX + lean + 2.2}
+              cy={topY + 9.5}
+              r={0.9}
+              fill={palette.glow}
+            />
+          </>
+        )}
+
+        {archetypeKey === "seer" && (
+          <>
+            {/* almond mask with glowing pupil */}
+            <path
+              d={`
+                M ${offsetX + lean - 6}, ${topY + 10}
+                Q ${offsetX + lean}, ${topY + 5} ${offsetX + lean + 6}, ${
+                topY + 10
+              }
+                Q ${offsetX + lean}, ${topY + 15} ${offsetX + lean - 6}, ${
+                topY + 10
+              }
+              `}
+              fill="#05060A"
+              stroke={palette.glow}
+              strokeWidth={0.9}
+            />
+            <circle
+              cx={offsetX + lean}
+              cy={topY + 10}
+              r={2.1}
+              fill={palette.glow}
+            />
+          </>
+        )}
+
+        {archetypeKey === "wanderer" && (
+          <>
+            {/* tall oval with vertical slit */}
+            <ellipse
+              cx={offsetX + lean}
+              cy={topY + 10}
+              rx={4.2}
+              ry={6.6}
+              fill="#05060A"
+              stroke={palette.glow}
+              strokeWidth={0.9}
+            />
+            <rect
+              x={offsetX + lean - 0.7}
+              y={topY + 5}
+              width={1.4}
+              height={10}
+              rx={0.7}
+              fill={palette.glow}
+            />
+          </>
+        )}
+
+        {/* fallback if archetype somehow unknown */}
+        {archetypeKey !== "architect" &&
+          archetypeKey !== "seer" &&
+          archetypeKey !== "wanderer" && (
+            <circle
+              cx={offsetX + lean}
+              cy={topY + 10}
+              r={6.4}
+              fill="#05060A"
+              stroke={palette.glow}
+              strokeWidth={0.8}
+            />
+          )}
 
         {/* chest glyphs */}
         {cloakStyle !== "trail" && (
           <>
+            {/* base triangle mark */}
             <path
               d={`
               M ${offsetX + lean}, ${offsetY - height * 0.35}
@@ -248,6 +363,7 @@ export const AvatarView: React.FC<AvatarViewProps> = ({ avatar, traits }) => {
               strokeLinejoin="round"
               opacity={0.85}
             />
+            {/* archetype-specific below the triangle */}
             {archetypeKey === "architect" && (
               <rect
                 x={offsetX + lean - 2.5}

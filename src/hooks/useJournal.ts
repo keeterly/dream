@@ -48,19 +48,19 @@ export function useJournal() {
   );
 
   const logBiomeVisited = useCallback(
-    (environmentId: string, phase: string) => {
-      const entry: JournalEntry = {
-        id: makeEntryId("biome_visited"),
-        type: "biome_visited",
-        timestampIso: new Date().toISOString(),
-        title: `Entered biome: ${environmentId}`,
-        body: `Phase: ${phase}`,
-        meta: { environmentId, phase },
-      };
-      logEntry(entry);
-    },
-    [logEntry]
-  );
+  (environmentId: string, phase?: string) => {
+    const entry: JournalEntry = {
+      id: makeEntryId("biome_visited"),
+      type: "biome_visited",
+      timestampIso: new Date().toISOString(),
+      title: `Entered biome: ${environmentId}`,
+      body: phase ? `Phase: ${phase}` : undefined,
+      meta: { environmentId, phase },
+    };
+    logEntry(entry);
+  },
+  [logEntry]
+);
 
   return {
     entries,

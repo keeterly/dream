@@ -3334,3 +3334,23 @@ body {
   margin-top: 0;
 }
 
+
+/* =========================================================
+   WORLD VIEW FULLSCREEN LAYOUT
+   ========================================================= */
+.app-main--world {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.app-main--world .app-screen-world {
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden; /* prevent scroll */
+}
+
+.app-main--world .world-card {
+  margin-top: 0;
+  height: 100%;
+}
+

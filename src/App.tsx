@@ -234,11 +234,18 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="App app-root">
-      <AppHeader screen={screen} />
-      <main className="App-main app-main">{renderScreen()}</main>
-    </div>
-  );
+  <div className="App app-root">
+    {screen !== "world" && <AppHeader screen={screen} />}
+    <main
+      className={
+        "App-main app-main" + (screen === "world" ? " app-main--world" : "")
+      }
+    >
+      {renderScreen()}
+    </main>
+  </div>
+);
+
 };
 
 export default App;

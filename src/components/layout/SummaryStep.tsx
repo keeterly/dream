@@ -18,8 +18,9 @@ export const SummaryStep: React.FC<SummaryStepProps> = ({
     <section className="app-screen app-screen-summary">
       <div className="summary-card">
         <div className="summary-avatar">
-          <AvatarView avatar={avatar} />
+            <AvatarView avatar={avatar} traits={traits} />
         </div>
+
         <div className="summary-details">
           <h2 className="summary-title">{dreamName}</h2>
           <p className="summary-archetype">

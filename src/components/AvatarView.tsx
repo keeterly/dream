@@ -1,37 +1,55 @@
 import React from "react";
+import "./AvatarView.css";
 
 interface AvatarViewProps {
-  // We keep this loose on purpose so we don't fight your existing types.ts.
-  // Everything is accessed with optional chaining + fallbacks.
   avatar: any;
+  // pass-through traits so we can align archetype/element with visuals
+  traits?: any;
 }
 
-function getElementKey(avatar: any): string {
-  return (
-    avatar?.primaryElement ||
-    avatar?.element ||
-    avatar?.elementKey ||
-    "glass"
-  )
-    .toString()
-    .toLowerCase();
+function normalizeKey(value: unknown): string {
+  if (!value) return "";
+  return value.toString().trim().toLowerCase();
 }
 
-function getArchetypeKey(avatar: any): string {
-  return (
-    avatar?.primaryArchetype ||
-    avatar?.archetype ||
-    avatar?.archetypeKey ||
-    "seer"
-  )
-    .toString()
-    .toLowerCase();
+function getElementKey(avatar: any, traits?: any): string {
+  // try avatar-specific fields first, then traits, then fallback
+  const candidates = [
+    avatar?.elementKey,
+    avatar?.primaryElement,
+    avatar?.element,
+    traits?.primaryElement,
+    traits?.elementKey,
+    traits?.element,
+  ];
+
+  for (const val of candidates) {
+    const key = normalizeKey(val);
+    if (key) return key;
+  }
+
+  return "glass";
 }
 
-function getPalette(avatar: any) {
-  const element = getElementKey(avatar);
+function getArchetypeKey(avatar: any, traits?: any): string {
+  const candidates = [
+    avatar?.archetypeKey,
+    avatar?.primaryArchetype,
+    avatar?.archetype,
+    traits?.primaryArchetype,
+    traits?.archetypeKey,
+    traits?.archetype,
+  ];
 
-  // You can tweak these hex codes to better match VENIA’s palette.
+  for (const val of candidates) {
+    const key = normalizeKey(val);
+    if (key) return key;
+  }
+
+  return "seer";
+}
+
+function getPalette(elementKey: string) {
   const palettes: Record<
     string,
     { robe: string; trim: string; glow: string; accent: string }
@@ -68,14 +86,22 @@ function getPalette(avatar: any) {
     },
   };
 
-  return palettes[element] || palettes.glass;
+  if (elementKey.startsWith("fire")) return palettes.ember;
+  if (elementKey.startsWith("glass")) return palettes.glass;
+  if (elementKey.startsWith("water") || elementKey.startsWith("tide"))
+    return palettes.tide;
+  if (elementKey.startsWith("shadow") || elementKey.startsWith("night"))
+    return palettes.shadow;
+  if (elementKey.startsWith("stone") || elementKey.startsWith("earth"))
+    return palettes.stone;
+
+  return palettes[elementKey] || palettes.glass;
 }
 
 function getBodyShape(avatar: any) {
-  const bodyType = (avatar?.bodyType || "tall").toString().toLowerCase();
-  const posture = (avatar?.posture || "neutral").toString().toLowerCase();
+  const bodyType = normalizeKey(avatar?.bodyType) || "tall";
+  const posture = normalizeKey(avatar?.posture) || "neutral";
 
-  // width & height of cloak blob relative to 100x140 canvas
   let width = 56;
   let height = 72;
   let offsetX = 50;
@@ -101,23 +127,25 @@ function getBodyShape(avatar: any) {
 }
 
 function getCloakStyle(avatar: any): "classic" | "glyph" | "trail" {
-  const style = (avatar?.cloakStyle || "classic").toString().toLowerCase();
+  const style = normalizeKey(avatar?.cloakStyle) || "classic";
   if (style === "glyph" || style === "trail") return style;
   return "classic";
 }
 
 function hasCompanion(avatar: any): boolean {
-  return !!(avatar?.companionType && avatar.companionType !== "none");
+  const t = normalizeKey(avatar?.companionType);
+  return !!t && t !== "none";
 }
 
-export const AvatarView: React.FC<AvatarViewProps> = ({ avatar }) => {
-  const palette = getPalette(avatar);
-  const archetypeKey = getArchetypeKey(avatar);
+export const AvatarView: React.FC<AvatarViewProps> = ({ avatar, traits }) => {
+  const elementKey = getElementKey(avatar, traits);
+  const archetypeKey = getArchetypeKey(avatar, traits);
+
+  const palette = getPalette(elementKey);
   const { width, height, offsetX, offsetY, lean } = getBodyShape(avatar);
   const cloakStyle = getCloakStyle(avatar);
   const companion = hasCompanion(avatar);
 
-  // cloak radius approximated from width/height
   const halfW = width / 2;
   const topY = offsetY - height;
 
@@ -172,7 +200,7 @@ export const AvatarView: React.FC<AvatarViewProps> = ({ avatar }) => {
           strokeWidth={1.4}
         />
 
-        {/* hood circle */}
+        {/* hood */}
         <circle
           cx={offsetX + lean}
           cy={topY + 10}
@@ -182,7 +210,7 @@ export const AvatarView: React.FC<AvatarViewProps> = ({ avatar }) => {
           strokeWidth={1.4}
         />
 
-        {/* mask face */}
+        {/* mask / face */}
         <circle
           cx={offsetX + lean}
           cy={topY + 10}
@@ -204,7 +232,7 @@ export const AvatarView: React.FC<AvatarViewProps> = ({ avatar }) => {
           fill={palette.glow}
         />
 
-        {/* chest glyphs based on archetype & cloakStyle */}
+        {/* chest glyphs */}
         {cloakStyle !== "trail" && (
           <>
             <path

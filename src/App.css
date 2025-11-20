@@ -912,6 +912,8 @@ body {
 }
 
 
+
+
 /* depth-based layering: 1 = far back, 5 = foreground */
 .world-lane-layer--depth-1 {
   z-index: 0;
@@ -933,14 +935,22 @@ body {
   z-index: 4;
 }
 
-@keyframes world-lane-ribbon-scroll {
+/* Smooth horizontal drift for PNG parallax layers */
+@keyframes world-lane-art-scroll {
   from {
-    background-position: 0% 0%;
+    background-position: 0% bottom;
   }
   to {
-    background-position: -60% 0%;
+    background-position: -120% bottom; /* enough to feel like a slow walk */
   }
 }
+
+
+/* When the Dreamself is not walking, freeze the parallax */
+.world-lane--paused .world-lane-layer {
+  animation-play-state: paused;
+}
+
 
 
 /* dusk overlay so valley matches D.R.E.A.M palette */

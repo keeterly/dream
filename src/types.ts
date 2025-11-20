@@ -74,6 +74,23 @@ export interface DreamselfProfile {
   lastUpdated: string;
 }
 
+// --- Journal types ---
+
+export type JournalEntryType =
+  | "dreamself_created"
+  | "item_found"
+  | "biome_visited";
+
+export interface JournalEntry {
+  id: string;
+  type: JournalEntryType;
+  timestampIso: string;
+  title: string;
+  body?: string;
+  meta?: Record<string, unknown>;
+}
+
+
 export type TimeOfDayPhase = "dawn" | "noon" | "dusk" | "night";
 
 export type ItemRarity = "common" | "rare" | "mythic";

@@ -91,15 +91,15 @@ export function computeTraitsAndAvatar(
     temperamentTags: Array.from(temperamentTags),
   };
 
-  const seed = buildSeed(answers);
+    const seed = buildSeed(answers);
+
   const avatar = buildAvatarConfig(
     seed,
     traits,
     companionType,
     caveMarking
-    randomSeed:
-    profileSeed || Math.random().toString(36).slice(2, 10),
   );
+
 
   const now = new Date().toISOString();
   const dreamName = buildDreamName(traits);

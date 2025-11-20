@@ -1535,3 +1535,181 @@ body {
   }
 }
 
+/* ==== DREAM v0.2 layout glue for new components ==== */
+
+/* Root & screens */
+.app-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-screen {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+/* Intro / Summary cards */
+.app-screen-intro .intro-card,
+.app-screen-summary .summary-card {
+  max-width: 960px;
+  width: 100%;
+  margin-inline: auto;
+}
+
+/* World overlay & panels */
+.app-screen-world .world-card {
+  margin-inline: auto;
+}
+
+.world-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.world-hud,
+.world-dock,
+.world-panels {
+  pointer-events: auto;
+}
+
+/* HUD bar */
+.world-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Dock buttons */
+.world-dock {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding-bottom: 1.25rem;
+}
+
+.world-dock-button {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.16), rgba(0, 0, 0, 0.6));
+  padding: 0.35rem 0.9rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.82);
+  cursor: pointer;
+  white-space: nowrap;
+  backdrop-filter: blur(20px);
+}
+
+.world-dock-button--active {
+  border-color: rgba(255, 255, 255, 0.7);
+  background: radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.35), rgba(0, 0, 0, 0.75));
+}
+
+/* Panel shell */
+.world-panels {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4.5rem; /* float above dock */
+}
+
+.world-panel {
+  max-width: 720px;
+  width: calc(100% - 2rem);
+  padding: 1.25rem 1.5rem;
+  border-radius: 1.25rem;
+  background: linear-gradient(
+    135deg,
+    rgba(9, 15, 26, 0.92),
+    rgba(18, 32, 60, 0.9)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(24px);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.85rem;
+}
+
+.world-panel-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 0.75rem;
+  opacity: 0.9;
+}
+
+.world-panel-empty {
+  opacity: 0.7;
+}
+
+/* Journal entries */
+.journal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 260px;
+  overflow: auto;
+}
+
+.journal-entry {
+  padding: 0.5rem 0.6rem;
+  border-radius: 0.75rem;
+  background: radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.08), transparent);
+}
+
+.journal-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  opacity: 0.8;
+}
+
+.journal-entry-title {
+  margin-top: 0.15rem;
+  font-size: 0.8rem;
+}
+
+.journal-entry-body {
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.journal-entry-type {
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Slight mobile tweaks */
+@media (max-width: 768px) {
+  .world-panel {
+    width: calc(100% - 1.5rem);
+    padding: 1rem 1.1rem;
+  }
+
+  .world-hud {
+    padding-inline: 1rem;
+  }
+}

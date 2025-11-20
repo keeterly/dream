@@ -156,11 +156,12 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="app-root">
-      <AppHeader screen={screen} />
-      <main className="app-main">{renderScreen()}</main>
-    </div>
-  );
+  <div className="App app-root">
+    <AppHeader screen={screen} />
+    <main className="App-main app-main">{renderScreen()}</main>
+  </div>
+);
+
 };
 
 export default App;

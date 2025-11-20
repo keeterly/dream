@@ -92,7 +92,8 @@ export const App: React.FC = () => {
     }
 
     // finished questionnaire → compute dreamself
-    const nextProfile = computeTraitsAndAvatar(nextAnswers);
+   const nextProfile = computeTraitsAndAvatar(nextAnswers, QUESTIONS);
+
     setProfile(nextProfile);
     logDreamselfCreated(nextProfile);
     setScreen("summary");

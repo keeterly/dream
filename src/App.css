@@ -2958,3 +2958,13 @@ body {
   backdrop-filter: blur(8px);
   cursor: pointer;
 }
+
+
+.world-stage-avatar {
+  position: absolute;
+  left: 50%;
+  bottom: 4.5vh;
+  transform: translateX(-50%) scale(1.6); /* <— sizing lives here */
+  transform-origin: 50% 100%;
+  pointer-events: none;
+}

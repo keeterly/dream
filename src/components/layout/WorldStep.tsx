@@ -74,7 +74,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
               avatar={profile.avatar}
               traits={profile.traits}
               dreamName={profile.dreamName}
-              scale={1.6}
+            
             />
 
             {activeEncounterItem && (

@@ -21,6 +21,40 @@ import type {
 
 type ScreenId = "intro" | "questions" | "summary" | "world";
 
+
+function computeEncounterChance(
+  profile: DreamselfProfile | null,
+  inventory: InventoryItem[]
+): number {
+  // base chance once you're in the world
+  let chance = 0.12;
+
+  if (profile?.traits.primaryArchetype === "seer") {
+    chance += 0.03; // seers notice more
+  }
+  if (profile?.traits.primaryArchetype === "wanderer") {
+    chance += 0.01;
+  }
+
+  // small bonus per rare / legendary relic
+  const bonusPerRelic = inventory.reduce((acc, item) => {
+    if (item.rarity === "rare") return acc + 0.015;
+    if (item.rarity === "legendary") return acc + 0.03;
+    return acc;
+  }, 0);
+
+  chance += bonusPerRelic;
+
+  // clamp to sane range
+  if (chance < 0.03) chance = 0.03;
+  if (chance > 0.4) chance = 0.4;
+
+  return chance;
+}
+
+
+
+
 function getRandomWorldItem() {
   return WORLD_ITEMS[Math.floor(Math.random() * WORLD_ITEMS.length)];
 }
@@ -47,6 +81,10 @@ export const App: React.FC = () => {
     string | null
   >(null);
 
+  // NEW: the item currently being "found" in the world
+  const [activeEncounterItem, setActiveEncounterItem] =
+    useState<InventoryItem | null>(null);
+
   const {
     entries: journalEntries,
     logDreamselfCreated,
@@ -54,15 +92,16 @@ export const App: React.FC = () => {
     logBiomeVisited,
   } = useJournal();
 
-  // world tick + passive relic drops
+    // world tick + passive relic drops
   useEffect(() => {
     if (!profile) return;
 
     const intervalId = window.setInterval(() => {
       setWorldTick((t) => t + 1);
 
-      // 18% chance to roll a new relic
-      if (Math.random() < 0.18) {
+      const chance = computeEncounterChance(profile, inventory);
+
+      if (Math.random() < chance) {
         const baseItem = getRandomWorldItem();
         const acquiredAt = new Date().toISOString();
 
@@ -71,9 +110,26 @@ export const App: React.FC = () => {
           acquiredAt,
         };
 
+        // add to inventory + journal
         setInventory((prev) => [invItem, ...prev]);
-        setLastEncounterItemName(invItem.name);
         logItemFound(invItem);
+
+        // drive world UI
+        setLastEncounterItemName(invItem.name);
+        setActiveEncounterItem(invItem);
+
+        // clear after a short "encounter moment"
+        const clearDelayMs = 2400;
+        window.setTimeout(() => {
+          setActiveEncounterItem((current) =>
+            current && current.acquiredAt === invItem.acquiredAt
+              ? null
+              : current
+          );
+          setLastEncounterItemName((current) =>
+            current === invItem.name ? null : current
+          );
+        }, clearDelayMs);
       }
 
       // later: derive biome from worldTick and log
@@ -81,7 +137,8 @@ export const App: React.FC = () => {
     }, 12000);
 
     return () => window.clearInterval(intervalId);
-  }, [profile, logItemFound, logBiomeVisited]);
+  }, [profile, inventory, logItemFound, logBiomeVisited]);
+
 
   const handleBegin = () => {
     setScreen("questions");
@@ -160,7 +217,8 @@ export const App: React.FC = () => {
           journalEntries={journalEntries as JournalEntry[]}
           onSpawnDebugItem={handleSpawnDebugItem}
           encounterItemName={lastEncounterItemName}
-          phase={phase}
+          phase="dawn"
+          activeEncounterItem={activeEncounterItem}
         />
       );
     }

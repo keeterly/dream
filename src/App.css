@@ -2681,3 +2681,89 @@ body {
 .map-node--active .map-node-label {
   opacity: 1;
 }
+
+
+/* Avatar bob / sway is controlled via .avatar-view-svg animation.
+   When an encounter is active, we pause it. */
+.world-stage-avatar--paused .avatar-view-svg {
+  animation-play-state: paused;
+}
+
+
+.world-stage-avatar {
+  position: absolute; /* you likely already have this */
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 7vh; /* or whatever you're currently using */
+}
+
+.world-encounter-bubble {
+  position: absolute;
+  bottom: 115%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.4rem 0.9rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(6, 10, 20, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.8);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.12rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: 50% 100%;
+  animation:
+    world-encounter-pop 0.18s ease-out forwards,
+    world-encounter-fade 0.4s ease-out 1.9s forwards;
+}
+
+.world-encounter-label {
+  opacity: 0.7;
+}
+
+.world-encounter-name {
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+}
+
+/* tiny highlight dot */
+.world-encounter-bubble::before {
+  content: "";
+  position: absolute;
+  bottom: -0.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, #f9e6b9 0%, #f4c46d 50%, #4b3413 100%);
+  box-shadow: 0 0 10px rgba(249, 230, 185, 0.9);
+}
+
+/* little "pop" when the bubble appears */
+@keyframes world-encounter-pop {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+/* gentle fade out at the end of the encounter window */
+@keyframes world-encounter-fade {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

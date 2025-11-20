@@ -16,6 +16,7 @@ interface WorldStepProps {
   onSpawnDebugItem: () => void;
   encounterItemName: string | null;
   phase: string;
+  activeEncounterItem?: InventoryItem | null; // NEW
 }
 
 export const WorldStep: React.FC<WorldStepProps> = ({
@@ -25,7 +26,15 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   onSpawnDebugItem,
   encounterItemName,
   phase,
+   activeEncounterItem, // NEW
+
+
+   
 }) => {
+
+      const isEncounterActive = !!activeEncounterItem;
+
+
   const [activePanel, setActivePanel] =
     useState<WorldPanelId | null>("inventory");
 
@@ -53,17 +62,31 @@ export const WorldStep: React.FC<WorldStepProps> = ({
         />
 
         {/* DREAMSELF AVATAR ON RIBBON */}
-        {profile && (
+                {profile && (
           <div
-            className={`world-stage-avatar world-stage-avatar--walking ${lighting.avatarClass}`}
+            className={`world-stage-avatar ${
+              isEncounterActive
+                ? "world-stage-avatar--paused"
+                : "world-stage-avatar--walking"
+            } ${lighting.avatarClass}`}
           >
             <AvatarView
               avatar={profile.avatar}
               traits={profile.traits}
               dreamName={profile.dreamName}
             />
+
+            {activeEncounterItem && (
+              <div className="world-encounter-bubble">
+                <div className="world-encounter-label">Relic found</div>
+                <div className="world-encounter-name">
+                  {activeEncounterItem.name}
+                </div>
+              </div>
+            )}
           </div>
         )}
+
 
         {/* GLOBAL TINT OVERLAY */}
         <div className="world-tint-overlay" />

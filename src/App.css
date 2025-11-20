@@ -531,10 +531,8 @@ body {
 .world-card .world-lane {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none; /* let clicks reach overlay */
-  z-index: 0;           /* BACKGROUND ONLY */
+  pointer-events: none;
+  z-index: 0; /* background only */
 }
 
 /* ---------- WORLD LANE VISUALS (cloak walk ref) ---------- */
@@ -669,7 +667,7 @@ body {
   animation: world-lane-scroll-fast 20s linear infinite;
 }
 
-/* character */
+/* character silhouette */
 
 .world-lane-figure {
   position: absolute;
@@ -682,7 +680,7 @@ body {
   background: linear-gradient(135deg, #020617 0, #020617 45%, #111827 100%);
   box-shadow: 0 18px 36px rgba(0, 0, 0, 0.9);
   animation: world-lane-walk-bob 1.4s ease-in-out infinite;
-  z-index: 10;              /* ⬅️ NEW */
+  z-index: 10; /* above overlay + parallax */
 }
 
 .world-lane-figure-shadow {
@@ -741,11 +739,11 @@ body {
   z-index: 2;
 }
 
-/* encounter pulse under feet */
+/* ground glow under loot */
 
 .world-lane-encounter-pulse {
   position: absolute;
-  bottom: 16.5%;                /* just under the crystal */
+  bottom: 16.5%;
   left: 50%;
   transform: translateX(-50%);
   width: 170px;
@@ -760,7 +758,7 @@ body {
   filter: blur(2px);
   opacity: 0;
   animation: world-lane-pulse 1.6s ease-out infinite;
-  z-index: 8;                    /* under crystal, above ground */
+  z-index: 9; /* under crystal, above ground */
 }
 
 /* animations */
@@ -817,17 +815,17 @@ body {
 }
 
 
-/* Minimal Nier-style loot crystal */
+/* minimalist Nier-style loot crystal */
+
 .world-lane-crystal {
   position: absolute;
   bottom: 19%;
-  left: 50%;
+  left: 56%; /* slightly ahead of the Dreamself so it’s not hidden */
   transform: translateX(-50%);
   width: 32px;
   height: 54px;
-  z-index: 9; /* above pulse, below figure (which is 10) */
+  z-index: 11; /* renders in front of the figure */
 
-  /* Tall rounded diamond */
   background: radial-gradient(
       circle at 50% 25%,
       #f9fafb 0%,
@@ -848,12 +846,11 @@ body {
     0 0 18px rgba(96, 165, 250, 0.75),
     0 0 40px rgba(37, 99, 235, 0.85);
 
-  /* Slight hover float */
   animation: world-lane-crystal-float 1.8s ease-in-out infinite;
 }
 
+
 .world-lane-crystal::before {
-  /* inner core */
   content: "";
   position: absolute;
   inset: 18% 24% 34%;
@@ -869,7 +866,6 @@ body {
 }
 
 .world-lane-crystal::after {
-  /* tiny spark above */
   content: "";
   position: absolute;
   left: 50%;
@@ -898,21 +894,21 @@ body {
 
 
 
-
 /* ---------- WORLD LANE PARALLAX ART LAYERS ---------- */
 
- .world-lane-layer {
+/* base layer styling – parallax art only */
+.world-lane-layer {
   position: absolute;
   inset: 0;
   background-repeat: repeat-x;
   background-position: 0 bottom;
-  background-size: 130% auto;  /* slightly zoomed so seams are less obvious */
+  background-size: 130% auto; /* slight zoom to hide tiling seams */
   transform: translate3d(0, 0, 0);
   will-change: background-position;
-  z-index: 0;
   animation-name: world-lane-art-scroll;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
+  z-index: 0;
 }
 
 
@@ -946,14 +942,13 @@ body {
   }
 }
 
-
-/* subtle night overlay so the art matches the dark UI */
+/* dusk overlay so valley matches D.R.E.A.M palette */
 .world-lane::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 5; /* above parallax (0–4), below figure + HUD */
+  z-index: 5; /* above parallax, below figure / crystal / HUD */
   background: linear-gradient(
     to bottom,
     rgba(15, 23, 42, 0.95) 0%,
@@ -1185,10 +1180,10 @@ body {
 .world-dock {
   position: absolute;
   right: 5vw;
-  bottom: 2.4rem;       /* icon row hugs the true bottom */
+  bottom: 2.4rem;
   display: flex;
   gap: 0.7rem;
-  z-index: 20;
+  z-index: 25;
 }
 
 .world-dock-btn {
@@ -1284,11 +1279,11 @@ body {
 /* Slide-up panels (inventory, map, etc.) */
 .world-panel-shell {
   position: absolute;
-  right: 5vw;           /* align horizontally with the dock */
-  bottom: 5.3rem;       /* ⬅️ LIFT PANEL ABOVE ICONS (~ icon height + gap) */
-  padding-bottom: 0;    /* no extra bottom padding needed now */
+  right: 5vw;      /* aligns with dock */
+  bottom: 5.3rem;  /* sits above the icon row instead of covering it */
+  padding-bottom: 0;
   pointer-events: none;
-  z-index: 30;
+  z-index: 30;     /* above dock */
 }
 
 .world-panel-shell--visible {
@@ -1296,8 +1291,8 @@ body {
 }
 
 .world-panel {
-  max-width: 480px;
-  margin-left: auto;    /* keep it hugging the right edge */
+   max-width: 480px;
+  margin-left: auto;
   border-radius: 1rem;
   padding: 1.1rem 1.2rem 1.2rem;
   border: 1px solid rgba(148, 163, 184, 0.6);

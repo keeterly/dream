@@ -8,7 +8,7 @@ interface WorldLaneProps {
 }
 
 // Hard-coded parallax layers for dusk_valley
-// depth: 0 = far back, 3 = foreground
+// depth: 0 = far back, 4 = foreground
 const PARALLAX_LAYERS = [
   {
     file: "layer_01.png",
@@ -47,7 +47,6 @@ const PARALLAX_LAYERS = [
   },
 ];
 
-
 const WorldLane: React.FC<WorldLaneProps> = ({ encounterItemName }) => {
   const baseUrl = import.meta.env.BASE_URL || "/";
 
@@ -57,6 +56,7 @@ const WorldLane: React.FC<WorldLaneProps> = ({ encounterItemName }) => {
       {PARALLAX_LAYERS.map((layer) => (
         <div
           key={layer.file}
+          className="world-lane-layer"
           style={{
             position: "absolute",
             top: 0,
@@ -66,9 +66,8 @@ const WorldLane: React.FC<WorldLaneProps> = ({ encounterItemName }) => {
             backgroundImage: `url("${baseUrl}assets/parallax/dusk_valley/${layer.file}")`,
             backgroundRepeat: "repeat-x",
             backgroundPosition: "0 bottom",
-            // zoom a bit to hide tiling seams
             backgroundSize: "130% auto",
-            transform: "translate3d(0,0,0)",
+            transform: "translate3d(0, 0, 0)",
             willChange: "background-position",
             animationName: "world-lane-art-scroll",
             animationTimingFunction: "linear",
@@ -76,7 +75,7 @@ const WorldLane: React.FC<WorldLaneProps> = ({ encounterItemName }) => {
             animationDuration: `${layer.duration}s`,
             opacity: layer.opacity,
             filter: layer.blur ? `blur(${layer.blur}px)` : "none",
-            zIndex: layer.depth, // 0–4, overlay + figure + HUD go above this
+            zIndex: layer.depth, // 0–4
           }}
         />
       ))}
@@ -91,20 +90,13 @@ const WorldLane: React.FC<WorldLaneProps> = ({ encounterItemName }) => {
         </div>
       </div>
 
-            {/* Loot encounter: crystal + subtle pulse */}
+      {/* Loot encounter: crystal + pulse */}
       {encounterItemName && (
         <>
-          <div
-            className="world-lane-encounter-pulse"
-            aria-hidden="true"
-          />
-          <div
-            className="world-lane-crystal"
-            aria-hidden="true"
-          />
+          <div className="world-lane-encounter-pulse" aria-hidden="true" />
+          <div className="world-lane-crystal" aria-hidden="true" />
         </>
       )}
-
     </div>
   );
 };

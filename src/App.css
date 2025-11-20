@@ -3317,5 +3317,21 @@ body {
   }
 }
 
+/* Default main layout (keep whatever you already have) */
+/* .app-main { ... } */
+
+/* WORLD view: no extra top padding, fill viewport, no scrolling wrapper */
+.app-main--world {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.app-main--world .app-screen-world {
+  min-height: 100vh;
+}
+
+.app-main--world .world-card {
+  margin-top: 0;
+}
 
 

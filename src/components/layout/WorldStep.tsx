@@ -39,7 +39,10 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
         {/* DREAMSELF AVATAR OVERLAY */}
         {profile && (
-            <div className="world-stage-avatar world-stage-avatar--walking">
+            <div
+  className={`world-stage-avatar world-stage-avatar--walking world-phase-${phase}`}
+>
+
 
             <AvatarView
               avatar={profile.avatar}

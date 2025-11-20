@@ -527,7 +527,7 @@ body {
   background: #020617;
 }
 
-/* WorldLane itself stretches full bleed */
+/* WORLD LANE is pure background */
 .world-card .world-lane {
   position: absolute;
   inset: 0;
@@ -673,12 +673,16 @@ body {
 
 .world-lane-figure {
   position: absolute;
-  bottom: 16%;
+  bottom: 18%;
   left: 50%;
   transform: translateX(-50%);
-  width: 90px;
-  height: 150px;
-  z-index: 8;
+  width: 92px;
+  height: 140px;
+  border-radius: 42% 42% 16% 16%;
+  background: linear-gradient(135deg, #020617 0, #020617 45%, #111827 100%);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.9);
+  animation: world-lane-walk-bob 1.4s ease-in-out infinite;
+  z-index: 10;              /* ⬅️ NEW */
 }
 
 .world-lane-figure-shadow {
@@ -741,17 +745,17 @@ body {
 
 .world-lane-encounter-pulse {
   position: absolute;
-  bottom: 13%;
+  bottom: 15%;
   left: 50%;
   transform: translateX(-50%);
-  width: 170px;
-  height: 46px;
+  width: 160px;
+  height: 44px;
   border-radius: 999px;
-  border: 1px solid rgba(56, 189, 248, 0.85);
-  box-shadow: 0 0 28px rgba(56, 189, 248, 0.9);
+  border: 1px solid rgba(56, 189, 248, 0.8);
+  box-shadow: 0 0 26px rgba(56, 189, 248, 0.8);
   opacity: 0;
   animation: world-lane-pulse 1.4s ease-out infinite;
-  z-index: 7;
+  z-index: 9;               /* ⬅️ NEW: above parallax + ground */
 }
 
 /* animations */
@@ -880,9 +884,10 @@ body {
 
 /* overlay on top of the sky */
 
+/* Main overlay content (title, description, toast, etc.) */
 .world-overlay-main {
   position: relative;
-  z-index: 20;
+  z-index: 10;
   height: 100%;
   padding: 3.2rem 5vw 2.4rem;
   display: flex;
@@ -1088,15 +1093,15 @@ body {
   color: #a5b4fc;
 }
 
-/* dock icons */
 
+/* Dock icons row (INVENTORY / DREAMSELF / MAP / DEBUG) */
 .world-dock {
   position: absolute;
   right: 5vw;
   bottom: 2.4rem;
   display: flex;
   gap: 0.7rem;
-  z-index: 25;
+  z-index: 20;
 }
 
 .world-dock-btn {
@@ -1189,14 +1194,15 @@ body {
 
 /* slide-up panels */
 
+/* Slide-up panels (inventory, map, etc.) */
 .world-panel-shell {
-    position: absolute;
+  position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   padding: 0 5vw 1.8rem;
   pointer-events: none;
-  z-index: 30;
+  z-index: 30;         /* ⬅️ higher than dock */
 }
 
 .world-panel-shell--visible {
@@ -1215,6 +1221,7 @@ body {
       rgba(15, 23, 42, 0.98)
     );
   box-shadow: 0 22px 60px rgba(15, 23, 42, 0.98);
+  /* panel lives in shell’s stacking context, so no extra z-index needed */
 }
 
 .world-panel-header {

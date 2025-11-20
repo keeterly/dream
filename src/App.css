@@ -2301,7 +2301,7 @@ body {
   position: absolute;
   left: 50%;
   bottom: 8vh; /* tweak until the feet sit nicely on the ground */
-  transform: translateX(-50%);
+  transform: translateX(-50%) scale(2);
   pointer-events: none;
 }
 

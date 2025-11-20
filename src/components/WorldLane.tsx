@@ -7,32 +7,43 @@ interface WorldLaneProps {
   encounterItemName: string | null;
 }
 
-// Back -> front
+// Hard-coded parallax layers for dusk_valley
+// depth: 0 = far back, 3 = foreground
 const PARALLAX_LAYERS = [
   {
-    file: "layer_01.png", // far sky / big mountains
-    depth: 1,
-    duration: 220,        // very slow
+    file: "layer_01.png",
+    depth: 0,
+    duration: 220,
+    opacity: 0.7,
+    blur: 1.4,
   },
   {
     file: "layer_02.png",
-    depth: 2,
+    depth: 1,
     duration: 150,
+    opacity: 0.8,
+    blur: 1.0,
   },
   {
     file: "layer_03.png",
-    depth: 3,
+    depth: 2,
     duration: 110,
+    opacity: 0.9,
+    blur: 0.6,
   },
   {
     file: "layer_04.png",
-    depth: 4,
+    depth: 3,
     duration: 75,
+    opacity: 0.95,
+    blur: 0.3,
   },
   {
-    file: "layer_05.png", // foreground shrubs / rock
-    depth: 5,
-    duration: 45,         // fastest
+    file: "layer_05.png",
+    depth: 4,
+    duration: 45,
+    opacity: 1,
+    blur: 0,
   },
 ];
 
@@ -52,20 +63,20 @@ const WorldLane: React.FC<WorldLaneProps> = ({ encounterItemName }) => {
             left: 0,
             right: 0,
             bottom: 0,
-            // visual
             backgroundImage: `url("${baseUrl}assets/parallax/dusk_valley/${layer.file}")`,
             backgroundRepeat: "repeat-x",
             backgroundPosition: "0 bottom",
-            backgroundSize: "auto 100%",
-            // movement
+            // zoom a bit to hide tiling seams
+            backgroundSize: "130% auto",
             transform: "translate3d(0,0,0)",
             willChange: "background-position",
             animationName: "world-lane-art-scroll",
             animationTimingFunction: "linear",
             animationIterationCount: "infinite",
             animationDuration: `${layer.duration}s`,
-            // depth ordering
-            zIndex: layer.depth,
+            opacity: layer.opacity,
+            filter: layer.blur ? `blur(${layer.blur}px)` : "none",
+            zIndex: layer.depth, // 0–4, overlay + figure + HUD go above this
           }}
         />
       ))}

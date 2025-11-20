@@ -7,14 +7,14 @@ interface AvatarViewProps {
   dreamName?: string;
 }
 
-/** ----------- tiny deterministic "rng" helpers ----------- **/
+/* ---------- tiny deterministic helpers ---------- */
 
 function normalizeKey(value: unknown): string {
   if (!value) return "";
   return value.toString().trim().toLowerCase();
 }
 
-// simple deterministic hash → [0, 1)
+// FNV-ish hash -> [0, 1)
 function hashToUnit(str: string): number {
   let h = 2166136261 >>> 0;
   for (let i = 0; i < str.length; i++) {
@@ -24,10 +24,11 @@ function hashToUnit(str: string): number {
   return (h >>> 0) / 4294967296;
 }
 
-// hash → integer [0, max)
 function hashToInt(str: string, max: number): number {
   return Math.floor(hashToUnit(str) * max);
 }
+
+/* ---------- derive archetype / element from traits & name ---------- */
 
 function splitDreamName(dreamName?: string) {
   if (!dreamName) return { archetype: "", element: "" };
@@ -41,34 +42,8 @@ function splitDreamName(dreamName?: string) {
   return { archetype: "", element: "" };
 }
 
-function getElementKey(avatar: any, traits?: any, dreamName?: string): string {
-  const fromName = splitDreamName(dreamName).element;
-
-  const candidates = [
-    avatar?.elementKey,
-    avatar?.primaryElement,
-    avatar?.element,
-    traits?.primaryElement,
-    traits?.elementKey,
-    traits?.element,
-    fromName,
-  ];
-
-  for (const val of candidates) {
-    const key = normalizeKey(val);
-    if (key) return key;
-  }
-
-  return "glass";
-}
-
-function getArchetypeKey(
-  avatar: any,
-  traits?: any,
-  dreamName?: string
-): string {
+function getArchetypeKey(avatar: any, traits?: any, dreamName?: string) {
   const fromName = splitDreamName(dreamName).archetype;
-
   const candidates = [
     avatar?.archetypeKey,
     avatar?.primaryArchetype,
@@ -78,16 +53,33 @@ function getArchetypeKey(
     traits?.archetype,
     fromName,
   ];
-
-  for (const val of candidates) {
-    const key = normalizeKey(val);
-    if (key) return key;
+  for (const c of candidates) {
+    const k = normalizeKey(c);
+    if (k) return k;
   }
-
   return "seer";
 }
 
-/** ----------- palette per element ----------- **/
+function getElementKey(avatar: any, traits?: any, dreamName?: string) {
+  const fromName = splitDreamName(dreamName).element;
+  const candidates = [
+    avatar?.elementKey,
+    avatar?.primaryElement,
+    avatar?.element,
+    traits?.dominantElement,
+    traits?.primaryElement,
+    traits?.elementKey,
+    traits?.element,
+    fromName,
+  ];
+  for (const c of candidates) {
+    const k = normalizeKey(c);
+    if (k) return k;
+  }
+  return "glass";
+}
+
+/* ---------- palettes per element ---------- */
 
 function getPalette(elementKey: string) {
   const palettes: Record<
@@ -95,137 +87,123 @@ function getPalette(elementKey: string) {
     { robe: string; trim: string; glow: string; accent: string; inner: string }
   > = {
     ember: {
-      robe: "#301617",
-      trim: "#FBB076",
-      glow: "#FFB977",
-      accent: "#FF7A3C",
-      inner: "#201012",
+      robe: "#3a1b14",
+      trim: "#fbb076",
+      glow: "#ffb977",
+      accent: "#ff7a3c",
+      inner: "#160d0b",
     },
     glass: {
       robe: "#111827",
-      trim: "#C4D9FF",
-      glow: "#A4DAFF",
-      accent: "#7BB3FF",
-      inner: "#070913",
-    },
-    tide: {
-      robe: "#0E1C22",
-      trim: "#8FD7D9",
-      glow: "#7BE6FF",
-      accent: "#47C2E8",
-      inner: "#061016",
+      trim: "#c4d9ff",
+      glow: "#a4daff",
+      accent: "#7bb3ff",
+      inner: "#05070f",
     },
     shadow: {
       robe: "#151322",
-      trim: "#C7B6FF",
-      glow: "#B6A0FF",
-      accent: "#7B5BFF",
-      inner: "#05040B",
+      trim: "#c7b6ff",
+      glow: "#b6a0ff",
+      accent: "#7b5bff",
+      inner: "#05030b",
     },
-    stone: {
-      robe: "#2B2A29",
-      trim: "#E4DFCF",
-      glow: "#F2E8D4",
-      accent: "#C6B593",
-      inner: "#151412",
+    bloom: {
+      robe: "#1f2c22",
+      trim: "#b5e3c2",
+      glow: "#baf5d1",
+      accent: "#7fd9a5",
+      inner: "#060a07",
+    },
+    aether: {
+      robe: "#1e1b2e",
+      trim: "#e0d6ff",
+      glow: "#d5c8ff",
+      accent: "#b29bff",
+      inner: "#06040b",
     },
   };
 
-  if (elementKey.startsWith("fire") || elementKey === "ember")
-    return palettes.ember;
+  if (elementKey.startsWith("fire") || elementKey === "ember") return palettes.ember;
   if (elementKey.startsWith("glass")) return palettes.glass;
-  if (elementKey.startsWith("water") || elementKey.startsWith("tide"))
-    return palettes.tide;
   if (elementKey.startsWith("shadow") || elementKey.startsWith("night"))
     return palettes.shadow;
-  if (elementKey.startsWith("stone") || elementKey.startsWith("earth"))
-    return palettes.stone;
+  if (elementKey.startsWith("bloom") || elementKey.startsWith("growth"))
+    return palettes.bloom;
+  if (elementKey.startsWith("aether") || elementKey.startsWith("void"))
+    return palettes.aether;
 
   return palettes[elementKey] || palettes.glass;
 }
 
-/** ----------- body / cloak geometry ----------- **/
+/* ---------- cloak body geometry for humanoid ---------- */
 
-function getBodyShape(archetypeKey: string, variantIndex: number) {
-  // base cloak: 120x160 canvas
-  let width = 54;
-  let height = 78;
-  let offsetX = 60;
-  let offsetY = 96;
+function getBodyGeometry(
+  archetypeKey: string,
+  variantIndex: number,
+  temperamentTags: string[]
+) {
+  // Canvas is 0..120 wide, 0..200 tall
+  let centerX = 60;
+  let feetY = 180;
+  let cloakWidth = 60;
+  let cloakHeight = 110;
   let lean = 0;
 
-  // archetype silhouette
   if (archetypeKey === "architect") {
-    width = 60;
-    height = 76;
+    cloakWidth = 64;
+    cloakHeight = 112;
   } else if (archetypeKey === "seer") {
-    width = 52;
-    height = 80;
+    cloakWidth = 54;
+    cloakHeight = 115;
   } else if (archetypeKey === "wanderer") {
-    width = 58;
-    height = 84;
-    lean = 2;
+    cloakWidth = 58;
+    cloakHeight = 118;
+    lean = 3;
   }
 
-  // variant tweaks: hem length + lean
-  if (variantIndex === 1) {
-    height += 4;
-  } else if (variantIndex === 2) {
-    height -= 3;
-    lean -= 1;
-  } else if (variantIndex === 3) {
+  // Temperament influences posture a bit
+  const tags = temperamentTags.map(normalizeKey);
+  if (tags.includes("guarded") || tags.includes("cautious")) {
+    lean -= 2;
+  }
+  if (tags.includes("bold") || tags.includes("impulsive")) {
     lean += 2;
   }
 
-  return { width, height, offsetX, offsetY, lean };
-}
-
-function getCloakStyle(
-  archetypeKey: string,
-  variantIndex: number
-): "classic" | "glyph" | "trail" {
-  if (archetypeKey === "architect") {
-    return variantIndex % 2 === 0 ? "glyph" : "classic";
+  // Variant tweak
+  if (variantIndex === 1) {
+    cloakHeight += 4;
+  } else if (variantIndex === 2) {
+    cloakHeight -= 4;
   }
-  if (archetypeKey === "wanderer") {
-    return "trail";
-  }
-  // seer
-  return variantIndex % 3 === 0 ? "glyph" : "classic";
+
+  const headY = feetY - cloakHeight - 26; // hood center
+  return { centerX, feetY, cloakWidth, cloakHeight, headY, lean };
 }
 
-function hasCompanion(avatar: any, variantIndex: number): boolean {
-  const explicit = normalizeKey(avatar?.companionType);
-  if (explicit && explicit !== "none") return true;
-  // 50% chance per seed for some variation
-  return variantIndex % 2 === 0;
-}
-
-/** ----------- mask variants ----------- **/
+/* ---------- mask variants ---------- */
 
 function renderMask(
   archetypeKey: string,
   palette: ReturnType<typeof getPalette>,
-  offsetX: number,
-  topY: number,
+  cx: number,
+  cy: number,
   lean: number,
   variantIndex: number
 ) {
-  const baseY = topY + 10;
+  const x = cx + lean;
 
   if (archetypeKey === "architect") {
-    // round mask, twin or triple eyes
-    const eyeCount = variantIndex % 3 === 0 ? 3 : 2;
-    const spacing = eyeCount === 3 ? 2.1 : 2.6;
-
+    const eyeCount = variantIndex % 2 === 0 ? 2 : 3;
+    const spacing = 2.4;
     const eyes = [];
     const start = -spacing * (eyeCount - 1) * 0.5;
     for (let i = 0; i < eyeCount; i++) {
       eyes.push(
         <circle
           key={i}
-          cx={offsetX + lean + start + spacing * i}
-          cy={baseY - 0.4}
+          cx={x + start + i * spacing}
+          cy={cy - 0.5}
           r={0.9}
           fill={palette.glow}
         />
@@ -235,12 +213,12 @@ function renderMask(
     return (
       <>
         <circle
-          cx={offsetX + lean}
-          cy={baseY}
-          r={6.6}
+          cx={x}
+          cy={cy}
+          r={7}
           fill={palette.inner}
           stroke={palette.glow}
-          strokeWidth={0.9}
+          strokeWidth={1}
         />
         {eyes}
       </>
@@ -248,19 +226,17 @@ function renderMask(
   }
 
   if (archetypeKey === "seer") {
-    // almond eye; variant chooses pupil vs slit vs crescent
-    const style = variantIndex % 3;
-
+    const style = variantIndex % 3; // dot / slit / crescent
     const almond = (
       <path
         d={`
-          M ${offsetX + lean - 6}, ${baseY}
-          Q ${offsetX + lean}, ${baseY - 5} ${offsetX + lean + 6}, ${baseY}
-          Q ${offsetX + lean}, ${baseY + 5} ${offsetX + lean - 6}, ${baseY}
+          M ${x - 7}, ${cy}
+          Q ${x}, ${cy - 4.8} ${x + 7}, ${cy}
+          Q ${x}, ${cy + 4.8} ${x - 7}, ${cy}
         `}
         fill={palette.inner}
         stroke={palette.glow}
-        strokeWidth={0.9}
+        strokeWidth={1}
       />
     );
 
@@ -268,7 +244,7 @@ function renderMask(
       return (
         <>
           {almond}
-          <circle cx={offsetX + lean} cy={baseY} r={2.2} fill={palette.glow} />
+          <circle cx={x} cy={cy} r={2.4} fill={palette.glow} />
         </>
       );
     }
@@ -277,30 +253,27 @@ function renderMask(
         <>
           {almond}
           <rect
-            x={offsetX + lean - 0.8}
-            y={baseY - 3.3}
-            width={1.6}
-            height={6.6}
-            rx={0.8}
+            x={x - 1}
+            y={cy - 3}
+            width={2}
+            height={6}
+            rx={1}
             fill={palette.glow}
           />
         </>
       );
     }
-    // crescent
     return (
       <>
         {almond}
         <path
           d={`
-            M ${offsetX + lean - 3}, ${baseY - 1.5}
-            Q ${offsetX + lean}, ${baseY + 1.5} ${
-            offsetX + lean + 3
-          }, ${baseY - 1.5}
+            M ${x - 3.5}, ${cy - 1.2}
+            Q ${x}, ${cy + 1.8} ${x + 3.5}, ${cy - 1.2}
           `}
           fill="none"
           stroke={palette.glow}
-          strokeWidth={1.3}
+          strokeWidth={1.4}
           strokeLinecap="round"
         />
       </>
@@ -308,32 +281,30 @@ function renderMask(
   }
 
   if (archetypeKey === "wanderer") {
-    // tall hood with slit or double-slit
-    const double = variantIndex % 3 === 0;
-
+    const extra = variantIndex % 3 === 0;
     return (
       <>
         <ellipse
-          cx={offsetX + lean}
-          cy={baseY}
-          rx={4.4}
-          ry={6.8}
+          cx={x}
+          cy={cy}
+          rx={4.6}
+          ry={7.2}
           fill={palette.inner}
           stroke={palette.glow}
           strokeWidth={1}
         />
         <rect
-          x={offsetX + lean - 0.7}
-          y={baseY - 4.2}
-          width={1.4}
-          height={8.4}
-          rx={0.7}
+          x={x - 0.8}
+          y={cy - 4.5}
+          width={1.6}
+          height={9}
+          rx={0.8}
           fill={palette.glow}
         />
-        {double && (
+        {extra && (
           <rect
-            x={offsetX + lean + 2.3}
-            y={baseY - 2}
+            x={x + 2.2}
+            y={cy - 2}
             width={1}
             height={4}
             rx={0.5}
@@ -345,64 +316,66 @@ function renderMask(
     );
   }
 
-  // fallback: simple round mask
+  // fallback
   return (
     <circle
-      cx={offsetX + lean}
-      cy={baseY}
-      r={6.2}
+      cx={x}
+      cy={cy}
+      r={6.6}
       fill={palette.inner}
       stroke={palette.glow}
-      strokeWidth={0.9}
+      strokeWidth={1}
     />
   );
 }
 
-/** ----------- main component ----------- **/
+/* ---------- main AvatarView ---------- */
 
 export const AvatarView: React.FC<AvatarViewProps> = ({
   avatar,
   traits,
   dreamName,
 }) => {
-  const elementKey = getElementKey(avatar, traits, dreamName);
   const archetypeKey = getArchetypeKey(avatar, traits, dreamName);
+  const elementKey = getElementKey(avatar, traits, dreamName);
   const palette = getPalette(elementKey);
 
-  // seed string for deterministic variation; if you later add avatar.randomSeed
-  // each profile can get a unique look even with identical answers.
+  const temperamentTags: string[] = traits?.temperamentTags || [];
+
+  // Seed string for deterministic variation
   const seedString =
+    (avatar?.seed || "") +
+    "|" +
     (dreamName || "") +
     "|" +
     (traits?.primaryArchetype || "") +
     "|" +
-    (traits?.primaryElement || "") +
-    "|" +
-    (avatar?.randomSeed || "");
+    (traits?.dominantElement || "");
 
-  const variantIndex = hashToInt(seedString, 4); // 0..3
+  const variantIndex = hashToInt(seedString, 4); // 0–3
 
-  const { width, height, offsetX, offsetY, lean } = getBodyShape(
-    archetypeKey,
-    variantIndex
-  );
-  const cloakStyle = getCloakStyle(archetypeKey, variantIndex);
-  const companion = hasCompanion(avatar, variantIndex);
+  const { centerX, feetY, cloakWidth, cloakHeight, headY, lean } =
+    getBodyGeometry(archetypeKey, variantIndex, temperamentTags);
 
-  const halfW = width / 2;
-  const topY = offsetY - height;
+  const halfW = cloakWidth / 2;
+  const hoodTopY = headY - 14;
+  const hoodBottomY = headY + 10;
+
+  const hasCompanion =
+    normalizeKey(avatar?.companionType) !== "" &&
+    normalizeKey(avatar?.companionType) !== "none";
 
   return (
     <div className="avatar-view-root">
       <svg
         className="avatar-view-svg"
-        viewBox="0 0 120 160"
+        viewBox="0 0 120 200"
         role="img"
         aria-label="Dreamself avatar"
       >
-        {/* soft background halo */}
+        {/* world lighting halo */}
         <defs>
-          <radialGradient id="avatarGlow" cx="50%" cy="30%" r="65%">
+          <radialGradient id="avatarGlow" cx="50%" cy="20%" r="70%">
             <stop offset="0%" stopColor={palette.glow} stopOpacity="0.85" />
             <stop offset="100%" stopColor={palette.glow} stopOpacity="0" />
           </radialGradient>
@@ -412,237 +385,257 @@ export const AvatarView: React.FC<AvatarViewProps> = ({
           x={0}
           y={0}
           width={120}
-          height={160}
+          height={200}
           fill="url(#avatarGlow)"
-          opacity={0.5}
+          opacity={0.65}
         />
 
         {/* ground shadow */}
         <ellipse
-          cx={offsetX + lean * 0.8}
-          cy={offsetY + 10}
-          rx={halfW * 1.05}
-          ry={11}
+          cx={centerX + lean * 0.8}
+          cy={feetY + 4}
+          rx={halfW * 0.9}
+          ry={7}
           fill="rgba(0,0,0,0.75)"
           style={{ filter: "blur(3px)" }}
         />
 
-        {/* cloak body (upper torso + hem) */}
+        {/* legs (simple silhouette) */}
+        <g fill="#050509" opacity={0.95}>
+          <rect
+            x={centerX - 8 + lean}
+            y={feetY - 20}
+            width={6}
+            height={20}
+            rx={2}
+          />
+          <rect
+            x={centerX + 2 + lean}
+            y={feetY - 20}
+            width={6}
+            height={20}
+            rx={2}
+          />
+        </g>
+
+        {/* cloak body */}
         <path
           d={`
-          M ${offsetX - halfW + lean}, ${offsetY}
-          Q ${offsetX + lean}, ${topY + 12} ${offsetX + halfW + lean}, ${offsetY}
-          L ${offsetX + halfW * 0.85 + lean}, ${offsetY + height * 0.52}
-          Q ${offsetX + lean}, ${offsetY + height} ${
-            offsetX - halfW * 0.85 + lean
-          }, ${offsetY + height * 0.52}
+          M ${centerX - halfW + lean}, ${feetY - cloakHeight + 18}
+          Q ${centerX + lean}, ${feetY - cloakHeight - 6}
+            ${centerX + halfW + lean}, ${feetY - cloakHeight + 18}
+          L ${centerX + halfW * 0.8 + lean}, ${feetY - 10}
+          Q ${centerX + lean}, ${feetY} ${
+          centerX - halfW * 0.8 + lean
+        }, ${feetY - 10}
           Z
         `}
           fill={palette.robe}
           stroke={palette.trim}
-          strokeWidth={1.4}
+          strokeWidth={1.6}
         />
 
-        {/* shoulder cape hint */}
+        {/* shoulder / cape line */}
         <path
           d={`
-          M ${offsetX - halfW * 0.9 + lean}, ${offsetY - height * 0.18}
-          Q ${offsetX + lean}, ${topY + 8} ${
-          offsetX + halfW * 0.9 + lean
-        }, ${offsetY - height * 0.18}
+          M ${centerX - halfW * 0.9 + lean}, ${headY + 16}
+          Q ${centerX + lean}, ${headY + 4}
+            ${centerX + halfW * 0.9 + lean}, ${headY + 16}
         `}
           fill="none"
           stroke={palette.trim}
-          strokeWidth={1}
-          opacity={0.75}
+          strokeWidth={1.2}
+          opacity={0.9}
         />
 
         {/* hood outline */}
         <path
           d={`
-          M ${offsetX - 11 + lean}, ${topY + 14}
-          Q ${offsetX + lean}, ${topY} ${offsetX + 11 + lean}, ${topY + 14}
+          M ${centerX - 13 + lean}, ${hoodBottomY}
+          Q ${centerX + lean}, ${hoodTopY}
+            ${centerX + 13 + lean}, ${hoodBottomY}
         `}
           fill="none"
           stroke={palette.trim}
-          strokeWidth={1.1}
+          strokeWidth={1.3}
         />
 
-        {/* MASK / FACE */}
+        {/* head silhouette under hood */}
+        <circle
+          cx={centerX + lean}
+          cy={headY + 3}
+          r={8.5}
+          fill={palette.inner}
+        />
+
+        {/* mask / face */}
         {renderMask(
           archetypeKey,
           palette,
-          offsetX,
-          topY,
+          centerX,
+          headY + 2,
           lean,
           variantIndex
         )}
 
-        {/* BELT / WAIST GLYPHS */}
-        <g opacity={0.9}>
-          {/* base belt line */}
+        {/* belt and glyphs */}
+        <g opacity={0.92}>
+          {/* base belt */}
           <path
             d={`
-            M ${offsetX - halfW * 0.7 + lean}, ${offsetY + height * 0.15}
-            L ${offsetX + halfW * 0.7 + lean}, ${offsetY + height * 0.15}
+            M ${centerX - halfW * 0.7 + lean}, ${
+              feetY - cloakHeight * 0.45
+            }
+            L ${centerX + halfW * 0.7 + lean}, ${
+              feetY - cloakHeight * 0.45
+            }
           `}
             fill="none"
             stroke={palette.trim}
-            strokeWidth={0.9}
+            strokeWidth={1}
           />
 
-          {/* archetype / variant details */}
           {archetypeKey === "architect" && (
             <>
+              {/* center buckle + pendant */}
               <rect
-                x={offsetX - 6 + lean}
-                y={offsetY + height * 0.11}
-                width={12}
+                x={centerX - 7 + lean}
+                y={feetY - cloakHeight * 0.47}
+                width={14}
                 height={6}
                 rx={3}
                 fill="none"
                 stroke={palette.accent}
-                strokeWidth={0.9}
+                strokeWidth={1}
               />
               <circle
-                cx={offsetX + lean}
-                cy={offsetY + height * 0.28}
+                cx={centerX + lean}
+                cy={feetY - cloakHeight * 0.3}
                 r={4}
                 fill="none"
                 stroke={palette.accent}
-                strokeWidth={0.9}
+                strokeWidth={1}
               />
               <line
-                x1={offsetX + lean}
-                y1={offsetY + height * 0.17}
-                x2={offsetX + lean}
-                y2={offsetY + height * 0.24}
+                x1={centerX + lean}
+                y1={feetY - cloakHeight * 0.36}
+                x2={centerX + lean}
+                y2={feetY - cloakHeight * 0.33}
                 stroke={palette.accent}
-                strokeWidth={0.8}
+                strokeWidth={1}
+              />
+              {/* hem lines */}
+              <path
+                d={`
+                M ${centerX - 6 + lean}, ${feetY - 14}
+                L ${centerX - 6 + lean}, ${feetY - 4}
+              `}
+                stroke={palette.accent}
+                strokeWidth={1}
+              />
+              <path
+                d={`
+                M ${centerX + lean}, ${feetY - 14}
+                L ${centerX + lean}, ${feetY - 3}
+              `}
+                stroke={palette.accent}
+                strokeWidth={1}
+              />
+              <path
+                d={`
+                M ${centerX + 6 + lean}, ${feetY - 14}
+                L ${centerX + 6 + lean}, ${feetY - 4}
+              `}
+                stroke={palette.accent}
+                strokeWidth={1}
               />
             </>
           )}
 
           {archetypeKey === "seer" && (
             <>
+              {/* circular focus at center */}
               <circle
-                cx={offsetX + lean}
-                cy={offsetY + height * 0.18}
-                r={3}
+                cx={centerX + lean}
+                cy={feetY - cloakHeight * 0.44}
+                r={3.2}
                 fill="none"
                 stroke={palette.accent}
-                strokeWidth={0.9}
+                strokeWidth={1}
               />
               {variantIndex % 2 === 0 && (
                 <circle
-                  cx={offsetX + lean}
-                  cy={offsetY + height * 0.18}
-                  r={1.4}
+                  cx={centerX + lean}
+                  cy={feetY - cloakHeight * 0.44}
+                  r={1.6}
                   fill={palette.accent}
                 />
               )}
+              {/* vertical glyph */}
+              <path
+                d={`
+                M ${centerX + lean}, ${feetY - cloakHeight * 0.4}
+                L ${centerX + lean}, ${feetY - cloakHeight * 0.24}
+              `}
+                stroke={palette.accent}
+                strokeWidth={1}
+              />
             </>
           )}
 
           {archetypeKey === "wanderer" && (
             <>
+              {/* flowing belt curve */}
               <path
                 d={`
-                M ${offsetX - 8 + lean}, ${offsetY + height * 0.16}
-                Q ${offsetX + lean}, ${offsetY + height * 0.22} ${
-                  offsetX + 8 + lean
-                }, ${offsetY + height * 0.16}
+                M ${centerX - 10 + lean}, ${feetY - cloakHeight * 0.45}
+                Q ${centerX + lean}, ${feetY - cloakHeight * 0.4}
+                  ${centerX + 10 + lean}, ${feetY - cloakHeight * 0.45}
               `}
                 fill="none"
                 stroke={palette.accent}
-                strokeWidth={0.9}
+                strokeWidth={1}
               />
-              {variantIndex % 2 === 1 && (
-                <path
-                  d={`
-                  M ${offsetX + lean}, ${offsetY + height * 0.16}
-                  L ${offsetX + lean}, ${offsetY + height * 0.28}
-                `}
-                  stroke={palette.accent}
-                  strokeWidth={0.9}
-                />
-              )}
+              {/* single long path glyph */}
+              <path
+                d={`
+                M ${centerX + lean}, ${feetY - cloakHeight * 0.38}
+                Q ${centerX + 6 + lean}, ${feetY - cloakHeight * 0.2}
+                  ${centerX + lean}, ${feetY - cloakHeight * 0.05}
+              `}
+                fill="none"
+                stroke={palette.accent}
+                strokeWidth={1}
+              />
             </>
           )}
         </g>
 
-        {/* hem glyphs for glyph / trail styles */}
-        {cloakStyle !== "classic" && (
-          <g opacity={0.85}>
-            {cloakStyle === "glyph" && (
-              <>
-                <path
-                  d={`
-                  M ${offsetX + lean}, ${offsetY + height * 0.46}
-                  L ${offsetX + lean}, ${offsetY + height * 0.68}
-                `}
-                  stroke={palette.accent}
-                  strokeWidth={1}
-                />
-                <path
-                  d={`
-                  M ${offsetX - 7 + lean}, ${offsetY + height * 0.5}
-                  L ${offsetX - 7 + lean}, ${offsetY + height * 0.7}
-                `}
-                  stroke={palette.accent}
-                  strokeWidth={0.8}
-                />
-                <path
-                  d={`
-                  M ${offsetX + 7 + lean}, ${offsetY + height * 0.5}
-                  L ${offsetX + 7 + lean}, ${offsetY + height * 0.7}
-                `}
-                  stroke={palette.accent}
-                  strokeWidth={0.8}
-                />
-              </>
-            )}
-
-            {cloakStyle === "trail" && (
-              <path
-                d={`
-                M ${offsetX + halfW * 0.9 + lean}, ${offsetY + height * 0.55}
-                Q ${offsetX + halfW * 1.3 + lean}, ${offsetY + height * 0.78}
-                  ${offsetX + halfW * 1.55 + lean}, ${offsetY + height * 0.96}
-              `}
-                fill="none"
-                stroke={palette.accent}
-                strokeWidth={1.2}
-              />
-            )}
-          </g>
-        )}
-
-        {/* small companion sprite if present */}
-        {companion && (
+        {/* optional companion as little floating light */}
+        {hasCompanion && (
           <>
             <ellipse
-              cx={offsetX + halfW + 10 + lean}
-              cy={offsetY + 6}
+              cx={centerX + halfW + 12 + lean}
+              cy={feetY - 12}
               rx={7}
               ry={3}
               fill="rgba(0,0,0,0.7)"
               style={{ filter: "blur(2px)" }}
             />
             <rect
-              x={offsetX + halfW + 4 + lean}
-              y={offsetY - 14}
+              x={centerX + halfW + 7 + lean}
+              y={feetY - cloakHeight * 0.25}
               width={10}
               height={18}
               rx={3}
               fill={palette.inner}
               stroke={palette.glow}
-              strokeWidth={0.9}
+              strokeWidth={1}
             />
             <circle
-              cx={offsetX + halfW + 9 + lean}
-              cy={offsetY - 9}
-              r={3.4}
+              cx={centerX + halfW + 12 + lean}
+              cy={feetY - cloakHeight * 0.21}
+              r={3.6}
               fill={palette.glow}
             />
           </>

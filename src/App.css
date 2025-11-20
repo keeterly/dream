@@ -3252,7 +3252,10 @@ body {
     );
 }
 
-
+/* Subtle lift of the avatar so it feels “called out” */
+.world-card--encounter .world-stage-avatar {
+  transform: translateY(28px);
+}
 
 
 @media (max-height: 780px) {
@@ -3260,6 +3263,9 @@ body {
     top: 5rem;
     padding: 0.8rem 1.9rem 1rem;
   }
+
+  .world-card--encounter .world-stage-avatar {
+    transform: translateY(32px);
   }
 }
 

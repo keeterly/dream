@@ -211,20 +211,24 @@ export const App: React.FC = () => {
       );
     }
 
-    if (screen === "world" && profile) {
-      return (
-        <WorldStep
-          profile={profile}
-          inventory={inventory}
-          journalEntries={journalEntries as JournalEntry[]}
-          onSpawnDebugItem={handleSpawnDebugItem}
-          encounterItemName={lastEncounterItemName}
-          phase={phase}
-          activeEncounterItem={activeEncounterItem}
-          onResolveEncounter={handleResolveEncounter}
-        />
-      );
-    }
+   if (screen === "world" && profile) {
+  const encounterNameForLane =
+    activeEncounterItem ? null : lastEncounterItemName;
+
+  return (
+    <WorldStep
+      profile={profile}
+      inventory={inventory}
+      journalEntries={journalEntries as JournalEntry[]}
+      onSpawnDebugItem={handleSpawnDebugItem}
+      encounterItemName={encounterNameForLane}
+      phase={phase}
+      activeEncounterItem={activeEncounterItem}
+      onResolveEncounter={handleResolveEncounter}
+    />
+  );
+}
+
 
     return <IntroStep onBegin={handleBegin} />;
   };

@@ -2,8 +2,8 @@ import React from "react";
 import "./AvatarView.css";
 
 interface AvatarViewProps {
-  avatar: any;   // AvatarConfig from profile
-  traits?: any;  // DreamTraits (optional)
+  avatar: any;
+  traits?: any;
   dreamName?: string;
 }
 
@@ -83,7 +83,7 @@ function getVariantIndex(avatar: any, traits?: any, dreamName?: string) {
   return hashToInt(seed || "default", 4);
 }
 
-/* ---------- geometry for body + sleeves ---------- */
+/* ---------- geometry ---------- */
 
 function getBodyGeometry(avatar: any, traits?: any, dreamName?: string) {
   const bodyType = getBodyType(avatar);
@@ -96,12 +96,10 @@ function getBodyGeometry(avatar: any, traits?: any, dreamName?: string) {
   const centerX = width / 2;
   const feetY = 182;
 
-  // how tall the robe is from shoulders to hem
   let robeHeight = 112;
   if (bodyType === "tall") robeHeight = 120;
   if (bodyType === "compact") robeHeight = 106;
 
-  // base width of the cloak at hem
   let baseWidth = 74;
   if (bodyType === "slim") baseWidth = 68;
   if (bodyType === "compact") baseWidth = 64;
@@ -114,9 +112,9 @@ function getBodyGeometry(avatar: any, traits?: any, dreamName?: string) {
   if (variantIndex === 1) robeHeight += 2;
   if (variantIndex === 2) robeHeight -= 2;
 
-  const headCenterY = feetY - robeHeight - 28;        // slightly higher head
-  const shoulderY = headCenterY + 22;                 // shoulders just below hood
-  const wristY = shoulderY + robeHeight * 0.45;       // end of sleeves
+  const headCenterY = feetY - robeHeight - 28;
+  const shoulderY = headCenterY + 22;
+  const wristY = shoulderY + robeHeight * 0.45;
 
   return {
     width,
@@ -263,7 +261,6 @@ function renderAccentGlyphs(
 
   const nodes: React.ReactNode[] = [];
 
-  // belt
   nodes.push(
     <path
       key="belt"
@@ -412,9 +409,7 @@ export const AvatarView: React.FC<AvatarViewProps> = ({
         role="img"
         aria-label="Dreamself avatar"
       >
-        {/* no background rect – world art shows through */}
-
-        {/* ground shadow */}
+        {/* static ground shadow (doesn't bob) */}
         <ellipse
           cx={x}
           cy={feetY + 3}
@@ -423,165 +418,166 @@ export const AvatarView: React.FC<AvatarViewProps> = ({
           fill="rgba(0,0,0,0.7)"
         />
 
-        {/* legs */}
-        <g fill="#050509" opacity={0.9}>
-          <rect x={x - 7} y={feetY - 24} width={6} height={24} rx={2} />
-          <rect x={x + 1} y={feetY - 24} width={6} height={24} rx={2} />
-        </g>
+        <g className="avatar-figure">
+          {/* legs */}
+          <g className="avatar-legs" fill="#050509" opacity={0.9}>
+            <rect x={x - 7} y={feetY - 24} width={6} height={24} rx={2} />
+            <rect x={x + 1} y={feetY - 24} width={6} height={24} rx={2} />
+          </g>
 
-        {/* sleeves / arms */}
-        <g fill={palettes.robe} stroke={palettes.trim} strokeWidth={1.2}>
-          {/* left sleeve */}
-          <path
-            d={`
-              M ${x - halfBase * 0.45}, ${shoulderY}
-              L ${x - halfBase * 0.75}, ${wristY}
-              L ${x - halfBase * 0.55}, ${wristY}
-              L ${x - halfBase * 0.35}, ${shoulderY + 4}
-              Z
-            `}
-          />
-          {/* right sleeve */}
-          <path
-            d={`
-              M ${x + halfBase * 0.45}, ${shoulderY}
-              L ${x + halfBase * 0.75}, ${wristY}
-              L ${x + halfBase * 0.55}, ${wristY}
-              L ${x + halfBase * 0.35}, ${shoulderY + 4}
-              Z
-            `}
-          />
-        </g>
+          {/* robe + sleeves + hood */}
+          <g className="avatar-robe">
+            {/* sleeves / arms */}
+            <g fill={palettes.robe} stroke={palettes.trim} strokeWidth={1.2}>
+              <path
+                d={`
+                  M ${x - halfBase * 0.45}, ${shoulderY}
+                  L ${x - halfBase * 0.75}, ${wristY}
+                  L ${x - halfBase * 0.55}, ${wristY}
+                  L ${x - halfBase * 0.35}, ${shoulderY + 4}
+                  Z
+                `}
+              />
+              <path
+                d={`
+                  M ${x + halfBase * 0.45}, ${shoulderY}
+                  L ${x + halfBase * 0.75}, ${wristY}
+                  L ${x + halfBase * 0.55}, ${wristY}
+                  L ${x + halfBase * 0.35}, ${shoulderY + 4}
+                  Z
+                `}
+              />
+            </g>
 
-        {/* main triangular / split-front robe */}
-        {cloakStyle !== "split_front" && (
-          <path
-            d={`
-              M ${x}, ${shoulderY}
-              L ${x - halfBase}, ${feetY - 4}
-              L ${x + halfBase}, ${feetY - 4}
-              Z
-            `}
-            fill={palettes.robe}
-            stroke={palettes.trim}
-            strokeWidth={1.6}
-          />
-        )}
+            {/* main robe */}
+            {cloakStyle !== "split_front" && (
+              <path
+                d={`
+                  M ${x}, ${shoulderY}
+                  L ${x - halfBase}, ${feetY - 4}
+                  L ${x + halfBase}, ${feetY - 4}
+                  Z
+                `}
+                fill={palettes.robe}
+                stroke={palettes.trim}
+                strokeWidth={1.6}
+              />
+            )}
 
-        {cloakStyle === "split_front" && (
-          <>
+            {cloakStyle === "split_front" && (
+              <>
+                <path
+                  d={`
+                    M ${x}, ${shoulderY}
+                    L ${x - halfBase * 0.95}, ${feetY - 4}
+                    L ${x - 5}, ${feetY - 4}
+                    Z
+                  `}
+                  fill={palettes.robe}
+                  stroke={palettes.trim}
+                  strokeWidth={1.6}
+                />
+                <path
+                  d={`
+                    M ${x}, ${shoulderY}
+                    L ${x + 5}, ${feetY - 4}
+                    L ${x + halfBase * 0.95}, ${feetY - 4}
+                    Z
+                  `}
+                  fill={palettes.robe}
+                  stroke={palettes.trim}
+                  strokeWidth={1.6}
+                />
+              </>
+            )}
+
+            {/* cape overlay */}
+            {cloakStyle === "cape_heavy" && (
+              <path
+                d={`
+                  M ${x - halfBase * 0.8}, ${shoulderY - 6}
+                  Q ${x}, ${shoulderY - 18}
+                    ${x + halfBase * 0.8}, ${shoulderY - 6}
+                  L ${x + halfBase * 0.9}, ${feetY - robeHeight * 0.35}
+                  Q ${x}, ${feetY - robeHeight * 0.2}
+                    ${x - halfBase * 0.9}, ${feetY - robeHeight * 0.35}
+                  Z
+                `}
+                fill={palettes.robe}
+                stroke={palettes.trim}
+                strokeWidth={1.2}
+              />
+            )}
+
+            {/* hood outline */}
             <path
               d={`
-                M ${x}, ${shoulderY}
-                L ${x - halfBase * 0.95}, ${feetY - 4}
-                L ${x - 5}, ${feetY - 4}
-                Z
+                M ${x - 16}, ${headCenterY + 14}
+                Q ${x}, ${headCenterY - 8}
+                  ${x + 16}, ${headCenterY + 14}
               `}
-              fill={palettes.robe}
+              fill="none"
               stroke={palettes.trim}
-              strokeWidth={1.6}
+              strokeWidth={1.4}
             />
+
+            {/* head + mask */}
+            <circle cx={x} cy={headCenterY + 3} r={9} fill={palettes.inner} />
+            {renderMask(avatar, palettes, centerX, headCenterY + 2, lean, variantIndex)}
+
+            {/* shoulder fold */}
             <path
               d={`
-                M ${x}, ${shoulderY}
-                L ${x + 5}, ${feetY - 4}
-                L ${x + halfBase * 0.95}, ${feetY - 4}
-                Z
+                M ${x - halfBase * 0.7}, ${shoulderY}
+                Q ${x}, ${shoulderY - 10}
+                  ${x + halfBase * 0.7}, ${shoulderY}
               `}
-              fill={palettes.robe}
+              fill="none"
               stroke={palettes.trim}
-              strokeWidth={1.6}
+              strokeWidth={1.2}
             />
-          </>
-        )}
 
-        {/* cape overlay for cape_heavy */}
-        {cloakStyle === "cape_heavy" && (
-          <path
-            d={`
-              M ${x - halfBase * 0.8}, ${shoulderY - 6}
-              Q ${x}, ${shoulderY - 18}
-                ${x + halfBase * 0.8}, ${shoulderY - 6}
-              L ${x + halfBase * 0.9}, ${feetY - robeHeight * 0.35}
-              Q ${x}, ${feetY - robeHeight * 0.2}
-                ${x - halfBase * 0.9}, ${feetY - robeHeight * 0.35}
-              Z
-            `}
-            fill={palettes.robe}
-            stroke={palettes.trim}
-            strokeWidth={1.2}
-          />
-        )}
+            {/* glyphs */}
+            {renderAccentGlyphs(
+              avatar,
+              palettes,
+              centerX,
+              feetY,
+              robeHeight,
+              baseWidth,
+              lean
+            )}
+          </g>
 
-        {/* hood outline */}
-        <path
-          d={`
-            M ${x - 16}, ${headCenterY + 14}
-            Q ${x}, ${headCenterY - 8}
-              ${x + 16}, ${headCenterY + 14}
-          `}
-          fill="none"
-          stroke={palettes.trim}
-          strokeWidth={1.4}
-        />
-
-        {/* head under hood */}
-        <circle cx={x} cy={headCenterY + 3} r={9} fill={palettes.inner} />
-
-        {/* mask / face */}
-        {renderMask(avatar, palettes, centerX, headCenterY + 2, lean, variantIndex)}
-
-        {/* shoulder fold */}
-        <path
-          d={`
-            M ${x - halfBase * 0.7}, ${shoulderY}
-            Q ${x}, ${shoulderY - 10}
-              ${x + halfBase * 0.7}, ${shoulderY}
-          `}
-          fill="none"
-          stroke={palettes.trim}
-          strokeWidth={1.2}
-        />
-
-        {/* robe glyphs */}
-        {renderAccentGlyphs(
-          avatar,
-          palettes,
-          centerX,
-          feetY,
-          robeHeight,
-          baseWidth,
-          lean
-        )}
-
-        {/* companion mote */}
-        {hasCompanion && (
-          <>
-            <ellipse
-              cx={x + halfBase * 0.7}
-              cy={feetY - 10}
-              rx={6}
-              ry={3}
-              fill="rgba(0,0,0,0.7)"
-            />
-            <rect
-              x={x + halfBase * 0.6 - 4}
-              y={feetY - robeHeight * 0.25}
-              width={8}
-              height={16}
-              rx={3}
-              fill={palettes.inner}
-              stroke={palettes.glow}
-              strokeWidth={1}
-            />
-            <circle
-              cx={x + halfBase * 0.6}
-              cy={feetY - robeHeight * 0.25 + 4}
-              r={3.2}
-              fill={palettes.glow}
-            />
-          </>
-        )}
+          {/* companion light */}
+          {hasCompanion && (
+            <>
+              <ellipse
+                cx={x + halfBase * 0.7}
+                cy={feetY - 10}
+                rx={6}
+                ry={3}
+                fill="rgba(0,0,0,0.7)"
+              />
+              <rect
+                x={x + halfBase * 0.6 - 4}
+                y={feetY - robeHeight * 0.25}
+                width={8}
+                height={16}
+                rx={3}
+                fill={palettes.inner}
+                stroke={palettes.glow}
+                strokeWidth={1}
+              />
+              <circle
+                cx={x + halfBase * 0.6}
+                cy={feetY - robeHeight * 0.25 + 4}
+                r={3.2}
+                fill={palettes.glow}
+              />
+            </>
+          )}
+        </g>
       </svg>
     </div>
   );

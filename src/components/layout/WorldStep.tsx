@@ -121,9 +121,9 @@ export const WorldStep: React.FC<WorldStepProps> = ({
       : "";
 
 
-  return (
+    return (
     <section className="app-screen app-screen-world">
-      <div className={`world-card ${lighting.worldClass}`}>
+      <div className={cardClasses}>
         {/* WORLD LANE / PARALLAX */}
         <WorldLane
           profile={profile}
@@ -156,7 +156,10 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
                 <button
                   type="button"
-                  className="world-encounter-banner world-encounter-banner--visible"
+                  className={
+                    "world-encounter-banner world-encounter-banner--visible " +
+                    bannerRarityClass
+                  }
                   onClick={handleEncounterBannerClick}
                 >
                   <div className="world-encounter-banner-label">
@@ -165,6 +168,16 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                   <div className="world-encounter-banner-name">
                     {activeEncounterItem.name}
                   </div>
+
+                  <div className="world-encounter-banner-meta">
+                    <span className="world-encounter-banner-rarity">
+                      {activeEncounterItem.rarity}
+                    </span>
+                    <span className="world-encounter-banner-hint">
+                      Tap to bind
+                    </span>
+                  </div>
+
                   <div className="world-encounter-banner-orb" />
                 </button>
               </>
@@ -174,6 +187,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             <div className="world-stage-shadow" />
           </div>
         )}
+
 
         {/* GLOBAL TINT OVERLAY */}
         <div className="world-tint-overlay" />

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type {
   DreamselfProfile,
   InventoryItem,
@@ -20,7 +20,9 @@ interface WorldStepProps {
   onSpawnDebugItem: () => void;
   encounterItemName: string | null;
   phase: string;
-  activeEncounterItem?: InventoryItem | null;
+  activeEncounterItem: InventoryItem | null;
+  /** Clear the current encounter (and usually add to inventory) */
+  onResolveEncounter: () => void;
 }
 
 export const WorldStep: React.FC<WorldStepProps> = ({
@@ -31,16 +33,19 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   encounterItemName,
   phase,
   activeEncounterItem,
+  onResolveEncounter,
 }) => {
   const [activePanel, setActivePanel] = useState<WorldPanelId | null>(
     "inventory"
   );
 
-  // Auto-walk toggle: true = drifting, false = standing
+  // Auto-walk toggle for HUD
   const [isAutoWalking, setIsAutoWalking] = useState(true);
+  // Did we start the encounter while auto-walk was on?
+  const [wasAutoWalkingBeforeEncounter, setWasAutoWalkingBeforeEncounter] =
+    useState(false);
 
   const isEncounterActive = !!activeEncounterItem;
-  // Encounters temporarily stop movement even if auto-walk is "on"
   const isWalking = isAutoWalking && !isEncounterActive;
 
   const togglePanel = (panel: WorldPanelId) => {
@@ -48,11 +53,58 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   };
 
   const dominantElement = profile?.traits?.dominantElement ?? null;
-
   const lighting = useBiomeLighting({
     phase,
     element: dominantElement,
   });
+
+  /**
+   * If an encounter becomes active while auto-walk is enabled,
+   * pause walking and remember that we should resume afterwards.
+   */
+  useEffect(() => {
+    if (isEncounterActive && isAutoWalking) {
+      setWasAutoWalkingBeforeEncounter(true);
+      setIsAutoWalking(false);
+    }
+
+    if (!isEncounterActive) {
+      // When all encounters are cleared we reset the flag.
+      setWasAutoWalkingBeforeEncounter(false);
+    }
+  }, [isEncounterActive, isAutoWalking]);
+
+  /**
+   * Auto-encounter roll:
+   * While auto-walk is ON and nothing is happening,
+   * roll for a relic encounter every 8–16 seconds.
+   *
+   * For now this just reuses onSpawnDebugItem, which should
+   * create a new activeEncounterItem in the parent.
+   */
+  useEffect(() => {
+    if (!isAutoWalking || isEncounterActive) return;
+
+    const delay = 8000 + Math.random() * 8000; // 8–16s
+    const id = window.setTimeout(() => {
+      setWasAutoWalkingBeforeEncounter(true);
+      setIsAutoWalking(false);
+      onSpawnDebugItem();
+    }, delay);
+
+    return () => window.clearTimeout(id);
+  }, [isAutoWalking, isEncounterActive, onSpawnDebugItem]);
+
+  const handleEncounterBannerClick = () => {
+    // Tell parent to finalize the encounter (add to inventory, clear active item)
+    onResolveEncounter();
+
+    // If we interrupted auto-walk, resume it
+    if (wasAutoWalkingBeforeEncounter) {
+      setIsAutoWalking(true);
+      setWasAutoWalkingBeforeEncounter(false);
+    }
+  };
 
   return (
     <section className="app-screen app-screen-world">
@@ -82,18 +134,24 @@ export const WorldStep: React.FC<WorldStepProps> = ({
               dreamName={profile.dreamName}
             />
 
+            {/* Encounter indicator above head */}
             {activeEncounterItem && (
               <>
-                {/* little attention marker over the head */}
                 <div className="world-encounter-glyph">!</div>
 
-                {/* speech-bubble style relic text */}
-                <div className="world-encounter-bubble">
-                  <div className="world-encounter-label">Relic found</div>
-                  <div className="world-encounter-name">
+                <button
+                  type="button"
+                  className="world-encounter-banner world-encounter-banner--visible"
+                  onClick={handleEncounterBannerClick}
+                >
+                  <div className="world-encounter-banner-label">
+                    Relic Found
+                  </div>
+                  <div className="world-encounter-banner-name">
                     {activeEncounterItem.name}
                   </div>
-                </div>
+                  <div className="world-encounter-banner-orb" />
+                </button>
               </>
             )}
 
@@ -133,7 +191,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 <span className="hud-value">{phase}</span>
               </div>
 
-              {/* Auto-walk toggle (desktop + mobile) */}
+              {/* Auto-walk toggle */}
               <button
                 type="button"
                 className={`world-autowalk-toggle ${
@@ -142,6 +200,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                     : "world-autowalk-toggle--off"
                 }`}
                 onClick={() => setIsAutoWalking((prev) => !prev)}
+                disabled={isEncounterActive}
               >
                 <span className="world-autowalk-label">Auto-walk</span>
                 <span className="world-autowalk-state">

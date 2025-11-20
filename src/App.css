@@ -768,7 +768,7 @@ body {
     transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translate3d(-40%, 0, 0);
+    transform: translate3d(40%, 0, 0);
   }
 }
 
@@ -777,7 +777,7 @@ body {
     transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translate3d(-60%, 0, 0);
+    transform: translate3d(60%, 0, 0);
   }
 }
 
@@ -786,17 +786,17 @@ body {
     transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translate3d(-90%, 0, 0);
+    transform: translate3d(90%, 0, 0);
   }
 }
 
 @keyframes world-lane-walk-bob {
   0%,
   100% {
-    transform: translate(-50%, 0);
+    transform: translate(50%, 0);
   }
   50% {
-    transform: translate(-50%, -4px);
+    transform: translate(50%, -4px);
   }
 }
 
@@ -941,7 +941,7 @@ body {
     background-position: 0% bottom;
   }
   to {
-    background-position: -120% bottom; /* enough to feel like a slow walk */
+    background-position: 120% bottom; /* enough to feel like a slow walk */
   }
 }
 

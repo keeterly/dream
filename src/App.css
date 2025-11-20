@@ -1713,3 +1713,313 @@ body {
     padding-inline: 1rem;
   }
 }
+
+
+/* === DREAM: World HUD / Dock / Panels (JRPG-style) === */
+
+/* Root & screens */
+.app-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-screen {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+/* World overlay hooks into your existing world-card, which is already positioned/animated */
+.app-screen-world .world-card {
+  margin-inline: auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.world-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+/* Let children be interactable */
+.world-hud,
+.world-dock,
+.world-panels {
+  pointer-events: auto;
+}
+
+/* ===== HUD (top overlay) ===== */
+
+.world-hud {
+  padding: 1rem 2.5rem 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.world-hud-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.hud-kicker {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  opacity: 0.6;
+}
+
+.world-hud-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.world-hud-title {
+  font-size: 1rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.world-hud-badge {
+  font-size: 0.7rem;
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.18em;
+}
+
+.world-hud-meta {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.1rem;
+  font-size: 0.7rem;
+}
+
+.hud-label {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  opacity: 0.6;
+  margin-right: 0.3rem;
+}
+
+.hud-value {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+.world-hud-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  font-size: 0.7rem;
+  text-align: right;
+}
+
+/* ===== Dock (bottom buttons) ===== */
+
+.world-dock {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  padding-bottom: 1.5rem;
+}
+
+.world-dock-button {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(
+    135deg,
+    rgba(18, 24, 40, 0.9),
+    rgba(4, 8, 20, 0.95)
+  );
+  padding: 0.4rem 1rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.82);
+  cursor: pointer;
+  white-space: nowrap;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.8),
+    0 12px 35px rgba(0, 0, 0, 0.75);
+  transition: transform 120ms ease-out, border-color 120ms ease-out,
+    box-shadow 120ms ease-out, background 120ms ease-out;
+}
+
+.world-dock-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 16px 45px rgba(0, 0, 0, 0.85);
+}
+
+.world-dock-button--active {
+  border-color: rgba(255, 255, 255, 0.7);
+  background: linear-gradient(
+    135deg,
+    rgba(250, 250, 255, 0.18),
+    rgba(3, 5, 15, 0.96)
+  );
+}
+
+/* ===== Panels (Inventory / Journal / Debug) ===== */
+
+.world-panels {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 2.5rem 4.8rem;
+}
+
+.world-panel {
+  max-width: 520px;
+  width: 100%;
+  padding: 1.2rem 1.4rem;
+  border-radius: 1.2rem 1.2rem 0 1.2rem;
+  background: linear-gradient(
+    135deg,
+    rgba(9, 15, 26, 0.96),
+    rgba(14, 27, 54, 0.94)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(24px);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.82rem;
+}
+
+.world-panel-title {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  margin-bottom: 0.6rem;
+  opacity: 0.8;
+}
+
+.world-panel-empty,
+.world-panel-body {
+  opacity: 0.75;
+}
+
+/* Inventory list within panel */
+.inventory-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.inventory-item {
+  padding: 0.45rem 0.5rem;
+  border-radius: 0.8rem;
+  background: radial-gradient(
+    circle at 0% 0%,
+    rgba(255, 255, 255, 0.09),
+    transparent
+  );
+}
+
+.inventory-item-main {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+/* subtle rarity tints */
+.inventory-item.rarity-common {
+  border-left: 2px solid rgba(255, 255, 255, 0.25);
+}
+
+.inventory-item.rarity-rare {
+  border-left: 2px solid rgba(156, 206, 255, 0.7);
+}
+
+.inventory-item.rarity-mythic {
+  border-left: 2px solid rgba(255, 215, 160, 0.95);
+}
+
+/* Journal entries */
+.journal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-height: 260px;
+  overflow: auto;
+}
+
+.journal-entry {
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.8rem;
+  background: radial-gradient(
+    circle at 0% 0%,
+    rgba(255, 255, 255, 0.08),
+    transparent
+  );
+}
+
+.journal-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  opacity: 0.82;
+}
+
+.journal-entry-title {
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+}
+
+.journal-entry-body {
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  opacity: 0.88;
+}
+
+.journal-entry-type {
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+/* Mobile tweaks */
+@media (max-width: 768px) {
+  .world-hud {
+    padding-inline: 1rem;
+  }
+
+  .world-panels {
+    margin: 0 1rem 4.5rem;
+    justify-content: center;
+  }
+
+  .world-panel {
+    max-width: none;
+    width: 100%;
+    border-radius: 1rem;
+  }
+}

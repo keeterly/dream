@@ -36,17 +36,29 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
         <div className="world-overlay">
           {/* HUD */}
-          <div className="world-hud">
-            <div className="world-hud-left">
-              <span className="world-hud-label">Dreamself</span>
-              <span className="world-hud-value">{profile.dreamName}</span>
-            </div>
-            <div className="world-hud-right">
-              <span className="world-hud-pill">
-                {profile.traits.primaryArchetype}
-              </span>
-            </div>
-          </div>
+         <div className="world-hud">
+  <div className="world-hud-left">
+    <div className="world-hud-field">
+      <span className="hud-kicker">FIELD — SCROLLING WORLD</span>
+    </div>
+    <div className="world-hud-title-row">
+      <span className="world-hud-title">{profile.dreamName}</span>
+      <span className="world-hud-badge">LV 01</span>
+    </div>
+    <div className="world-hud-meta">
+      <span className="hud-label">DREAMSELF</span>
+      <span className="hud-value">{profile.traits.primaryArchetype}</span>
+    </div>
+  </div>
+
+  <div className="world-hud-right">
+    <div className="world-hud-phase">
+      <span className="hud-label">PHASE</span>
+      <span className="hud-value">Night</span>
+    </div>
+  </div>
+</div>
+
 
           {/* Dock */}
           <div className="world-dock">

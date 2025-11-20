@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import type { DreamselfProfile, InventoryItem, JournalEntry } from "../../types";
-import { WorldLane } from "../WorldLane";
+import WorldLane from "../WorldLane";
 import { JournalPanel } from "../panels/JournalPanel";
 
 type WorldPanelId = "inventory" | "character" | "map" | "journal" | "debug";

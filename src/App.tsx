@@ -36,11 +36,12 @@ export const App: React.FC = () => {
   const [worldTick, setWorldTick] = useState(0);
 
   const {
-    entries: journalEntries,
-    logDreamselfCreated,
-    logItemFound,
-    logBiomeVisited,
-  } = useJournal([]);
+  entries: journalEntries,
+  logDreamselfCreated,
+  logItemFound,
+  logBiomeVisited,
+} = useJournal();
+
 
   // world tick + passive relic drops
   useEffect(() => {

@@ -1,6 +1,7 @@
 import React from "react";
 import type { DreamselfProfile } from "../../types";
-import { AvatarView } from "../AvatarView";
+import AvatarView from "../AvatarView";
+
 
 interface SummaryStepProps {
   profile: DreamselfProfile;

@@ -10,8 +10,8 @@ function makeEntryId(type: JournalEntryType): string {
   return `${type}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-export function useJournal(initialEntries: JournalEntry[] = []) {
-  const [entries, setEntries] = useState<JournalEntry[]>(initialEntries);
+export function useJournal() {
+  const [entries, setEntries] = useState<JournalEntry[]>([]);
 
   const logEntry = useCallback((entry: JournalEntry) => {
     setEntries((prev) => [entry, ...prev]);
@@ -24,7 +24,6 @@ export function useJournal(initialEntries: JournalEntry[] = []) {
         type: "dreamself_created",
         timestampIso: new Date().toISOString(),
         title: `Dreamself awakened: ${profile.dreamName}`,
-        // keep body generic so we don't depend on element fields
         body: `Primary archetype: ${profile.traits.primaryArchetype}.`,
         meta: { profile },
       };

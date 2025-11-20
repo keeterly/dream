@@ -10,6 +10,7 @@ interface WorldStepProps {
   inventory: InventoryItem[];
   journalEntries: JournalEntry[];
   onSpawnDebugItem: () => void;
+  encounterItemName: string | null;
 }
 
 export const WorldStep: React.FC<WorldStepProps> = ({
@@ -17,6 +18,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   inventory,
   journalEntries,
   onSpawnDebugItem,
+  encounterItemName,
 }) => {
   const [activePanel, setActivePanel] = useState<WorldPanelId | null>(
     "inventory"
@@ -25,7 +27,12 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   return (
     <section className="app-screen app-screen-world">
       <div className="world-card">
-        <WorldLane environmentId="dusk_valley" phase="twilight" />
+        <WorldLane
+          profile={profile}
+          environmentId="dusk_valley"
+          phase="twilight"
+          encounterItemName={encounterItemName}
+        />
 
         <div className="world-overlay">
           {/* HUD */}
@@ -145,7 +152,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
               </div>
             )}
 
-            {/* character + map panels can be wired in next pass */}
+            {/* character + map can be wired next */}
           </div>
         </div>
       </div>

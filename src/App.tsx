@@ -34,14 +34,16 @@ export const App: React.FC = () => {
   const [profile, setProfile] = useState<DreamselfProfile | null>(null);
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [worldTick, setWorldTick] = useState(0);
+  const [lastEncounterItemName, setLastEncounterItemName] = useState<
+    string | null
+  >(null);
 
   const {
-  entries: journalEntries,
-  logDreamselfCreated,
-  logItemFound,
-  logBiomeVisited,
-} = useJournal();
-
+    entries: journalEntries,
+    logDreamselfCreated,
+    logItemFound,
+    logBiomeVisited,
+  } = useJournal();
 
   // world tick + passive relic drops
   useEffect(() => {
@@ -61,6 +63,7 @@ export const App: React.FC = () => {
         };
 
         setInventory((prev) => [invItem, ...prev]);
+        setLastEncounterItemName(invItem.name);
         logItemFound(invItem);
       }
 
@@ -109,6 +112,7 @@ export const App: React.FC = () => {
     };
 
     setInventory((prev) => [invItem, ...prev]);
+    setLastEncounterItemName(invItem.name);
     logItemFound(invItem);
   };
 
@@ -141,6 +145,7 @@ export const App: React.FC = () => {
           inventory={inventory}
           journalEntries={journalEntries as JournalEntry[]}
           onSpawnDebugItem={handleSpawnDebugItem}
+          encounterItemName={lastEncounterItemName}
         />
       );
     }

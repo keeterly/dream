@@ -2316,3 +2316,37 @@ body {
   display: none;
 }
 
+.world-lane-figure {
+  display: none;
+}
+
+/* Position the Dreamself avatar in the world */
+.world-stage-avatar {
+  position: absolute;
+  left: 50%;
+  bottom: 8vh;              /* tweak until feet sit on the ground */
+  pointer-events: none;
+}
+
+/* scale + center the SVG */
+.world-stage-avatar .avatar-view-svg {
+  width: clamp(80px, 13vh, 120px);
+  height: auto;
+  transform: translateX(-50%);
+}
+
+/* Walking / bobbing animation for world mode */
+.world-stage-avatar--walking .avatar-view-svg {
+  animation: dreamself-walk-bob 1.15s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
+/* simple bob that suggests walking while the world scrolls */
+@keyframes dreamself-walk-bob {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  25%, 75% {
+    transform: translateX(-50%) translateY(-3px);
+  }
+}

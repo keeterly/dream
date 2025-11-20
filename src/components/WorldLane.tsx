@@ -1,53 +1,40 @@
-import React from "react";
-import { DreamselfProfile, TimeOfDayPhase } from "../types";
+import React, { useEffect, useState } from "react";
 
-interface WorldLaneProps {
-  profile: DreamselfProfile | null;
-  phase: TimeOfDayPhase;
-  environmentId: string;
-  encounterItemName: string | null;
+interface ParallaxLayer {
+  file: string;
+  speed: number;
 }
 
-const WorldLane: React.FC<WorldLaneProps> = ({
-  profile, // reserved for future use (robe variants, etc.)
-  phase,
-  environmentId,
-  encounterItemName,
-}) => {
-  const phaseClass = `world-lane--phase-${phase}`;
-  const envClass = `world-lane--env-${environmentId}`;
+interface ParallaxConfig {
+  layers: ParallaxLayer[];
+}
+
+const WorldLane: React.FC = () => {
+  const [config, setConfig] = useState<ParallaxConfig | null>(null);
+
+  useEffect(() => {
+    fetch("/assets/parallax/dusk_valley/parallax.json")
+      .then((res) => res.json())
+      .then((data) => setConfig(data));
+  }, []);
+
+  if (!config) return null;
 
   return (
-    <div className={`world-lane ${phaseClass} ${envClass}`}>
-      {/* sky + stars */}
-      <div className="world-lane-sky" />
-      <div className="world-lane-stars" />
+    <div className="world-lane">
+      {config.layers.map((layer, index) => (
+        <div
+          key={index}
+          className="world-layer"
+          style={{
+            backgroundImage: `url("/assets/parallax/dusk_valley/${layer.file}")`,
+            animationDuration: `${60 / layer.speed}s`,
+          }}
+        />
+      ))}
 
-      {/* distant hills / ruins */}
-      <div className="world-lane-backdrop world-lane-backdrop--far" />
-      <div className="world-lane-backdrop world-lane-backdrop--near" />
-
-      {/* scrolling ground / path */}
-      <div className="world-lane-ground world-lane-ground--back" />
-      <div className="world-lane-ground world-lane-ground--front" />
-
-      {/* character */}
-      <div className="world-lane-figure">
-        <div className="world-lane-figure-shadow" />
-        <div className="world-lane-figure-body">
-          <div className="world-lane-figure-hood">
-            <div className="world-lane-figure-face" />
-          </div>
-        </div>
-      </div>
-
-      {/* moon */}
-      <div className="world-lane-moon" />
-
-      {/* encounter pulse under feet */}
-      {encounterItemName && (
-        <div className="world-lane-encounter-pulse" aria-hidden={true} />
-      )}
+      {/* Character — stays centered */}
+      <div className="world-character" />
     </div>
   );
 };

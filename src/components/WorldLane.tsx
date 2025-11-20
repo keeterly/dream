@@ -5,6 +5,7 @@ interface WorldLaneProps {
   phase: string;
   environmentId: string;
   encounterItemName: string | null;
+  isEncounterActive?: boolean;
 }
 
 // Hard-coded parallax layers for dusk_valley
@@ -14,14 +15,14 @@ const PARALLAX_LAYERS = [
     file: "layer_01.png",
     depth: 0,
     duration: 220,
-    opacity: 0.7,
-    blur: 1.4,
+    opacity: 0.4,
+    blur: 1.6,
   },
   {
     file: "layer_02.png",
     depth: 1,
-    duration: 150,
-    opacity: 0.8,
+    duration: 160,
+    opacity: 0.7,
     blur: 1.0,
   },
   {
@@ -48,57 +49,50 @@ const PARALLAX_LAYERS = [
 ];
 
 const WorldLane: React.FC<WorldLaneProps> = ({
-  profile,
   phase,
   environmentId,
   encounterItemName,
+  isEncounterActive,
 }) => {
   const baseUrl = import.meta.env.BASE_URL || "/";
 
-  return (
-    <div
-      className={`world-lane world-lane--${environmentId} world-lane--phase-${phase.toLowerCase()}`}
-      style={{ position: "relative", width: "100%", height: "100%" }}
-    >
-      {/* Parallax art layers */}
-      {PARALLAX_LAYERS.map((layer) => (
-        <div
-          key={layer.file}
-          className="world-lane-layer"
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundImage: `url("${baseUrl}assets/parallax/dusk_valley/${layer.file}")`,
-            backgroundRepeat: "repeat-x",
-            backgroundPosition: "0 bottom",
-            backgroundSize: "130% auto",
-            transform: "translate3d(0, 0, 0)",
-            willChange: "background-position",
-            animationName: "world-lane-art-scroll",
-            animationTimingFunction: "linear",
-            animationIterationCount: "infinite",
-            animationDuration: `${layer.duration}s`,
-            opacity: layer.opacity,
-            filter: layer.blur ? `blur(${layer.blur}px)` : "none",
-            zIndex: layer.depth, // 0–4
-          }}
-        />
-      ))}
+  const rootClassName = [
+    "world-lane",
+    `world-lane--${environmentId}`,
+    `world-lane--phase-${phase.toLowerCase()}`,
+    isEncounterActive ? "world-lane--paused" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-      {/* Character silhouette */}
-      <div className="world-lane-figure">
-        <div className="world-lane-figure-shadow" />
-        <div className="world-lane-figure-body">
-          <div className="world-lane-figure-hood">
-            <div className="world-lane-figure-face" />
-          </div>
-        </div>
+  return (
+    <div className={rootClassName}>
+      <div className="world-lane-inner">
+        {/* Parallax art layers */}
+        {PARALLAX_LAYERS.map((layer) => (
+          <div
+            key={layer.file}
+            className={`world-lane-layer world-lane-layer--depth-${layer.depth}`}
+            style={{
+              backgroundImage: `url(${baseUrl}world/${environmentId}/${layer.file})`,
+              backgroundSize: "130% auto",
+              willChange: "background-position",
+              animationName: "world-lane-art-scroll",
+              animationTimingFunction: "linear",
+              animationIterationCount: "infinite",
+              animationDuration: `${layer.duration}s`,
+              opacity: layer.opacity,
+              filter: layer.blur ? `blur(${layer.blur}px)` : "none",
+              zIndex: layer.depth,
+            }}
+          />
+        ))}
+
+        {/* The actual “ribbon” strip the character walks on */}
+        <div className="world-lane-ribbon" />
       </div>
 
-      {/* Loot encounter: crystal + pulse */}
+      {/* Loot encounter: crystal + pulse in front of the avatar */}
       {encounterItemName && (
         <>
           <div className="world-lane-encounter-pulse" aria-hidden="true" />

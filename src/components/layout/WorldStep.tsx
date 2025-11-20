@@ -50,37 +50,46 @@ export const WorldStep: React.FC<WorldStepProps> = ({
       <div className={`world-card ${lighting.worldClass}`}>
         {/* WORLD LANE */}
         <WorldLane
-          profile={profile}
-          environmentId="dusk_valley"
-          phase={phase}
-          encounterItemName={encounterItemName}
+            profile={profile}
+            environmentId="dusk_valley"
+            phase={phase}
+            encounterItemName={encounterItemName}
+            isEncounterActive={isEncounterActive}
         />
+
 
         {/* DREAMSELF AVATAR ON RIBBON */}
         {profile && (
-          <div
-            className={`world-stage-avatar ${
-              isEncounterActive
-                ? "world-stage-avatar--paused"
-                : "world-stage-avatar--walking"
-            } ${lighting.avatarClass}`}
-          >
+            <div
+                className={`world-stage-avatar ${
+                isEncounterActive
+                    ? "world-stage-avatar--paused"
+                    : "world-stage-avatar--walking"
+                } ${lighting.avatarClass}`}
+            >
             <AvatarView
-              avatar={profile.avatar}
-              traits={profile.traits}
-              dreamName={profile.dreamName}
+            avatar={profile.avatar}
+            traits={profile.traits}
+            dreamName={profile.dreamName}
             />
 
             {activeEncounterItem && (
-              <div className="world-encounter-bubble">
+            <>
+                {/* little attention marker over the head */}
+                <div className="world-encounter-glyph">!</div>
+
+                {/* speech-bubble style relic text */}
+                <div className="world-encounter-bubble">
                 <div className="world-encounter-label">Relic found</div>
                 <div className="world-encounter-name">
-                  {activeEncounterItem.name}
+                    {activeEncounterItem.name}
                 </div>
-              </div>
+                </div>
+            </>
             )}
-          </div>
+        </div>
         )}
+
 
         {/* GLOBAL TINT OVERLAY */}
         <div className="world-tint-overlay" />

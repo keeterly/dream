@@ -106,6 +106,21 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     }
   };
 
+
+  const cardClasses = [
+    "world-card",
+    lighting.worldClass,
+    isEncounterActive ? "world-card--encounter" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const bannerRarityClass =
+    activeEncounterItem != null
+      ? `world-encounter-banner--${activeEncounterItem.rarity}`
+      : "";
+
+
   return (
     <section className="app-screen app-screen-world">
       <div className={`world-card ${lighting.worldClass}`}>

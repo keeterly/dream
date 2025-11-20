@@ -17,7 +17,6 @@ import type {
   DreamselfProfile,
   InventoryItem,
   JournalEntry,
-  Question,
 } from "./types";
 
 type ScreenId = "intro" | "questions" | "summary" | "world";
@@ -43,7 +42,7 @@ export const App: React.FC = () => {
     logBiomeVisited,
   } = useJournal([]);
 
-  // World ticking + passive item drops
+  // world tick + passive relic drops
   useEffect(() => {
     if (!profile) return;
 
@@ -53,18 +52,18 @@ export const App: React.FC = () => {
       // 18% chance to roll a new relic
       if (Math.random() < 0.18) {
         const baseItem = getRandomWorldItem();
-        const acquiredAtIso = new Date().toISOString();
+        const acquiredAt = new Date().toISOString();
 
         const invItem: InventoryItem = {
           ...baseItem,
-          acquiredAtIso,
+          acquiredAt,
         };
 
         setInventory((prev) => [invItem, ...prev]);
         logItemFound(invItem);
       }
 
-      // Example: logBiomeVisited once you have environments keyed off worldTick
+      // later: derive biome from worldTick and log
       // logBiomeVisited("dusk_valley", "twilight");
     }, 12000);
 
@@ -88,7 +87,7 @@ export const App: React.FC = () => {
       return;
     }
 
-    // Finished questionnaire → compute Dreamself
+    // finished questionnaire → compute dreamself
     const nextProfile = computeTraitsAndAvatar(nextAnswers);
     setProfile(nextProfile);
     logDreamselfCreated(nextProfile);
@@ -101,11 +100,11 @@ export const App: React.FC = () => {
 
   const handleSpawnDebugItem = () => {
     const baseItem = getRandomWorldItem();
-    const acquiredAtIso = new Date().toISOString();
+    const acquiredAt = new Date().toISOString();
 
     const invItem: InventoryItem = {
       ...baseItem,
-      acquiredAtIso,
+      acquiredAt,
     };
 
     setInventory((prev) => [invItem, ...prev]);
@@ -120,7 +119,7 @@ export const App: React.FC = () => {
     if (screen === "questions") {
       return (
         <QuestionStep
-          questions={QUESTIONS as Question[]}
+          questions={QUESTIONS}
           currentIndex={currentQuestionIndex}
           answers={answers}
           onChooseAnswer={handleChooseAnswer}
@@ -145,7 +144,6 @@ export const App: React.FC = () => {
       );
     }
 
-    // Fallback
     return <IntroStep onBegin={handleBegin} />;
   };
 

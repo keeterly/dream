@@ -24,7 +24,8 @@ export function useJournal(initialEntries: JournalEntry[] = []) {
         type: "dreamself_created",
         timestampIso: new Date().toISOString(),
         title: `Dreamself awakened: ${profile.dreamName}`,
-        body: `Primary archetype: ${profile.traits.primaryArchetype}, element: ${profile.traits.primaryElement}.`,
+        // keep body generic so we don't depend on element fields
+        body: `Primary archetype: ${profile.traits.primaryArchetype}.`,
         meta: { profile },
       };
       logEntry(entry);

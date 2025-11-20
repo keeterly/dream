@@ -1,6 +1,6 @@
 import React from "react";
 import type { DreamselfProfile } from "../../types";
-import { AvatarView } from "../../AvatarView";
+import { AvatarView } from "../AvatarView";
 
 interface SummaryStepProps {
   profile: DreamselfProfile;
@@ -22,18 +22,17 @@ export const SummaryStep: React.FC<SummaryStepProps> = ({
         <div className="summary-details">
           <h2 className="summary-title">{dreamName}</h2>
           <p className="summary-archetype">
-            {traits.primaryArchetype}{" "}
-            {traits.secondaryArchetype && ` / ${traits.secondaryArchetype}`}
+            {traits.primaryArchetype}
+            {traits.secondaryArchetype
+              ? ` / ${traits.secondaryArchetype}`
+              : null}
           </p>
-          <p className="summary-element">
-            Element: {traits.primaryElement}
-            {traits.secondaryElement && ` / ${traits.secondaryElement}`}
-          </p>
-          {traits.temperamentTags?.length > 0 && (
+
+          {traits.temperamentTags?.length ? (
             <p className="summary-tags">
               Temperament: {traits.temperamentTags.join(" · ")}
             </p>
-          )}
+          ) : null}
 
           <div className="summary-actions">
             <button className="primary-button" onClick={onEnterWorld}>

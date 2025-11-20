@@ -106,3 +106,21 @@ export interface InventoryItem extends WorldItem {
   acquiredAt: string; // ISO timestamp
 }
 
+// map of questionId -> optionId
+export type AnswerMap = Record<string, string>;
+
+// --- Journal types ---
+
+export type JournalEntryType =
+  | "dreamself_created"
+  | "item_found"
+  | "biome_visited";
+
+export interface JournalEntry {
+  id: string;
+  type: JournalEntryType;
+  timestampIso: string;
+  title: string;
+  body?: string;
+  meta?: Record<string, unknown>;
+}

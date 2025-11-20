@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import type { DreamselfProfile, InventoryItem, JournalEntry } from "../../types";
-import { WorldLane } from "../../WorldLane";
+import { WorldLane } from "../WorldLane";
 import { JournalPanel } from "../panels/JournalPanel";
-// (Optional: InventoryPanel, CharacterPanel, MapPanel, DebugPanel later)
 
 type WorldPanelId = "inventory" | "character" | "map" | "journal" | "debug";
 
@@ -19,7 +18,9 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   journalEntries,
   onSpawnDebugItem,
 }) => {
-  const [activePanel, setActivePanel] = useState<WorldPanelId | null>("inventory");
+  const [activePanel, setActivePanel] = useState<WorldPanelId | null>(
+    "inventory"
+  );
 
   return (
     <section className="app-screen app-screen-world">
@@ -35,8 +36,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             </div>
             <div className="world-hud-right">
               <span className="world-hud-pill">
-                {profile.traits.primaryArchetype} ·{" "}
-                {profile.traits.primaryElement}
+                {profile.traits.primaryArchetype}
               </span>
             </div>
           </div>
@@ -108,7 +108,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                   <ul className="inventory-list">
                     {inventory.map((item) => (
                       <li
-                        key={item.id + item.acquiredAtIso}
+                        key={item.id + item.acquiredAt}
                         className={`inventory-item rarity-${item.rarity}`}
                       >
                         <div className="inventory-item-main">
@@ -145,7 +145,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
               </div>
             )}
 
-            {/* TODO: Character & Map panels can be extracted from your existing code */}
+            {/* character + map panels can be wired in next pass */}
           </div>
         </div>
       </div>

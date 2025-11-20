@@ -1,5 +1,18 @@
 import React from "react";
-import type { AnswerMap, Question } from "../../types";
+
+type AnswerMap = Record<string, string>;
+
+type QuestionOption = {
+  id: string;
+  label: string;
+};
+
+type Question = {
+  id: string;
+  prompt: string;
+  subtitle?: string;
+  options: QuestionOption[];
+};
 
 interface QuestionStepProps {
   questions: Question[];
@@ -41,9 +54,6 @@ export const QuestionStep: React.FC<QuestionStepProps> = ({
               onClick={() => onChooseAnswer(question.id, opt.id)}
             >
               <span className="question-option-label">{opt.label}</span>
-              {opt.helper && (
-                <span className="question-option-helper">{opt.helper}</span>
-              )}
             </button>
           ))}
         </div>

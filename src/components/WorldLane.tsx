@@ -6,6 +6,8 @@ interface WorldLaneProps {
   environmentId: string;
   encounterItemName: string | null;
   isEncounterActive?: boolean;
+  /** Whether the Dreamself is currently walking (controls parallax scroll) */
+  isWalking?: boolean;
 }
 
 // Hard-coded parallax layers for dusk_valley
@@ -53,6 +55,7 @@ const WorldLane: React.FC<WorldLaneProps> = ({
   environmentId,
   encounterItemName,
   isEncounterActive,
+  isWalking = true,
 }) => {
   // For GitHub Pages this will be "/dream/" – Vite serves everything under
   // /public at the root, so our PNGs are at:
@@ -63,7 +66,7 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     "world-lane",
     `world-lane--${environmentId}`,
     `world-lane--phase-${phase.toLowerCase()}`,
-    isEncounterActive ? "world-lane--paused" : "",
+    !isWalking ? "world-lane--paused" : "",
   ]
     .filter(Boolean)
     .join(" ");

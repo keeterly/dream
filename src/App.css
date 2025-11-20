@@ -1045,6 +1045,50 @@ body {
   font-size: 0.9rem;
 }
 
+
+/* subtle top vignette behind HUD */
+.world-card::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+      circle at 50% -10%,
+      rgba(255, 255, 255, 0.06),
+      transparent 55%
+    ),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.65), transparent 35%);
+  mix-blend-mode: soft-light;
+}
+
+/* glass strip behind HUD */
+.world-hud {
+  position: relative;
+}
+
+.world-hud::before {
+  content: "";
+  position: absolute;
+  inset: -0.4rem -2.2rem 0.4rem -2.2rem;
+  background: radial-gradient(
+      circle at 0% 0%,
+      rgba(255, 255, 255, 0.13),
+      transparent 55%
+    ),
+    linear-gradient(
+      to right,
+      rgba(4, 6, 15, 0.9),
+      rgba(6, 12, 24, 0.85),
+      rgba(4, 6, 15, 0.9)
+    );
+  opacity: 0.7;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+  z-index: -1;
+}
+
+
+
 /* bottom gauges */
 
 .world-overlay-bottom {
@@ -1619,10 +1663,36 @@ body {
   backdrop-filter: blur(20px);
 }
 
+/* focus ring & active glow */
+.world-dock-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(180, 210, 255, 0.6),
+    0 0 0 3px rgba(33, 150, 255, 0.3),
+    0 16px 45px rgba(0, 0, 0, 0.85);
+}
+
+.world-dock-button--active .world-dock-icon {
+  box-shadow: 0 0 8px rgba(180, 210, 255, 0.9);
+}
+
 .world-dock-button--active {
   border-color: rgba(255, 255, 255, 0.7);
   background: radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.35), rgba(0, 0, 0, 0.75));
+ animation: dock-active-pulse 1.8s ease-out infinite;
 }
+
+@keyframes dock-active-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(180, 210, 255, 0.35);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(180, 210, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(180, 210, 255, 0);
+  }
+}
+
 
 /* Panel shell */
 .world-panels {
@@ -2162,4 +2232,55 @@ body {
   top: -1px;
   width: 32%;
   border-top: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+
+/* subtle phase tint over world */
+.world-lane--phase-dawn::after,
+.world-lane--phase-day::after,
+.world-lane--phase-dusk::after,
+.world-lane--phase-night::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  opacity: 0.65;
+}
+
+.world-lane--phase-dawn::after {
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(255, 204, 170, 0.55),
+    transparent 55%
+  );
+}
+
+.world-lane--phase-day::after {
+  background: radial-gradient(
+    circle at 50% -10%,
+    rgba(180, 220, 255, 0.4),
+    transparent 60%
+  );
+}
+
+.world-lane--phase-dusk::after {
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(180, 140, 255, 0.45),
+    transparent 55%
+  );
+}
+
+.world-lane--phase-night::after {
+  background: radial-gradient(
+      circle at 50% -10%,
+      rgba(120, 160, 255, 0.2),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 10% 90%,
+      rgba(80, 130, 255, 0.25),
+      transparent 70%
+    );
 }

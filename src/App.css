@@ -3317,10 +3317,5 @@ body {
   }
 }
 
-/* Push avatar DOWN during encounter to avoid top overlap */
-.world-card--encounter .world-stage-avatar {
-  transform: translateY(28px);
-}
-
 
 

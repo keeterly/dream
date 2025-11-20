@@ -47,11 +47,19 @@ const PARALLAX_LAYERS = [
   },
 ];
 
-const WorldLane: React.FC<WorldLaneProps> = ({ encounterItemName }) => {
+const WorldLane: React.FC<WorldLaneProps> = ({
+  profile,
+  phase,
+  environmentId,
+  encounterItemName,
+}) => {
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   return (
-    className={`world-lane world-lane--${environmentId} world-lane--phase-${phase.toLowerCase()}`}
+    <div
+      className={`world-lane world-lane--${environmentId} world-lane--phase-${phase.toLowerCase()}`}
+      style={{ position: "relative", width: "100%", height: "100%" }}
+    >
       {/* Parallax art layers */}
       {PARALLAX_LAYERS.map((layer) => (
         <div

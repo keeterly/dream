@@ -54,6 +54,9 @@ const WorldLane: React.FC<WorldLaneProps> = ({
   encounterItemName,
   isEncounterActive,
 }) => {
+  // For GitHub Pages this will be "/dream/" – Vite serves everything under
+  // /public at the root, so our PNGs are at:
+  //   <baseUrl>assets/parallax/<environmentId>/layer_01.png
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   const rootClassName = [
@@ -69,24 +72,27 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     <div className={rootClassName}>
       <div className="world-lane-inner">
         {/* Parallax art layers */}
-        {PARALLAX_LAYERS.map((layer) => (
-          <div
-            key={layer.file}
-            className={`world-lane-layer world-lane-layer--depth-${layer.depth}`}
-            style={{
-              backgroundImage: `url(${baseUrl}world/${environmentId}/${layer.file})`,
-              backgroundSize: "130% auto",
-              willChange: "background-position",
-              animationName: "world-lane-art-scroll",
-              animationTimingFunction: "linear",
-              animationIterationCount: "infinite",
-              animationDuration: `${layer.duration}s`,
-              opacity: layer.opacity,
-              filter: layer.blur ? `blur(${layer.blur}px)` : "none",
-              zIndex: layer.depth,
-            }}
-          />
-        ))}
+        {PARALLAX_LAYERS.map((layer) => {
+          const imgPath = `${baseUrl}assets/parallax/${environmentId}/${layer.file}`;
+          return (
+            <div
+              key={layer.file}
+              className={`world-lane-layer world-lane-layer--depth-${layer.depth}`}
+              style={{
+                backgroundImage: `url("${imgPath}")`,
+                backgroundSize: "130% auto",
+                willChange: "background-position",
+                animationName: "world-lane-art-scroll",
+                animationTimingFunction: "linear",
+                animationIterationCount: "infinite",
+                animationDuration: `${layer.duration}s`,
+                opacity: layer.opacity,
+                filter: layer.blur ? `blur(${layer.blur}px)` : "none",
+                zIndex: layer.depth,
+              }}
+            />
+          );
+        })}
 
         {/* The actual “ribbon” strip the character walks on */}
         <div className="world-lane-ribbon" />

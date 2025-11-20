@@ -3066,31 +3066,31 @@ body {
 /* Exclamation marker above the Dreamself when an encounter is active */
 .world-encounter-glyph {
   position: absolute;
-  top: -3rem;
+  top: -3.1rem;
   left: 50%;
   transform: translateX(-50%);
-  width: 1.3rem;
-  height: 1.3rem;
+  width: 1.35rem;
+  height: 1.35rem;
   border-radius: 999px;
   border: 1px solid rgba(248, 250, 252, 0.9);
-  background: radial-gradient(circle at center, #facc15, #f97316 52%, #020617);
+  background: radial-gradient(circle at center, #f97316, #b45309 55%, #020617);
   color: #020617;
   font-size: 0.9rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 18px rgba(250, 204, 21, 0.9);
+  box-shadow: 0 0 20px rgba(248, 250, 252, 0.7);
   animation: world-encounter-glyph-pulse 1.4s ease-out infinite;
 }
 
 @keyframes world-encounter-glyph-pulse {
   0% {
     transform: translate(-50%, 0) scale(0.9);
-    opacity: 0.5;
+    opacity: 0.55;
   }
   40% {
-    transform: translate(-50%, -2px) scale(1.04);
+    transform: translate(-50%, -3px) scale(1.05);
     opacity: 1;
   }
   100% {
@@ -3099,21 +3099,21 @@ body {
   }
 }
 
-/* Relic banner */
+
 .world-encounter-banner {
   position: absolute;
-  top: 4.9rem; /* adjust to taste & viewport */
+  bottom: 5.2rem; /* sits just above the dock */
   left: 50%;
   transform: translateX(-50%);
-  padding: 0.85rem 1.9rem;
-  border-radius: 999px;
+  padding: 1rem 2.4rem 1.3rem;
+  border-radius: 1.9rem;
+  width: min(90vw, 24rem);
   border: 1px solid rgba(148, 163, 184, 0.9);
-  background: radial-gradient(
-    circle at top,
-    rgba(15, 23, 42, 0.96),
-    #020617
-  );
-  min-width: 16.5rem;
+  background:
+    radial-gradient(circle at top, rgba(15, 23, 42, 0.96), #020617);
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.9),
+    0 0 0 1px rgba(15, 23, 42, 0.8);
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.18em;
@@ -3124,32 +3124,10 @@ body {
   pointer-events: none;
 }
 
-.world-encounter-banner-label {
-  opacity: 0.8;
-}
-
-.world-encounter-banner-name {
-  margin-top: 0.15rem;
-  font-size: 0.82rem;
-  letter-spacing: 0.25em;
-}
-
-.world-encounter-banner-orb {
-  position: absolute;
-  bottom: -0.45rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0.75rem;
-  height: 0.75rem;
-  border-radius: 999px;
-  background: radial-gradient(circle at center, #fbbf24, #f97316 60%, #0b1120);
-  box-shadow: 0 0 18px rgba(251, 191, 36, 0.95);
-}
-
 /* Visible + animated state */
 .world-encounter-banner--visible {
   pointer-events: auto;
-  animation: world-encounter-banner-in 380ms
+  animation: world-encounter-banner-in 360ms
     cubic-bezier(0.25, 0.9, 0.3, 1.1) forwards;
 }
 
@@ -3158,14 +3136,124 @@ body {
     opacity: 0;
     transform: translate(-50%, 18px) scale(0.96);
   }
-  60% {
+  55% {
     opacity: 1;
-    transform: translate(-50%, 0) scale(1.02);
+    transform: translate(-50%, -2px) scale(1.02);
   }
   100% {
     opacity: 1;
     transform: translate(-50%, 0) scale(1);
   }
+}
+
+.world-encounter-banner-label {
+  opacity: 0.7;
+  font-size: 0.7rem;
+}
+
+.world-encounter-banner-name {
+  margin-top: 0.2rem;
+  font-size: 0.9rem;
+  letter-spacing: 0.25em;
+}
+
+.world-encounter-banner-meta {
+  margin-top: 0.4rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.9rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+}
+
+.world-encounter-banner-rarity {
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.9);
+  text-transform: uppercase;
+}
+
+.world-encounter-banner-hint {
+  opacity: 0.65;
+}
+
+/* Glowing orb beneath the banner */
+.world-encounter-banner-orb {
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 999px;
+  background: radial-gradient(circle at center, #fbbf24, #f97316 60%, #0b1120);
+  box-shadow: 0 0 22px rgba(251, 191, 36, 0.95);
+}
+
+
+/* Common (default) – cool steel */
+.world-encounter-banner--common {
+  border-color: rgba(148, 163, 184, 0.9);
+}
+
+.world-encounter-banner--common .world-encounter-banner-rarity {
+  border-color: rgba(148, 163, 184, 0.9);
+}
+
+/* Rare – soft cyan edge + orb tint */
+.world-encounter-banner--rare {
+  border-color: rgba(56, 189, 248, 0.9);
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.9),
+    0 0 22px rgba(56, 189, 248, 0.7);
+}
+
+.world-encounter-banner--rare .world-encounter-banner-rarity {
+  border-color: rgba(56, 189, 248, 0.9);
+}
+
+.world-encounter-banner--rare .world-encounter-banner-orb {
+  background: radial-gradient(circle at center, #38bdf8, #0ea5e9 60%, #0b1120);
+  box-shadow: 0 0 22px rgba(56, 189, 248, 0.95);
+}
+
+/* Legendary – golden frame */
+.world-encounter-banner--legendary {
+  border-color: rgba(250, 204, 21, 1);
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.9),
+    0 0 26px rgba(250, 204, 21, 0.9);
+}
+
+.world-encounter-banner--legendary .world-encounter-banner-rarity {
+  border-color: rgba(250, 204, 21, 1);
+}
+
+.world-encounter-banner--legendary .world-encounter-banner-orb {
+  background: radial-gradient(circle at center, #facc15, #eab308 60%, #0b1120);
+  box-shadow: 0 0 26px rgba(250, 204, 21, 0.98);
+}
+
+
+
+/* When an encounter is active, darken and vignette the scene a bit */
+.world-card--encounter .world-tint-overlay {
+  opacity: 0.7;
+  background: radial-gradient(
+      circle at center,
+      rgba(15, 23, 42, 0.15),
+      rgba(15, 23, 42, 0.9)
+    ),
+    radial-gradient(
+      circle at top center,
+      rgba(56, 189, 248, 0.12),
+      transparent 55%
+    );
+}
+
+/* Subtle lift of the avatar so it feels “called out” */
+.world-card--encounter .world-stage-avatar {
+  transform: translateY(-4px);
 }
 
 

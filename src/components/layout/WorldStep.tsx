@@ -36,7 +36,12 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     "inventory"
   );
 
+  // Auto-walk toggle: true = drifting, false = standing
+  const [isAutoWalking, setIsAutoWalking] = useState(true);
+
   const isEncounterActive = !!activeEncounterItem;
+  // Encounters temporarily stop movement even if auto-walk is "on"
+  const isWalking = isAutoWalking && !isEncounterActive;
 
   const togglePanel = (panel: WorldPanelId) => {
     setActivePanel((current) => (current === panel ? null : panel));
@@ -59,22 +64,22 @@ export const WorldStep: React.FC<WorldStepProps> = ({
           phase={phase}
           encounterItemName={encounterItemName}
           isEncounterActive={isEncounterActive}
+          isWalking={isWalking}
         />
 
         {/* DREAMSELF AVATAR ON THE RIBBON */}
         {profile && (
           <div
             className={`world-stage-avatar ${
-              isEncounterActive
-                ? "world-stage-avatar--paused"
-                : "world-stage-avatar--walking"
+              isWalking
+                ? "world-stage-avatar--walking"
+                : "world-stage-avatar--paused"
             } ${lighting.avatarClass}`}
           >
             <AvatarView
               avatar={profile.avatar}
               traits={profile.traits}
               dreamName={profile.dreamName}
-            
             />
 
             {activeEncounterItem && (
@@ -127,6 +132,23 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 <span className="hud-label">PHASE</span>
                 <span className="hud-value">{phase}</span>
               </div>
+
+              {/* Auto-walk toggle (desktop + mobile) */}
+              <button
+                type="button"
+                className={`world-autowalk-toggle ${
+                  isWalking
+                    ? "world-autowalk-toggle--on"
+                    : "world-autowalk-toggle--off"
+                }`}
+                onClick={() => setIsAutoWalking((prev) => !prev)}
+              >
+                <span className="world-autowalk-label">Auto-walk</span>
+                <span className="world-autowalk-state">
+                  {isWalking ? "ON" : "OFF"}
+                </span>
+                <span className="world-autowalk-dot" aria-hidden="true" />
+              </button>
             </div>
           </div>
 

@@ -4,6 +4,8 @@ import WorldLane from "../WorldLane";
 import { JournalPanel } from "../panels/JournalPanel";
 import { AvatarView } from "../AvatarView";
 import { useBiomeLighting } from "../../hooks/useBiomeLighting";
+import { DreamselfPanel } from "../panels/DreamselfPanel";
+import { MapPanel } from "../panels/MapPanel";
 
 type WorldPanelId = "inventory" | "character" | "map" | "journal" | "debug";
 
@@ -27,7 +29,11 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   const [activePanel, setActivePanel] =
     useState<WorldPanelId | null>("inventory");
 
-  // biome / lighting info derived from phase + dominant element
+  // helper: clicking a button toggles the panel open/closed
+  const togglePanel = (panel: WorldPanelId) => {
+    setActivePanel((prev) => (prev === panel ? null : panel));
+  };
+
   const dominantElement = profile?.traits?.dominantElement ?? null;
 
   const lighting = useBiomeLighting({
@@ -46,7 +52,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
           encounterItemName={encounterItemName}
         />
 
-        {/* DREAMSELF AVATAR OVERLAY */}
+        {/* DREAMSELF AVATAR ON RIBBON */}
         {profile && (
           <div
             className={`world-stage-avatar world-stage-avatar--walking ${lighting.avatarClass}`}
@@ -59,7 +65,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
           </div>
         )}
 
-        {/* BIOME / PHASE TINT OVERLAY (sits above world, below HUD) */}
+        {/* GLOBAL TINT OVERLAY */}
         <div className="world-tint-overlay" />
 
         {/* WORLD OVERLAY (HUD, DOCK, PANELS) */}
@@ -90,14 +96,14 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             </div>
           </div>
 
-          {/* DOCK */}
+          {/* DOCK BUTTONS */}
           <div className="world-dock">
             <button
               className={
                 "world-dock-button" +
                 (activePanel === "inventory" ? " world-dock-button--active" : "")
               }
-              onClick={() => setActivePanel("inventory")}
+              onClick={() => togglePanel("inventory")}
             >
               <span className="world-dock-icon world-dock-icon--inventory" />
               <span className="world-dock-label">Inventory</span>
@@ -108,7 +114,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 "world-dock-button" +
                 (activePanel === "character" ? " world-dock-button--active" : "")
               }
-              onClick={() => setActivePanel("character")}
+              onClick={() => togglePanel("character")}
             >
               <span className="world-dock-icon world-dock-icon--dreamself" />
               <span className="world-dock-label">Dreamself</span>
@@ -119,7 +125,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 "world-dock-button" +
                 (activePanel === "map" ? " world-dock-button--active" : "")
               }
-              onClick={() => setActivePanel("map")}
+              onClick={() => togglePanel("map")}
             >
               <span className="world-dock-icon world-dock-icon--map" />
               <span className="world-dock-label">Map</span>
@@ -132,7 +138,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                   ? " world-dock-button--active"
                   : "")
               }
-              onClick={() => setActivePanel("journal")}
+              onClick={() => togglePanel("journal")}
             >
               <span className="world-dock-icon world-dock-icon--journal" />
               <span className="world-dock-label">Journal</span>
@@ -143,7 +149,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 "world-dock-button" +
                 (activePanel === "debug" ? " world-dock-button--active" : "")
               }
-              onClick={() => setActivePanel("debug")}
+              onClick={() => togglePanel("debug")}
             >
               <span className="world-dock-icon world-dock-icon--debug" />
               <span className="world-dock-label">Debug</span>
@@ -171,22 +177,38 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                         key={item.id + item.acquiredAt}
                         className={`inventory-item rarity-${item.rarity}`}
                       >
-                        <div className="inventory-item-main">
-                          <span className="inventory-item-name">
-                            {item.name}
-                          </span>
-                          <span className="inventory-item-rarity">
-                            {item.rarity}
-                          </span>
+                        <div className="inventory-item-icon-wrapper">
+                          <span
+                            className={`inventory-item-icon rarity-${item.rarity}`}
+                            aria-hidden="true"
+                          />
                         </div>
-                        <p className="inventory-item-desc">
-                          {item.description}
-                        </p>
+                        <div className="inventory-item-content">
+                          <div className="inventory-item-main">
+                            <span className="inventory-item-name">
+                              {item.name}
+                            </span>
+                            <span className="inventory-item-rarity">
+                              {item.rarity}
+                            </span>
+                          </div>
+                          <p className="inventory-item-desc">
+                            {item.description}
+                          </p>
+                        </div>
                       </li>
                     ))}
                   </ul>
                 )}
               </div>
+            )}
+
+            {activePanel === "character" && (
+              <DreamselfPanel profile={profile} inventory={inventory} />
+            )}
+
+            {activePanel === "map" && (
+              <MapPanel currentBiomeId="dusk_valley" phase={phase} />
             )}
 
             {activePanel === "debug" && (
@@ -201,8 +223,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 </button>
               </div>
             )}
-
-            {/* character + map can be wired next */}
           </div>
         </div>
       </div>

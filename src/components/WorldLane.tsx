@@ -10,45 +10,14 @@ interface WorldLaneProps {
   isWalking?: boolean;
 }
 
-// Hard-coded parallax layers for dusk_valley
-// depth: 0 = far back, 4 = foreground
 const PARALLAX_LAYERS = [
-  {
-    file: "layer_01.png",
-    depth: 0,
-    duration: 220,
-    opacity: 0.4,
-    blur: 1.6,
-  },
-  {
-    file: "layer_02.png",
-    depth: 1,
-    duration: 160,
-    opacity: 0.7,
-    blur: 1.0,
-  },
-  {
-    file: "layer_03.png",
-    depth: 2,
-    duration: 110,
-    opacity: 0.9,
-    blur: 0.6,
-  },
-  {
-    file: "layer_04.png",
-    depth: 3,
-    duration: 75,
-    opacity: 0.95,
-    blur: 0.3,
-  },
-  {
-    file: "layer_05.png",
-    depth: 4,
-    duration: 45,
-    opacity: 1,
-    blur: 0,
-  },
+  { file: "layer_01.png", depth: 0, duration: 70,  opacity: 0.4,  blur: 1.6 },
+  { file: "layer_02.png", depth: 1, duration: 50,  opacity: 0.7,  blur: 1.0 },
+  { file: "layer_03.png", depth: 2, duration: 32,  opacity: 0.9,  blur: 0.6 },
+  { file: "layer_04.png", depth: 3, duration: 22,  opacity: 0.95, blur: 0.3 },
+  { file: "layer_05.png", depth: 4, duration: 14,  opacity: 1.0,  blur: 0   },
 ];
+
 
 const WorldLane: React.FC<WorldLaneProps> = ({
   phase,

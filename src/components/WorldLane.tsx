@@ -45,10 +45,26 @@ const WorldLane: React.FC<WorldLaneProps> = ({ encounterItemName }) => {
       {PARALLAX_LAYERS.map((layer) => (
         <div
           key={layer.file}
-          className={`world-lane-layer world-lane-layer--depth-${layer.depth}`}
           style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            // visual
             backgroundImage: `url("${baseUrl}assets/parallax/dusk_valley/${layer.file}")`,
+            backgroundRepeat: "repeat-x",
+            backgroundPosition: "0 bottom",
+            backgroundSize: "auto 100%",
+            // movement
+            transform: "translate3d(0,0,0)",
+            willChange: "background-position",
+            animationName: "world-lane-art-scroll",
+            animationTimingFunction: "linear",
+            animationIterationCount: "infinite",
             animationDuration: `${layer.duration}s`,
+            // depth ordering
+            zIndex: layer.depth,
           }}
         />
       ))}

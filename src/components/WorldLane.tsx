@@ -1,5 +1,6 @@
 import React from "react";
-import { DreamselfProfile, TimeOfDayPhase } from "../types";
+import type { DreamselfProfile } from "../types";
+import type { TimeOfDayPhase } from "../worldItems";
 
 interface WorldLaneProps {
   profile: DreamselfProfile | null;
@@ -9,12 +10,11 @@ interface WorldLaneProps {
 }
 
 // Hard-coded parallax layers for dusk_valley
-// Back -> front
 const PARALLAX_LAYERS = [
   {
-    file: "layer_01.png", // sky / stars / moon
+    file: "layer_01.png",
     depth: 1,
-    duration: 160, // slowest (furthest back)
+    duration: 160,
   },
   {
     file: "layer_02.png",
@@ -32,23 +32,19 @@ const PARALLAX_LAYERS = [
     duration: 55,
   },
   {
-    file: "layer_05.png", // ground / path
+    file: "layer_05.png",
     depth: 5,
-    duration: 32, // fastest (foreground)
+    duration: 32,
   },
 ];
 
 const WorldLane: React.FC<WorldLaneProps> = ({
-  // profile,
-  // phase,
-  // environmentId,
   encounterItemName,
 }) => {
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   return (
     <div className="world-lane">
-      {/* Parallax art layers */}
       {PARALLAX_LAYERS.map((layer) => (
         <div
           key={layer.file}
@@ -60,7 +56,6 @@ const WorldLane: React.FC<WorldLaneProps> = ({
         />
       ))}
 
-      {/* Character silhouette */}
       <div className="world-lane-figure">
         <div className="world-lane-figure-shadow" />
         <div className="world-lane-figure-body">
@@ -70,7 +65,6 @@ const WorldLane: React.FC<WorldLaneProps> = ({
         </div>
       </div>
 
-      {/* Loot encounter pulse under feet */}
       {encounterItemName && (
         <div className="world-lane-encounter-pulse" aria-hidden="true" />
       )}

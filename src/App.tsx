@@ -25,6 +25,15 @@ function getRandomWorldItem() {
   return WORLD_ITEMS[Math.floor(Math.random() * WORLD_ITEMS.length)];
 }
 
+const PHASES = ["Dawn", "Day", "Dusk", "Night"] as const;
+
+function getPhaseFromTick(tick: number): string {
+  // 48 ticks → full cycle (Dawn, Day, Dusk, Night)
+  const segment = Math.floor((tick % 48) / 12);
+  return PHASES[segment] ?? "Night";
+}
+
+
 export const App: React.FC = () => {
   const [screen, setScreen] = useState<ScreenId>("intro");
 
@@ -119,6 +128,9 @@ export const App: React.FC = () => {
   };
 
   const renderScreen = () => {
+    
+    const phase = getPhaseFromTick(worldTick);
+
     if (screen === "intro") {
       return <IntroStep onBegin={handleBegin} />;
     }
@@ -148,6 +160,7 @@ export const App: React.FC = () => {
           journalEntries={journalEntries as JournalEntry[]}
           onSpawnDebugItem={handleSpawnDebugItem}
           encounterItemName={lastEncounterItemName}
+          phase={phase}
         />
       );
     }

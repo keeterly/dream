@@ -2023,3 +2023,143 @@ body {
     border-radius: 1rem;
   }
 }
+
+
+
+/* === Dock icons (simple geometric glyphs) === */
+
+.world-dock-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.world-dock-icon {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Inventory: stacked circles */
+.world-dock-icon--inventory::before,
+.world-dock-icon--inventory::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.world-dock-icon--inventory::before {
+  width: 60%;
+  height: 60%;
+  left: 10%;
+  top: 10%;
+}
+
+.world-dock-icon--inventory::after {
+  width: 40%;
+  height: 40%;
+  right: 4%;
+  bottom: 4%;
+}
+
+/* Dreamself: mask-shaped diamond */
+.world-dock-icon--dreamself {
+  border-radius: 0.4rem;
+  transform: rotate(45deg);
+}
+
+.world-dock-icon--dreamself::before {
+  content: "";
+  position: absolute;
+  inset: 20%;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Map: small grid */
+.world-dock-icon--map::before,
+.world-dock-icon--map::after {
+  content: "";
+  position: absolute;
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  border-left: 1px solid rgba(255, 255, 255, 0.5);
+  width: 65%;
+  height: 65%;
+  left: 15%;
+  top: 15%;
+}
+
+/* Journal: lines */
+.world-dock-icon--journal::before,
+.world-dock-icon--journal::after {
+  content: "";
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  border-top: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.world-dock-icon--journal::before {
+  top: 30%;
+}
+
+.world-dock-icon--journal::after {
+  top: 60%;
+}
+
+/* Debug: triangle warning */
+.world-dock-icon--debug {
+  border-radius: 0;
+  border: none;
+}
+
+.world-dock-icon--debug::before {
+  content: "";
+  position: absolute;
+  inset: 10%;
+  border-left: 1px solid rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+  transform: rotate(45deg);
+}
+
+/* Label text */
+.world-dock-label {
+  font-size: 0.7rem;
+}
+
+/* === Journal NEW badge + divider === */
+
+.journal-entry-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.journal-entry-badge {
+  font-size: 0.6rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  opacity: 0.9;
+}
+
+.journal-entry-divider {
+  margin: 0.3rem 0 0.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  position: relative;
+}
+
+.journal-entry-divider::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 32%;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+}

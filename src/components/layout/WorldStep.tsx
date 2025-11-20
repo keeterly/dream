@@ -11,6 +11,7 @@ interface WorldStepProps {
   journalEntries: JournalEntry[];
   onSpawnDebugItem: () => void;
   encounterItemName: string | null;
+   phase: string;
 }
 
 export const WorldStep: React.FC<WorldStepProps> = ({
@@ -19,6 +20,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   journalEntries,
   onSpawnDebugItem,
   encounterItemName,
+  phase,
 }) => {
   const [activePanel, setActivePanel] = useState<WorldPanelId | null>(
     "inventory"
@@ -30,13 +32,13 @@ export const WorldStep: React.FC<WorldStepProps> = ({
         <WorldLane
           profile={profile}
           environmentId="dusk_valley"
-          phase="twilight"
+          phase={phase}
           encounterItemName={encounterItemName}
         />
 
         <div className="world-overlay">
           {/* HUD */}
-         <div className="world-hud">
+        <div className="world-hud">
   <div className="world-hud-left">
     <div className="world-hud-field">
       <span className="hud-kicker">FIELD — SCROLLING WORLD</span>
@@ -54,60 +56,71 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   <div className="world-hud-right">
     <div className="world-hud-phase">
       <span className="hud-label">PHASE</span>
-      <span className="hud-value">Night</span>
+      <span className="hud-value">{phase}</span>
     </div>
   </div>
 </div>
 
 
+
           {/* Dock */}
           <div className="world-dock">
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "inventory" ? " world-dock-button--active" : "")
-              }
-              onClick={() => setActivePanel("inventory")}
-            >
-              Inventory
-            </button>
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "character" ? " world-dock-button--active" : "")
-              }
-              onClick={() => setActivePanel("character")}
-            >
-              Dreamself
-            </button>
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "map" ? " world-dock-button--active" : "")
-              }
-              onClick={() => setActivePanel("map")}
-            >
-              Map
-            </button>
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "journal" ? " world-dock-button--active" : "")
-              }
-              onClick={() => setActivePanel("journal")}
-            >
-              Journal
-            </button>
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "debug" ? " world-dock-button--active" : "")
-              }
-              onClick={() => setActivePanel("debug")}
-            >
-              Debug
-            </button>
-          </div>
+  <button
+    className={
+      "world-dock-button" +
+      (activePanel === "inventory" ? " world-dock-button--active" : "")
+    }
+    onClick={() => setActivePanel("inventory")}
+  >
+    <span className="world-dock-icon world-dock-icon--inventory" />
+    <span className="world-dock-label">Inventory</span>
+  </button>
+
+  <button
+    className={
+      "world-dock-button" +
+      (activePanel === "character" ? " world-dock-button--active" : "")
+    }
+    onClick={() => setActivePanel("character")}
+  >
+    <span className="world-dock-icon world-dock-icon--dreamself" />
+    <span className="world-dock-label">Dreamself</span>
+  </button>
+
+  <button
+    className={
+      "world-dock-button" +
+      (activePanel === "map" ? " world-dock-button--active" : "")
+    }
+    onClick={() => setActivePanel("map")}
+  >
+    <span className="world-dock-icon world-dock-icon--map" />
+    <span className="world-dock-label">Map</span>
+  </button>
+
+  <button
+    className={
+      "world-dock-button" +
+      (activePanel === "journal" ? " world-dock-button--active" : "")
+    }
+    onClick={() => setActivePanel("journal")}
+  >
+    <span className="world-dock-icon world-dock-icon--journal" />
+    <span className="world-dock-label">Journal</span>
+  </button>
+
+  <button
+    className={
+      "world-dock-button" +
+      (activePanel === "debug" ? " world-dock-button--active" : "")
+    }
+    onClick={() => setActivePanel("debug")}
+  >
+    <span className="world-dock-icon world-dock-icon--debug" />
+    <span className="world-dock-label">Debug</span>
+  </button>
+</div>
+
 
           {/* Panels */}
           <div className="world-panels">

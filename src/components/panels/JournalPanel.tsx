@@ -21,25 +21,34 @@ export const JournalPanel: React.FC<JournalPanelProps> = ({ entries }) => {
     <div className="world-panel world-panel-journal">
       <h3 className="world-panel-title">Journal</h3>
       <div className="journal-list">
-        {entries.map((entry) => (
-          <article key={entry.id} className="journal-entry">
-            <div className="journal-entry-header">
-              <span className={`journal-entry-type tag-${entry.type}`}>
-                {entry.type === "dreamself_created" && "Dreamself"}
-                {entry.type === "item_found" && "Relic"}
-                {entry.type === "biome_visited" && "Biome"}
-              </span>
-              <time className="journal-entry-time">
-                {new Date(entry.timestampIso).toLocaleString()}
-              </time>
-            </div>
-            <h4 className="journal-entry-title">{entry.title}</h4>
-            {entry.body && (
-              <p className="journal-entry-body">{entry.body}</p>
-            )}
-          </article>
-        ))}
+  {entries.map((entry, index) => (
+    <article key={entry.id} className="journal-entry">
+      <div className="journal-entry-header">
+        <span className={`journal-entry-type tag-${entry.type}`}>
+          {entry.type === "dreamself_created" && "Dreamself"}
+          {entry.type === "item_found" && "Relic"}
+          {entry.type === "biome_visited" && "Biome"}
+        </span>
+        <div className="journal-entry-meta">
+          <time className="journal-entry-time">
+            {new Date(entry.timestampIso).toLocaleString()}
+          </time>
+          {index === 0 && (
+            <span className="journal-entry-badge">NEW</span>
+          )}
+        </div>
       </div>
+
+      <div className="journal-entry-divider" />
+
+      <h4 className="journal-entry-title">{entry.title}</h4>
+      {entry.body && (
+        <p className="journal-entry-body">{entry.body}</p>
+      )}
+    </article>
+  ))}
+</div>
+
     </div>
   );
 };

@@ -3,6 +3,7 @@ import type { DreamselfProfile, InventoryItem, JournalEntry } from "../../types"
 import WorldLane from "../WorldLane";
 import { JournalPanel } from "../panels/JournalPanel";
 import { AvatarView } from "../AvatarView";
+import { useBiomeLighting } from "../../hooks/useBiomeLighting";
 
 type WorldPanelId = "inventory" | "character" | "map" | "journal" | "debug";
 
@@ -26,9 +27,17 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   const [activePanel, setActivePanel] =
     useState<WorldPanelId | null>("inventory");
 
+  // biome / lighting info derived from phase + dominant element
+  const dominantElement = profile?.traits?.dominantElement ?? null;
+
+  const lighting = useBiomeLighting({
+    phase,
+    element: dominantElement,
+  });
+
   return (
     <section className="app-screen app-screen-world">
-      <div className="world-card">
+      <div className={`world-card ${lighting.worldClass}`}>
         {/* WORLD LANE */}
         <WorldLane
           profile={profile}
@@ -39,11 +48,9 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
         {/* DREAMSELF AVATAR OVERLAY */}
         {profile && (
-            <div
-  className={`world-stage-avatar world-stage-avatar--walking world-phase-${phase}`}
->
-
-
+          <div
+            className={`world-stage-avatar world-stage-avatar--walking ${lighting.avatarClass}`}
+          >
             <AvatarView
               avatar={profile.avatar}
               traits={profile.traits}
@@ -51,6 +58,9 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             />
           </div>
         )}
+
+        {/* BIOME / PHASE TINT OVERLAY (sits above world, below HUD) */}
+        <div className="world-tint-overlay" />
 
         {/* WORLD OVERLAY (HUD, DOCK, PANELS) */}
         <div className="world-overlay">

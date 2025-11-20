@@ -806,6 +806,54 @@ body {
 }
 
 
+/* ---------- WORLD LANE PARALLAX ART LAYERS ---------- */
+
+.world-lane-layer {
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat-x;
+  background-position: 0 bottom;
+  background-size: auto 100%;
+  transform: translate3d(0, 0, 0);
+  will-change: background-position;
+  z-index: 0;
+  animation-name: world-lane-art-scroll;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* depth-based layering: 1 = far back, 5 = foreground */
+.world-lane-layer--depth-1 {
+  z-index: 0;
+}
+
+.world-lane-layer--depth-2 {
+  z-index: 1;
+}
+
+.world-lane-layer--depth-3 {
+  z-index: 2;
+}
+
+.world-lane-layer--depth-4 {
+  z-index: 3;
+}
+
+.world-lane-layer--depth-5 {
+  z-index: 4;
+}
+
+@keyframes world-lane-art-scroll {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: -200%;
+  }
+}
+
+
+
 /* overlay on top of the sky */
 
 .world-overlay-main {

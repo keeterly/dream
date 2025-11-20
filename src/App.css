@@ -2968,3 +2968,16 @@ body {
   transform-origin: 50% 100%;
   pointer-events: none;
 }
+
+/* When auto-walk is paused (or an encounter is active) stop all background motion */
+.world-lane--paused .world-lane-layer,
+.world-lane--paused .world-lane-backdrop,
+.world-lane--paused .world-lane-ground,
+.world-lane--paused .world-lane-figure,
+.world-lane--paused .world-lane-figure-body,
+.world-lane--paused .world-lane-crystal,
+.world-lane--paused .world-lane-encounter-pulse {
+  animation-play-state: paused;
+}
+
+

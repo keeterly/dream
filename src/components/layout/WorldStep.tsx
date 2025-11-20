@@ -12,7 +12,7 @@ interface WorldStepProps {
   journalEntries: JournalEntry[];
   onSpawnDebugItem: () => void;
   encounterItemName: string | null;
-   phase: string;
+  phase: string;
 }
 
 export const WorldStep: React.FC<WorldStepProps> = ({
@@ -23,13 +23,13 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   encounterItemName,
   phase,
 }) => {
-  const [activePanel, setActivePanel] = useState<WorldPanelId | null>(
-    "inventory"
-  );
+  const [activePanel, setActivePanel] =
+    useState<WorldPanelId | null>("inventory");
 
   return (
     <section className="app-screen app-screen-world">
       <div className="world-card">
+        {/* WORLD LANE */}
         <WorldLane
           profile={profile}
           environmentId="dusk_valley"
@@ -37,104 +37,106 @@ export const WorldStep: React.FC<WorldStepProps> = ({
           encounterItemName={encounterItemName}
         />
 
+        {/* DREAMSELF AVATAR OVERLAY */}
         {profile && (
-        <div className="world-stage-avatar">
+          <div className="world-stage-avatar">
             <AvatarView
-                avatar={profile.avatar}
-                traits={profile.traits}
-                dreamName={profile.dreamName}
+              avatar={profile.avatar}
+              traits={profile.traits}
+              dreamName={profile.dreamName}
             />
-        </div>
+          </div>
+        )}
 
-
-
+        {/* WORLD OVERLAY (HUD, DOCK, PANELS) */}
         <div className="world-overlay">
           {/* HUD */}
-        <div className="world-hud">
-  <div className="world-hud-left">
-    <div className="world-hud-field">
-      <span className="hud-kicker">FIELD — SCROLLING WORLD</span>
-    </div>
-    <div className="world-hud-title-row">
-      <span className="world-hud-title">{profile.dreamName}</span>
-      <span className="world-hud-badge">LV 01</span>
-    </div>
-    <div className="world-hud-meta">
-      <span className="hud-label">DREAMSELF</span>
-      <span className="hud-value">{profile.traits.primaryArchetype}</span>
-    </div>
-  </div>
+          <div className="world-hud">
+            <div className="world-hud-left">
+              <div className="world-hud-field">
+                <span className="hud-kicker">FIELD — SCROLLING WORLD</span>
+              </div>
+              <div className="world-hud-title-row">
+                <span className="world-hud-title">{profile.dreamName}</span>
+                <span className="world-hud-badge">LV 01</span>
+              </div>
+              <div className="world-hud-meta">
+                <span className="hud-label">DREAMSELF</span>
+                <span className="hud-value">
+                  {profile.traits.primaryArchetype}
+                </span>
+              </div>
+            </div>
 
-  <div className="world-hud-right">
-    <div className="world-hud-phase">
-      <span className="hud-label">PHASE</span>
-      <span className="hud-value">{phase}</span>
-    </div>
-  </div>
-</div>
+            <div className="world-hud-right">
+              <div className="world-hud-phase">
+                <span className="hud-label">PHASE</span>
+                <span className="hud-value">{phase}</span>
+              </div>
+            </div>
+          </div>
 
-
-
-          {/* Dock */}
+          {/* DOCK */}
           <div className="world-dock">
-  <button
-    className={
-      "world-dock-button" +
-      (activePanel === "inventory" ? " world-dock-button--active" : "")
-    }
-    onClick={() => setActivePanel("inventory")}
-  >
-    <span className="world-dock-icon world-dock-icon--inventory" />
-    <span className="world-dock-label">Inventory</span>
-  </button>
+            <button
+              className={
+                "world-dock-button" +
+                (activePanel === "inventory" ? " world-dock-button--active" : "")
+              }
+              onClick={() => setActivePanel("inventory")}
+            >
+              <span className="world-dock-icon world-dock-icon--inventory" />
+              <span className="world-dock-label">Inventory</span>
+            </button>
 
-  <button
-    className={
-      "world-dock-button" +
-      (activePanel === "character" ? " world-dock-button--active" : "")
-    }
-    onClick={() => setActivePanel("character")}
-  >
-    <span className="world-dock-icon world-dock-icon--dreamself" />
-    <span className="world-dock-label">Dreamself</span>
-  </button>
+            <button
+              className={
+                "world-dock-button" +
+                (activePanel === "character" ? " world-dock-button--active" : "")
+              }
+              onClick={() => setActivePanel("character")}
+            >
+              <span className="world-dock-icon world-dock-icon--dreamself" />
+              <span className="world-dock-label">Dreamself</span>
+            </button>
 
-  <button
-    className={
-      "world-dock-button" +
-      (activePanel === "map" ? " world-dock-button--active" : "")
-    }
-    onClick={() => setActivePanel("map")}
-  >
-    <span className="world-dock-icon world-dock-icon--map" />
-    <span className="world-dock-label">Map</span>
-  </button>
+            <button
+              className={
+                "world-dock-button" +
+                (activePanel === "map" ? " world-dock-button--active" : "")
+              }
+              onClick={() => setActivePanel("map")}
+            >
+              <span className="world-dock-icon world-dock-icon--map" />
+              <span className="world-dock-label">Map</span>
+            </button>
 
-  <button
-    className={
-      "world-dock-button" +
-      (activePanel === "journal" ? " world-dock-button--active" : "")
-    }
-    onClick={() => setActivePanel("journal")}
-  >
-    <span className="world-dock-icon world-dock-icon--journal" />
-    <span className="world-dock-label">Journal</span>
-  </button>
+            <button
+              className={
+                "world-dock-button" +
+                (activePanel === "journal"
+                  ? " world-dock-button--active"
+                  : "")
+              }
+              onClick={() => setActivePanel("journal")}
+            >
+              <span className="world-dock-icon world-dock-icon--journal" />
+              <span className="world-dock-label">Journal</span>
+            </button>
 
-  <button
-    className={
-      "world-dock-button" +
-      (activePanel === "debug" ? " world-dock-button--active" : "")
-    }
-    onClick={() => setActivePanel("debug")}
-  >
-    <span className="world-dock-icon world-dock-icon--debug" />
-    <span className="world-dock-label">Debug</span>
-  </button>
-</div>
+            <button
+              className={
+                "world-dock-button" +
+                (activePanel === "debug" ? " world-dock-button--active" : "")
+              }
+              onClick={() => setActivePanel("debug")}
+            >
+              <span className="world-dock-icon world-dock-icon--debug" />
+              <span className="world-dock-label">Debug</span>
+            </button>
+          </div>
 
-
-          {/* Panels */}
+          {/* PANELS */}
           <div className="world-panels">
             {activePanel === "journal" && (
               <JournalPanel entries={journalEntries} />
@@ -180,10 +182,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                   Spawn a random relic event for testing drops and journal
                   entries.
                 </p>
-                <button
-                  className="secondary-button"
-                  onClick={onSpawnDebugItem}
-                >
+                <button className="secondary-button" onClick={onSpawnDebugItem}>
                   Spawn Random Relic
                 </button>
               </div>

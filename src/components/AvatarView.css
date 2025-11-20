@@ -6,9 +6,11 @@
 
 /* default size; we’ll override in specific screens via parent selectors */
 .avatar-view-svg {
-  width: 190px;
+  width: 240px;
   height: auto;
   display: block;
+    background: none; /* important: no solid card behind the avatar */
+
 }
 
 /* Summary screen: slightly larger avatar, centered in card */

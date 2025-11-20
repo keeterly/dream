@@ -2,18 +2,19 @@ import React from "react";
 import "./AvatarView.css";
 
 interface AvatarViewProps {
-  avatar: any;   // DreamselfProfile.avatar (AvatarConfig)
-  traits?: any;  // DreamTraits (optional, for extra nuance later)
+  avatar: any;   // AvatarConfig from your profile
+  traits?: any;  // DreamTraits (optional)
   dreamName?: string;
 }
 
-/** Small helpers */
+/* ---------- tiny helpers ---------- */
 
 function normalizeKey(value: unknown): string {
   if (!value) return "";
   return value.toString().trim().toLowerCase();
 }
 
+// FNV-ish hash -> [0,1)
 function hashToUnit(str: string): number {
   let h = 2166136261 >>> 0;
   for (let i = 0; i < str.length; i++) {
@@ -27,44 +28,35 @@ function hashToInt(str: string, max: number): number {
   return Math.floor(hashToUnit(str) * max);
 }
 
-/** Pull knobs from AvatarConfig */
+/* ---------- read knobs from AvatarConfig ---------- */
 
 function getBodyType(avatar: any): "slim" | "tall" | "compact" {
-  const t = normalizeKey(avatar?.bodyType);
-  if (t === "tall") return "tall";
-  if (t === "compact") return "compact";
+  const k = normalizeKey(avatar?.bodyType);
+  if (k === "tall") return "tall";
+  if (k === "compact") return "compact";
   return "slim";
 }
 
-function getPosture(avatar: any): "upright" | "forward-leaning" | "stooped" {
-  const t = normalizeKey(avatar?.posture);
-  if (t === "forward-leaning") return "forward-leaning";
-  if (t === "stooped") return "stooped";
-  return "upright";
-}
-
-function getHeadShape(
-  avatar: any
-): "oval" | "angular" | "soft" {
-  const t = normalizeKey(avatar?.headShape);
-  if (t === "angular") return "angular";
-  if (t === "soft") return "soft";
+function getHeadShape(avatar: any): "oval" | "angular" | "soft" {
+  const k = normalizeKey(avatar?.headShape);
+  if (k === "angular") return "angular";
+  if (k === "soft") return "soft";
   return "oval";
 }
 
 function getFaceDetail(avatar: any): "minimal" | "medium" | "ornate" {
-  const t = normalizeKey(avatar?.faceDetailLevel);
-  if (t === "minimal" || t === "ornate") return t;
+  const k = normalizeKey(avatar?.faceDetailLevel);
+  if (k === "minimal" || k === "ornate") return k;
   return "medium";
 }
 
 function getCloakStyle(
   avatar: any
-): "mantle_open" | "structured" | "asym_trail" {
-  const t = normalizeKey(avatar?.cloakStyle);
-  if (t === "structured") return "structured";
-  if (t === "asym_trail") return "asym_trail";
-  return "mantle_open";
+): "triangular" | "split_front" | "cape_heavy" {
+  const k = normalizeKey(avatar?.cloakStyle);
+  if (k === "structured") return "split_front";     // architect
+  if (k === "asym_trail") return "cape_heavy";      // wanderer-ish
+  return "triangular";                              // seer default
 }
 
 function getAccentGlyphs(avatar: any): string[] {
@@ -72,18 +64,19 @@ function getAccentGlyphs(avatar: any): string[] {
 }
 
 function getPalettes(avatar: any) {
-  const robe = avatar?.primaryPalette || "#111827";
+  const robe = avatar?.primaryPalette || "#161822";
   const accent = avatar?.secondaryPalette || "#c4d9ff";
 
-  // simple derived glow: mix accent with white a bit
-  const glow = "#ffffff";
-  const inner = "#05060b";
+  // trim is a softer version of accent
+  const trim = accent;
+  const glow = "#fdfdfd";
+  const inner = "#05060b"; // face / shadow
 
-  return { robe, accent, trim: accent, glow, inner };
+  return { robe, accent, trim, glow, inner };
 }
 
 function getVariantIndex(avatar: any, traits?: any, dreamName?: string) {
-  const seedString =
+  const seed =
     (avatar?.seed || "") +
     "|" +
     (dreamName || "") +
@@ -91,76 +84,63 @@ function getVariantIndex(avatar: any, traits?: any, dreamName?: string) {
     (traits?.primaryArchetype || "") +
     "|" +
     (traits?.dominantElement || "");
-  return hashToInt(seedString || "default", 4); // 0–3
+  return hashToInt(seed || "default", 4); // 0–3
 }
 
-/** Geometry based on bodyType & posture */
+/* ---------- geometry for the robed body ---------- */
 
-function getBodyGeometry(
-  avatar: any,
-  traits?: any,
-  dreamName?: string
-) {
+function getBodyGeometry(avatar: any, traits?: any, dreamName?: string) {
   const bodyType = getBodyType(avatar);
-  const posture = getPosture(avatar);
   const temperamentTags: string[] = traits?.temperamentTags || [];
   const variantIndex = getVariantIndex(avatar, traits, dreamName);
 
-  const canvasWidth = 120;
-  const canvasHeight = 200;
+  const width = 120;
+  const height = 200;
 
-  let centerX = canvasWidth / 2;
-  let feetY = 180;
-  let cloakWidth = 60;
-  let cloakHeight = 110;
+  const centerX = width / 2;
+  const feetY = 182;
+
+  let cloakHeight = 116;
+  let baseWidth = 70; // full triangular span at hem
   let lean = 0;
 
   if (bodyType === "tall") {
-    cloakHeight = 120;
+    cloakHeight = 124;
   } else if (bodyType === "compact") {
-    cloakWidth = 56;
-    cloakHeight = 104;
-  } else {
-    // slim
-    cloakWidth = 52;
-  }
-
-  if (posture === "forward-leaning") {
-    lean += 3;
-  } else if (posture === "stooped") {
-    lean -= 2;
+    cloakHeight = 110;
+    baseWidth = 64;
   }
 
   const tags = temperamentTags.map(normalizeKey);
   if (tags.includes("bold") || tags.includes("impulsive")) {
-    lean += 1;
+    lean += 2;
   }
   if (tags.includes("guarded") || tags.includes("cautious")) {
     lean -= 1;
   }
 
-  if (variantIndex === 1) {
-    cloakHeight += 4;
-  } else if (variantIndex === 2) {
-    cloakHeight -= 4;
-  }
+  // tiny variant tweak
+  if (variantIndex === 1) cloakHeight += 3;
+  if (variantIndex === 2) cloakHeight -= 3;
 
-  const headCenterY = feetY - cloakHeight - 22;
+  const headCenterY = feetY - cloakHeight - 24;
+  const shoulderY = headCenterY + 20;
 
   return {
-    canvasWidth,
-    canvasHeight,
+    width,
+    height,
     centerX,
     feetY,
-    cloakWidth,
     cloakHeight,
+    baseWidth,
     headCenterY,
+    shoulderY,
     lean,
     variantIndex,
   };
 }
 
-/** Render mask using headShape + faceDetail */
+/* ---------- mask / face rendering ---------- */
 
 function renderMask(
   avatar: any,
@@ -174,121 +154,105 @@ function renderMask(
   const faceDetail = getFaceDetail(avatar);
   const x = cx + lean;
 
-  const baseMask =
-    headShape === "angular" ? (
+  let base: React.ReactNode;
+
+  if (headShape === "angular") {
+    base = (
       <path
         d={`
-          M ${x - 6}, ${cy - 6}
-          L ${x + 6}, ${cy - 6}
-          L ${x + 6.5}, ${cy + 5}
-          L ${x - 6.5}, ${cy + 5}
+          M ${x - 7}, ${cy - 7}
+          L ${x + 7}, ${cy - 7}
+          L ${x + 7.5}, ${cy + 4.5}
+          L ${x - 7.5}, ${cy + 4.5}
           Z
         `}
         fill={palettes.inner}
         stroke={palettes.glow}
         strokeWidth={1}
       />
-    ) : headShape === "soft" ? (
+    );
+  } else if (headShape === "soft") {
+    base = (
       <ellipse
         cx={x}
         cy={cy}
-        rx={6.6}
-        ry={7.2}
-        fill={palettes.inner}
-        stroke={palettes.glow}
-        strokeWidth={1}
-      />
-    ) : (
-      <circle
-        cx={x}
-        cy={cy}
-        r={7}
+        rx={7.3}
+        ry={8.1}
         fill={palettes.inner}
         stroke={palettes.glow}
         strokeWidth={1}
       />
     );
+  } else {
+    base = (
+      <circle
+        cx={x}
+        cy={cy}
+        r={7.4}
+        fill={palettes.inner}
+        stroke={palettes.glow}
+        strokeWidth={1}
+      />
+    );
+  }
 
-  // eyes / face detail
   let details: React.ReactNode = null;
 
   if (faceDetail === "minimal") {
-    details = (
-      <circle
-        cx={x}
-        cy={cy}
-        r={2.2}
-        fill={palettes.glow}
-      />
-    );
+    details = <circle cx={x} cy={cy} r={2.3} fill={palettes.glow} />;
   } else if (faceDetail === "medium") {
     details = (
       <>
-        <circle
-          cx={x - 2.4}
-          cy={cy - 0.4}
-          r={1}
-          fill={palettes.glow}
-        />
-        <circle
-          cx={x + 2.4}
-          cy={cy - 0.4}
-          r={1}
-          fill={palettes.glow}
-        />
+        <circle cx={x - 2.8} cy={cy} r={1.2} fill={palettes.glow} />
+        <circle cx={x + 2.8} cy={cy} r={1.2} fill={palettes.glow} />
       </>
     );
   } else {
-    // ornate: variant decides pattern
     const style = variantIndex % 3;
     if (style === 0) {
       details = (
         <>
-          <circle cx={x - 2.2} cy={cy - 0.6} r={1} fill={palettes.glow} />
-          <circle cx={x + 2.2} cy={cy - 0.6} r={1} fill={palettes.glow} />
-          <circle cx={x} cy={cy + 2.1} r={0.9} fill={palettes.glow} />
+          <circle cx={x - 3} cy={cy - 0.4} r={1.1} fill={palettes.glow} />
+          <circle cx={x + 3} cy={cy - 0.4} r={1.1} fill={palettes.glow} />
+          <circle cx={x} cy={cy + 2.4} r={1} fill={palettes.glow} />
         </>
       );
     } else if (style === 1) {
       details = (
-        <>
-          <rect
-            x={x - 1}
-            y={cy - 3}
-            width={2}
-            height={6}
-            rx={1}
-            fill={palettes.glow}
-          />
-        </>
+        <rect
+          x={x - 1.2}
+          y={cy - 3.5}
+          width={2.4}
+          height={7}
+          rx={1.2}
+          fill={palettes.glow}
+        />
       );
     } else {
       details = (
-        <>
-          <path
-            d={`
-              M ${x - 3.5}, ${cy - 1.2}
-              Q ${x}, ${cy + 2} ${x + 3.5}, ${cy - 1.2}
-            `}
-            fill="none"
-            stroke={palettes.glow}
-            strokeWidth={1.3}
-            strokeLinecap="round"
-          />
-        </>
+        <path
+          d={`
+            M ${x - 4}, ${cy - 1.3}
+            Q ${x}, ${cy + 2.2} ${x + 4}, ${cy - 1.3}
+          `}
+          fill="none"
+          stroke={palettes.glow}
+          strokeWidth={1.4}
+          strokeLinecap="round"
+        />
       );
     }
   }
 
   return (
     <>
-      {baseMask}
+      {base}
       {details}
     </>
   );
 }
 
-/** Use accentGlyphs → robe glyphs */
+/* ---------- accent glyphs on robe ---------- */
 
 function renderAccentGlyphs(
   avatar: any,
@@ -296,119 +260,117 @@ function renderAccentGlyphs(
   cx: number,
   feetY: number,
   cloakHeight: number,
-  cloakWidth: number,
+  baseWidth: number,
   lean: number
 ) {
-  const glyphs: string[] = getAccentGlyphs(avatar);
+  const glyphs = getAccentGlyphs(avatar).map(normalizeKey);
   const x = cx + lean;
+  const waistY = feetY - cloakHeight * 0.45;
+  const hemY = feetY - 6;
 
-  const topBeltY = feetY - cloakHeight * 0.45;
-  const hemY = feetY - 8;
+  const nodes: React.ReactNode[] = [];
 
-  const out: React.ReactNode[] = [];
-
-  // base belt
-  out.push(
+  // base belt across waist
+  nodes.push(
     <path
       key="belt"
       d={`
-        M ${x - cloakWidth * 0.32}, ${topBeltY}
-        L ${x + cloakWidth * 0.32}, ${topBeltY}
+        M ${x - baseWidth * 0.22}, ${waistY}
+        L ${x + baseWidth * 0.22}, ${waistY}
       `}
       fill="none"
       stroke={palettes.trim}
-      strokeWidth={1}
+      strokeWidth={1.2}
     />
   );
 
   glyphs.forEach((g) => {
-    const key = normalizeKey(g);
-    if (key === "seer_eye") {
-      out.push(
+    if (g === "seer_eye") {
+      nodes.push(
         <circle
           key="seer_eye_outer"
           cx={x}
-          cy={topBeltY}
-          r={3.2}
+          cy={waistY}
+          r={3.4}
           fill="none"
           stroke={palettes.accent}
           strokeWidth={1}
         />
       );
-      out.push(
+      nodes.push(
         <circle
           key="seer_eye_inner"
           cx={x}
-          cy={topBeltY}
-          r={1.5}
+          cy={waistY}
+          r={1.8}
           fill={palettes.accent}
         />
       );
-    } else if (key === "ring_aura") {
-      out.push(
+    } else if (g === "ring_aura") {
+      nodes.push(
         <circle
           key="ring_aura"
           cx={x}
           cy={feetY - cloakHeight * 0.3}
-          r={4}
+          r={4.4}
           fill="none"
           stroke={palettes.accent}
           strokeWidth={1}
         />
       );
-    } else if (key === "geo_lines") {
-      out.push(
+    } else if (g === "geo_lines") {
+      nodes.push(
         <path
           key="geo_lines"
           d={`
-            M ${x - 7}, ${hemY - 10}
-            L ${x - 7}, ${hemY}
-            M ${x}, ${hemY - 12}
+            M ${x - 8}, ${hemY - 10}
+            L ${x - 8}, ${hemY}
+            M ${x}, ${hemY - 13}
             L ${x}, ${hemY}
-            M ${x + 7}, ${hemY - 10}
-            L ${x + 7}, ${hemY}
+            M ${x + 8}, ${hemY - 10}
+            L ${x + 8}, ${hemY}
           `}
           fill="none"
           stroke={palettes.accent}
-          strokeWidth={1}
+          strokeWidth={1.1}
         />
       );
-    } else if (key === "grid_fragment") {
-      out.push(
+    } else if (g === "grid_fragment") {
+      nodes.push(
         <rect
           key="grid_fragment"
-          x={x - 8}
-          y={topBeltY - 4}
-          width={16}
-          height={8}
+          x={x - 9}
+          y={waistY - 5}
+          width={18}
+          height={10}
           rx={3}
           fill="none"
           stroke={palettes.accent}
           strokeWidth={1}
         />
       );
-    } else if (key === "path_curve") {
-      out.push(
+    } else if (g === "path_curve") {
+      nodes.push(
         <path
           key="path_curve"
           d={`
-            M ${x - 10}, ${feetY - cloakHeight * 0.25}
-            Q ${x}, ${feetY - cloakHeight * 0.15}
-              ${x + 10}, ${feetY - cloakHeight * 0.05}
+            M ${x - 10}, ${feetY - cloakHeight * 0.35}
+            Q ${x}, ${feetY - cloakHeight * 0.2}
+              ${x + 10}, ${feetY - cloakHeight * 0.12}
           `}
           fill="none"
           stroke={palettes.accent}
           strokeWidth={1}
         />
       );
-    } else if (key === "footstep") {
-      out.push(
+    } else if (g === "footstep") {
+      nodes.push(
         <path
           key="footstep"
           d={`
-            M ${x - 4}, ${hemY - 6}
+            M ${x - 4}, ${hemY - 7}
             L ${x - 4}, ${hemY - 2}
-            M ${x + 4}, ${hemY - 8}
+            M ${x + 4}, ${hemY - 9}
             L ${x + 4}, ${hemY - 3}
           `}
           fill="none"
@@ -419,191 +381,193 @@ function renderAccentGlyphs(
     }
   });
 
-  return out;
+  return nodes;
 }
 
-/** Main component */
+/* ---------- main AvatarView ---------- */
 
 export const AvatarView: React.FC<AvatarViewProps> = ({
   avatar,
   traits,
   dreamName,
 }) => {
+  if (!avatar) return null;
+
   const palettes = getPalettes(avatar);
   const {
-    canvasWidth,
-    canvasHeight,
+    width,
+    height,
     centerX,
     feetY,
-    cloakWidth,
     cloakHeight,
+    baseWidth,
     headCenterY,
+    shoulderY,
     lean,
     variantIndex,
   } = getBodyGeometry(avatar, traits, dreamName);
 
-  const halfW = cloakWidth / 2;
-
   const cloakStyle = getCloakStyle(avatar);
+
+  const x = centerX + lean;
+  const halfBase = baseWidth / 2;
+
   const hasCompanion =
     normalizeKey(avatar?.companionType) &&
     normalizeKey(avatar?.companionType) !== "none";
-
-  const x = centerX + lean;
 
   return (
     <div className="avatar-view-root">
       <svg
         className="avatar-view-svg"
-        viewBox={`0 0 ${canvasWidth} ${canvasHeight}`}
+        viewBox={`0 0 ${width} ${height}`}
         role="img"
         aria-label="Dreamself avatar"
       >
-        {/* background halo */}
-        <defs>
-          <radialGradient id="avatarGlow" cx="50%" cy="20%" r="70%">
-            <stop offset="0%" stopColor={palettes.glow} stopOpacity="0.75" />
-            <stop offset="100%" stopColor={palettes.glow} stopOpacity="0" />
-          </radialGradient>
-        </defs>
-
-        <rect
-          x={0}
-          y={0}
-          width={canvasWidth}
-          height={canvasHeight}
-          fill="url(#avatarGlow)"
-          opacity={0.6}
-        />
+        {/* no background rect: world art shows through */}
 
         {/* ground shadow */}
         <ellipse
           cx={x}
-          cy={feetY + 4}
-          rx={halfW * 0.9}
-          ry={7}
-          fill="rgba(0,0,0,0.75)"
-          style={{ filter: "blur(3px)" }}
+          cy={feetY + 3}
+          rx={halfBase * 0.4}
+          ry={6}
+          fill="rgba(0,0,0,0.7)"
         />
 
         {/* legs */}
         <g fill="#050509" opacity={0.9}>
-          <rect
-            x={x - 8}
-            y={feetY - 22}
-            width={6}
-            height={22}
-            rx={2}
-          />
-          <rect
-            x={x + 2}
-            y={feetY - 22}
-            width={6}
-            height={22}
-            rx={2}
-          />
+          <rect x={x - 7} y={feetY - 24} width={6} height={24} rx={2} />
+          <rect x={x + 1} y={feetY - 24} width={6} height={24} rx={2} />
         </g>
 
-        {/* cloak body */}
-        <path
-          d={`
-          M ${x - halfW}, ${feetY - cloakHeight + 20}
-          Q ${x}, ${feetY - cloakHeight - 4} ${x + halfW}, ${
-            feetY - cloakHeight + 20
-          }
-          L ${x + halfW * 0.85}, ${feetY - 10}
-          Q ${x}, ${feetY} ${x - halfW * 0.85}, ${feetY - 10}
-          Z
-        `}
-          fill={palettes.robe}
-          stroke={palettes.trim}
-          strokeWidth={1.6}
-        />
-
-        {/* shoulder mantle */}
-        <path
-          d={`
-          M ${x - halfW * 0.9}, ${headCenterY + 18}
-          Q ${x}, ${headCenterY + 4} ${x + halfW * 0.9}, ${headCenterY + 18}
-        `}
-          fill="none"
-          stroke={palettes.trim}
-          strokeWidth={cloakStyle === "structured" ? 1.4 : 1.1}
-          opacity={0.9}
-        />
-
-        {/* trailing cloak for asym_trail */}
-        {cloakStyle === "asym_trail" && (
+        {/* triangular / split-front cloak */}
+        {cloakStyle !== "split_front" && (
           <path
             d={`
-            M ${x + halfW * 0.85}, ${feetY - 10}
-            Q ${x + halfW * 1.2}, ${feetY - 2}
-              ${x + halfW * 1.3}, ${feetY}
-          `}
-            fill="none"
+              M ${x}, ${shoulderY}
+              L ${x - halfBase}, ${feetY - 4}
+              L ${x + halfBase}, ${feetY - 4}
+              Z
+            `}
+            fill={palettes.robe}
             stroke={palettes.trim}
-            strokeWidth={1.4}
+            strokeWidth={1.6}
           />
         )}
 
-        {/* head under hood */}
-        <circle
-          cx={x}
-          cy={headCenterY + 4}
-          r={9}
-          fill={palettes.inner}
-        />
+        {cloakStyle === "split_front" && (
+          <>
+            {/* left panel */}
+            <path
+              d={`
+                M ${x}, ${shoulderY}
+                L ${x - halfBase * 0.95}, ${feetY - 4}
+                L ${x - 5}, ${feetY - 4}
+                Z
+              `}
+              fill={palettes.robe}
+              stroke={palettes.trim}
+              strokeWidth={1.6}
+            />
+            {/* right panel */}
+            <path
+              d={`
+                M ${x}, ${shoulderY}
+                L ${x + 5}, ${feetY - 4}
+                L ${x + halfBase * 0.95}, ${feetY - 4}
+                Z
+              `}
+              fill={palettes.robe}
+              stroke={palettes.trim}
+              strokeWidth={1.6}
+            />
+          </>
+        )}
 
-        {/* hood outline */}
+        {/* cape overlay for cape_heavy style (architect / wanderer) */}
+        {cloakStyle === "cape_heavy" && (
+          <path
+            d={`
+              M ${x - halfBase * 0.8}, ${shoulderY - 6}
+              Q ${x}, ${shoulderY - 18}
+                ${x + halfBase * 0.8}, ${shoulderY - 6}
+              L ${x + halfBase * 0.9}, ${feetY - cloakHeight * 0.35}
+              Q ${x}, ${feetY - cloakHeight * 0.2}
+                ${x - halfBase * 0.9}, ${feetY - cloakHeight * 0.35}
+              Z
+            `}
+            fill={palettes.robe}
+            stroke={palettes.trim}
+            strokeWidth={1.2}
+          />
+        )}
+
+        {/* hood frame */}
         <path
           d={`
-          M ${x - 14}, ${headCenterY + 12}
-          Q ${x}, ${headCenterY - 6} ${x + 14}, ${headCenterY + 12}
-        `}
+            M ${x - 16}, ${headCenterY + 14}
+            Q ${x}, ${headCenterY - 8}
+              ${x + 16}, ${headCenterY + 14}
+          `}
           fill="none"
           stroke={palettes.trim}
-          strokeWidth={1.3}
+          strokeWidth={1.4}
         />
 
-        {/* mask / face */}
-        {renderMask(avatar, palettes, centerX, headCenterY + 3, lean, variantIndex)}
+        {/* head under hood */}
+        <circle cx={x} cy={headCenterY + 3} r={9} fill={palettes.inner} />
 
-        {/* robe glyphs from accentGlyphs */}
+        {/* mask / face */}
+        {renderMask(avatar, palettes, centerX, headCenterY + 2, lean, variantIndex)}
+
+        {/* shoulders / upper robe fold */}
+        <path
+          d={`
+            M ${x - halfBase * 0.8}, ${shoulderY}
+            Q ${x}, ${shoulderY - 10}
+              ${x + halfBase * 0.8}, ${shoulderY}
+          `}
+          fill="none"
+          stroke={palettes.trim}
+          strokeWidth={1.2}
+        />
+
+        {/* accent glyphs */}
         {renderAccentGlyphs(
           avatar,
           palettes,
           centerX,
           feetY,
           cloakHeight,
-          cloakWidth,
+          baseWidth,
           lean
         )}
 
-        {/* optional companion light */}
+        {/* optional companion as tiny lantern / mote */}
         {hasCompanion && (
           <>
             <ellipse
-              cx={x + halfW + 12}
+              cx={x + halfBase * 0.7}
               cy={feetY - 10}
-              rx={7}
+              rx={6}
               ry={3}
               fill="rgba(0,0,0,0.7)"
-              style={{ filter: "blur(2px)" }}
             />
             <rect
-              x={x + halfW + 7}
+              x={x + halfBase * 0.6 - 4}
               y={feetY - cloakHeight * 0.25}
-              width={10}
-              height={18}
+              width={8}
+              height={16}
               rx={3}
               fill={palettes.inner}
               stroke={palettes.glow}
               strokeWidth={1}
             />
             <circle
-              cx={x + halfW + 12}
-              cy={feetY - cloakHeight * 0.21}
-              r={3.5}
+              cx={x + halfBase * 0.6}
+              cy={feetY - cloakHeight * 0.25 + 4}
+              r={3.2}
               fill={palettes.glow}
             />
           </>

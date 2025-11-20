@@ -1334,19 +1334,7 @@ body {
   pointer-events: auto;
 }
 
-.world-panel {
-   max-width: 480px;
-  margin-left: auto;
-  border-radius: 1rem;
-  padding: 1.1rem 1.2rem 1.2rem;
-  border: 1px solid rgba(148, 163, 184, 0.6);
-  background: radial-gradient(
-      circle at top,
-      rgba(15, 23, 42, 0.8),
-      rgba(15, 23, 42, 0.98)
-    );
-  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.98);
-}
+
 
 .world-panel-header {
   display: flex;
@@ -1702,20 +1690,36 @@ body {
 }
 
 .world-panel {
-  max-width: 720px;
-  width: calc(100% - 2rem);
-  padding: 1.25rem 1.5rem;
-  border-radius: 1.25rem;
+  max-width: 520px;
+  width: 100%;
+  padding: 1.2rem 1.4rem;
+  border-radius: 1.2rem 1.2rem 0 1.2rem;
   background: linear-gradient(
     135deg,
-    rgba(9, 15, 26, 0.92),
-    rgba(18, 32, 60, 0.9)
+    rgba(9, 15, 26, 0.96),
+    rgba(14, 27, 54, 0.94)
   );
   border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(24px);
-  color: rgba(255, 255, 255, 0.88);
-  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.82rem;
+
+  /* NEW: JRPG slide-in animation */
+  transform: translateY(10px);
+  opacity: 0;
+  animation: panel-enter 240ms ease-out forwards;
+}
+
+@keyframes panel-enter {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .world-panel-title {
@@ -2235,7 +2239,7 @@ body {
 }
 
 
-/* subtle phase tint over world */
+/* Phase-based tint overlay on the scrolling world */
 .world-lane--phase-dawn::after,
 .world-lane--phase-day::after,
 .world-lane--phase-dusk::after,
@@ -2284,3 +2288,4 @@ body {
       transparent 70%
     );
 }
+

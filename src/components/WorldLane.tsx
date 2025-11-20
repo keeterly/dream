@@ -51,7 +51,7 @@ const WorldLane: React.FC<WorldLaneProps> = ({ encounterItemName }) => {
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   return (
-    <div className="world-lane">
+    className={`world-lane world-lane--${environmentId} world-lane--phase-${phase.toLowerCase()}`}
       {/* Parallax art layers */}
       {PARALLAX_LAYERS.map((layer) => (
         <div

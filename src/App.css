@@ -745,17 +745,22 @@ body {
 
 .world-lane-encounter-pulse {
   position: absolute;
-  bottom: 15%;
+  bottom: 16.5%;                /* just under the crystal */
   left: 50%;
   transform: translateX(-50%);
-  width: 160px;
-  height: 44px;
+  width: 170px;
+  height: 46px;
   border-radius: 999px;
-  border: 1px solid rgba(56, 189, 248, 0.8);
-  box-shadow: 0 0 26px rgba(56, 189, 248, 0.8);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(148, 197, 253, 0.55) 0%,
+    rgba(56, 189, 248, 0.35) 35%,
+    transparent 70%
+  );
+  filter: blur(2px);
   opacity: 0;
-  animation: world-lane-pulse 1.4s ease-out infinite;
-  z-index: 9;               /* ⬅️ NEW: above parallax + ground */
+  animation: world-lane-pulse 1.6s ease-out infinite;
+  z-index: 8;                    /* under crystal, above ground */
 }
 
 /* animations */
@@ -800,16 +805,98 @@ body {
 @keyframes world-lane-pulse {
   0% {
     opacity: 0;
-    transform: translateX(-50%) scaleX(0.9);
+    transform: translateX(-50%) scale(0.85);
   }
-  40% {
+  35% {
     opacity: 1;
   }
   100% {
     opacity: 0;
-    transform: translateX(-50%) scaleX(1.08);
+    transform: translateX(-50%) scale(1.1);
   }
 }
+
+
+/* Minimal Nier-style loot crystal */
+.world-lane-crystal {
+  position: absolute;
+  bottom: 19%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 54px;
+  z-index: 9; /* above pulse, below figure (which is 10) */
+
+  /* Tall rounded diamond */
+  background: radial-gradient(
+      circle at 50% 25%,
+      #f9fafb 0%,
+      #e5f0ff 18%,
+      rgba(191, 219, 254, 0.2) 38%,
+      transparent 60%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(15, 23, 42, 0.4),
+      rgba(37, 99, 235, 0.9) 45%,
+      rgba(59, 130, 246, 0.3) 70%,
+      rgba(15, 23, 42, 0.8)
+    );
+  border-radius: 999px 999px 18px 18px;
+
+  box-shadow:
+    0 0 18px rgba(96, 165, 250, 0.75),
+    0 0 40px rgba(37, 99, 235, 0.85);
+
+  /* Slight hover float */
+  animation: world-lane-crystal-float 1.8s ease-in-out infinite;
+}
+
+.world-lane-crystal::before {
+  /* inner core */
+  content: "";
+  position: absolute;
+  inset: 18% 24% 34%;
+  border-radius: 999px 999px 14px 14px;
+  background: radial-gradient(
+    circle at 50% 15%,
+    #ffffff 0%,
+    #e5f0ff 30%,
+    rgba(148, 197, 253, 0.1) 70%,
+    transparent 100%
+  );
+  box-shadow: 0 0 12px rgba(191, 219, 254, 0.9);
+}
+
+.world-lane-crystal::after {
+  /* tiny spark above */
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -16px;
+  width: 8px;
+  height: 8px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: radial-gradient(circle, #f9fafb 0%, transparent 70%);
+  box-shadow: 0 0 12px rgba(191, 219, 254, 0.9);
+  opacity: 0.8;
+}
+
+@keyframes world-lane-crystal-float {
+  0% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-4px);
+  }
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+
+
 
 
 /* ---------- WORLD LANE PARALLAX ART LAYERS ---------- */
@@ -1098,7 +1185,7 @@ body {
 .world-dock {
   position: absolute;
   right: 5vw;
-  bottom: 2.4rem;
+  bottom: 2.4rem;       /* icon row hugs the true bottom */
   display: flex;
   gap: 0.7rem;
   z-index: 20;
@@ -1197,12 +1284,11 @@ body {
 /* Slide-up panels (inventory, map, etc.) */
 .world-panel-shell {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 0 5vw 1.8rem;
+  right: 5vw;           /* align horizontally with the dock */
+  bottom: 5.3rem;       /* ⬅️ LIFT PANEL ABOVE ICONS (~ icon height + gap) */
+  padding-bottom: 0;    /* no extra bottom padding needed now */
   pointer-events: none;
-  z-index: 30;         /* ⬅️ higher than dock */
+  z-index: 30;
 }
 
 .world-panel-shell--visible {
@@ -1211,7 +1297,7 @@ body {
 
 .world-panel {
   max-width: 480px;
-  margin-left: auto;
+  margin-left: auto;    /* keep it hugging the right edge */
   border-radius: 1rem;
   padding: 1.1rem 1.2rem 1.2rem;
   border: 1px solid rgba(148, 163, 184, 0.6);
@@ -1221,7 +1307,6 @@ body {
       rgba(15, 23, 42, 0.98)
     );
   box-shadow: 0 22px 60px rgba(15, 23, 42, 0.98);
-  /* panel lives in shell’s stacking context, so no extra z-index needed */
 }
 
 .world-panel-header {

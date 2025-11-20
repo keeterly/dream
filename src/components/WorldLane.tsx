@@ -91,10 +91,20 @@ const WorldLane: React.FC<WorldLaneProps> = ({ encounterItemName }) => {
         </div>
       </div>
 
-      {/* Loot encounter pulse under feet */}
+            {/* Loot encounter: crystal + subtle pulse */}
       {encounterItemName && (
-        <div className="world-lane-encounter-pulse" aria-hidden="true" />
+        <>
+          <div
+            className="world-lane-encounter-pulse"
+            aria-hidden="true"
+          />
+          <div
+            className="world-lane-crystal"
+            aria-hidden="true"
+          />
+        </>
       )}
+
     </div>
   );
 };

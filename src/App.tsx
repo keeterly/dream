@@ -21,7 +21,6 @@ import type {
 
 type ScreenId = "intro" | "questions" | "summary" | "world";
 
-
 function computeEncounterChance(
   profile: DreamselfProfile | null,
   inventory: InventoryItem[]
@@ -52,9 +51,6 @@ function computeEncounterChance(
   return chance;
 }
 
-
-
-
 function getRandomWorldItem() {
   return WORLD_ITEMS[Math.floor(Math.random() * WORLD_ITEMS.length)];
 }
@@ -66,7 +62,6 @@ function getPhaseFromTick(tick: number): string {
   const segment = Math.floor((tick % 48) / 12);
   return PHASES[segment] ?? "Night";
 }
-
 
 export const App: React.FC = () => {
   const [screen, setScreen] = useState<ScreenId>("intro");
@@ -81,7 +76,7 @@ export const App: React.FC = () => {
     string | null
   >(null);
 
-  // NEW: the item currently being "found" in the world
+  // The item currently being "found" in the world
   const [activeEncounterItem, setActiveEncounterItem] =
     useState<InventoryItem | null>(null);
 
@@ -92,12 +87,16 @@ export const App: React.FC = () => {
     logBiomeVisited,
   } = useJournal();
 
-    // world tick + passive relic drops
+  // world tick + passive relic drops
   useEffect(() => {
-    if (!profile) return;
+    if (!profile || screen !== "world") return;
 
     const intervalId = window.setInterval(() => {
+      // advance time-of-day
       setWorldTick((t) => t + 1);
+
+      // don't start a new encounter if one is already active
+      if (activeEncounterItem) return;
 
       const chance = computeEncounterChance(profile, inventory);
 
@@ -110,26 +109,13 @@ export const App: React.FC = () => {
           acquiredAt,
         };
 
-        // add to inventory + journal
+        // add to inventory + journal immediately
         setInventory((prev) => [invItem, ...prev]);
         logItemFound(invItem);
 
-        // drive world UI
+        // drive world UI: this becomes the active encounter
         setLastEncounterItemName(invItem.name);
         setActiveEncounterItem(invItem);
-
-        // clear after a short "encounter moment"
-        const clearDelayMs = 2400;
-        window.setTimeout(() => {
-          setActiveEncounterItem((current) =>
-            current && current.acquiredAt === invItem.acquiredAt
-              ? null
-              : current
-          );
-          setLastEncounterItemName((current) =>
-            current === invItem.name ? null : current
-          );
-        }, clearDelayMs);
       }
 
       // later: derive biome from worldTick and log
@@ -137,8 +123,14 @@ export const App: React.FC = () => {
     }, 12000);
 
     return () => window.clearInterval(intervalId);
-  }, [profile, inventory, logItemFound, logBiomeVisited]);
-
+  }, [
+    profile,
+    screen,
+    inventory,
+    activeEncounterItem,
+    logItemFound,
+    logBiomeVisited,
+  ]);
 
   const handleBegin = () => {
     setScreen("questions");
@@ -170,37 +162,32 @@ export const App: React.FC = () => {
     setScreen("world");
   };
 
+  // Debug: force-spawn a relic encounter immediately
   const handleSpawnDebugItem = () => {
-  const baseItem = getRandomWorldItem();
-  const acquiredAt = new Date().toISOString();
+    const baseItem = getRandomWorldItem();
+    const acquiredAt = new Date().toISOString();
 
-  const invItem: InventoryItem = {
-    ...baseItem,
-    acquiredAt,
+    const invItem: InventoryItem = {
+      ...baseItem,
+      acquiredAt,
+    };
+
+    // add to inventory + journal
+    setInventory((prev) => [invItem, ...prev]);
+    logItemFound(invItem);
+
+    // drive encounter UI (pause + bubble)
+    setLastEncounterItemName(invItem.name);
+    setActiveEncounterItem(invItem);
   };
 
-  // add to inventory + journal
-  setInventory((prev) => [invItem, ...prev]);
-  setLastEncounterItemName(invItem.name);
-  logItemFound(invItem);
-
-  // drive encounter UI (pause + bubble)
-  setActiveEncounterItem(invItem);
-
-  const clearDelayMs = 2400;
-  window.setTimeout(() => {
-    setActiveEncounterItem((current) =>
-      current && current.acquiredAt === invItem.acquiredAt ? null : current
-    );
-    setLastEncounterItemName((current) =>
-      current === invItem.name ? null : current
-    );
-  }, clearDelayMs);
-};
-
+  // Called by WorldStep when the player taps the "Relic Found" banner
+  const handleResolveEncounter = () => {
+    setActiveEncounterItem(null);
+    setLastEncounterItemName(null);
+  };
 
   const renderScreen = () => {
-    
     const phase = getPhaseFromTick(worldTick);
 
     if (screen === "intro") {
@@ -232,8 +219,9 @@ export const App: React.FC = () => {
           journalEntries={journalEntries as JournalEntry[]}
           onSpawnDebugItem={handleSpawnDebugItem}
           encounterItemName={lastEncounterItemName}
-          phase="dawn"
+          phase={phase}
           activeEncounterItem={activeEncounterItem}
+          onResolveEncounter={handleResolveEncounter}
         />
       );
     }
@@ -242,12 +230,11 @@ export const App: React.FC = () => {
   };
 
   return (
-  <div className="App app-root">
-    <AppHeader screen={screen} />
-    <main className="App-main app-main">{renderScreen()}</main>
-  </div>
-);
-
+    <div className="App app-root">
+      <AppHeader screen={screen} />
+      <main className="App-main app-main">{renderScreen()}</main>
+    </div>
+  );
 };
 
 export default App;

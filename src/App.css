@@ -3049,3 +3049,17 @@ body {
 }
 
 
+/* Matches world drift for a grounded walking feel */
+.world-stage-avatar--walking .avatar-root {
+  animation: dreamself-walk 1.8s ease-in-out infinite;
+}
+
+@keyframes dreamself-walk {
+  0%   { transform: translateY(0px); }
+  25%  { transform: translateY(-4px); }
+  50%  { transform: translateY(0px); }
+  75%  { transform: translateY(3px); }
+  100% { transform: translateY(0); }
+}
+
+

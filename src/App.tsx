@@ -92,7 +92,8 @@ export const App: React.FC = () => {
     }
 
     // finished questionnaire → compute dreamself
-   const nextProfile = computeTraitsAndAvatar(nextAnswers, QUESTIONS);
+    // first arg = seed string, second arg = AnswerMap
+    const nextProfile = computeTraitsAndAvatar("dream-seed", nextAnswers);
 
     setProfile(nextProfile);
     logDreamselfCreated(nextProfile);

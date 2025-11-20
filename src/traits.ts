@@ -97,6 +97,8 @@ export function computeTraitsAndAvatar(
     traits,
     companionType,
     caveMarking
+    randomSeed:
+    profileSeed || Math.random().toString(36).slice(2, 10),
   );
 
   const now = new Date().toISOString();

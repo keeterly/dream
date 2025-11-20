@@ -63,6 +63,7 @@ export interface AvatarConfig {
   cloakStyle: string;
   companionType?: CompanionType;
   caveMarking?: CaveMarking;
+  randomSeed?: string;
 }
 
 export interface DreamselfProfile {

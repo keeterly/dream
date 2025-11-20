@@ -79,7 +79,7 @@ export interface DreamselfProfile {
 
 export type TimeOfDayPhase = "dawn" | "noon" | "dusk" | "night";
 
-export type ItemRarity = "common" | "rare" | "mythic";
+export type ItemRarity = "common" | "rare" | "mythic" | "legendary";
 
 export interface WorldItem {
   id: string;

@@ -7,34 +7,35 @@ interface WorldLaneProps {
   encounterItemName: string | null;
 }
 
-// Hard-coded parallax layers for dusk_valley
+// Back -> front
 const PARALLAX_LAYERS = [
   {
-    file: "layer_01.png",
+    file: "layer_01.png", // far sky / big mountains
     depth: 1,
-    duration: 160,
+    duration: 220,        // very slow
   },
   {
     file: "layer_02.png",
     depth: 2,
-    duration: 110,
+    duration: 150,
   },
   {
     file: "layer_03.png",
     depth: 3,
-    duration: 80,
+    duration: 110,
   },
   {
     file: "layer_04.png",
     depth: 4,
-    duration: 55,
+    duration: 75,
   },
   {
-    file: "layer_05.png",
+    file: "layer_05.png", // foreground shrubs / rock
     depth: 5,
-    duration: 32,
+    duration: 45,         // fastest
   },
 ];
+
 
 const WorldLane: React.FC<WorldLaneProps> = ({ encounterItemName }) => {
   const baseUrl = import.meta.env.BASE_URL || "/";

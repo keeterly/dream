@@ -808,12 +808,12 @@ body {
 
 /* ---------- WORLD LANE PARALLAX ART LAYERS ---------- */
 
-.world-lane-layer {
+ .world-lane-layer {
   position: absolute;
   inset: 0;
   background-repeat: repeat-x;
   background-position: 0 bottom;
-  background-size: auto 100%;
+  background-size: 130% auto;  /* slightly zoomed so seams are less obvious */
   transform: translate3d(0, 0, 0);
   will-change: background-position;
   z-index: 0;
@@ -821,6 +821,7 @@ body {
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }
+
 
 /* depth-based layering: 1 = far back, 5 = foreground */
 .world-lane-layer--depth-1 {
@@ -851,6 +852,29 @@ body {
     background-position-x: -200%;
   }
 }
+
+
+/* subtle night overlay so the art matches the dark UI */
+.world-lane::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4; /* under figure (z 5), above parallax layers */
+
+  /* darken top, leave ground mostly intact */
+  background: linear-gradient(
+    to bottom,
+    rgba(15, 23, 42, 0.9) 0%,
+    rgba(15, 23, 42, 0.85) 30%,
+    rgba(15, 23, 42, 0.6) 55%,
+    rgba(15, 23, 42, 0.2) 75%,
+    transparent 100%
+  );
+}
+
+
+
 
 
 

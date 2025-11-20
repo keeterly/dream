@@ -16,7 +16,7 @@ interface WorldStepProps {
   onSpawnDebugItem: () => void;
   encounterItemName: string | null;
   phase: string;
-  activeEncounterItem?: InventoryItem | null; // NEW
+  activeEncounterItem?: InventoryItem | null;
 }
 
 export const WorldStep: React.FC<WorldStepProps> = ({
@@ -26,14 +26,9 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   onSpawnDebugItem,
   encounterItemName,
   phase,
-   activeEncounterItem, // NEW
-
-
-   
+  activeEncounterItem,
 }) => {
-
-      const isEncounterActive = !!activeEncounterItem;
-
+  const isEncounterActive = !!activeEncounterItem;
 
   const [activePanel, setActivePanel] =
     useState<WorldPanelId | null>("inventory");
@@ -62,7 +57,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
         />
 
         {/* DREAMSELF AVATAR ON RIBBON */}
-                {profile && (
+        {profile && (
           <div
             className={`world-stage-avatar ${
               isEncounterActive
@@ -86,7 +81,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             )}
           </div>
         )}
-
 
         {/* GLOBAL TINT OVERLAY */}
         <div className="world-tint-overlay" />
@@ -157,9 +151,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             <button
               className={
                 "world-dock-button" +
-                (activePanel === "journal"
-                  ? " world-dock-button--active"
-                  : "")
+                (activePanel === "journal" ? " world-dock-button--active" : "")
               }
               onClick={() => togglePanel("journal")}
             >
@@ -241,8 +233,15 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                   Spawn a random relic event for testing drops and journal
                   entries.
                 </p>
-                <button className="secondary-button" onClick={onSpawnDebugItem}>
-                  Spawn Random Relic
+                <button
+                  type="button"
+                  className="world-debug-pill"
+                  onClick={onSpawnDebugItem}
+                >
+                  <span className="world-debug-pill__orb" />
+                  <span className="world-debug-pill__label">
+                    Spawn Random Relic
+                  </span>
                 </button>
               </div>
             )}

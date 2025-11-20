@@ -171,18 +171,33 @@ export const App: React.FC = () => {
   };
 
   const handleSpawnDebugItem = () => {
-    const baseItem = getRandomWorldItem();
-    const acquiredAt = new Date().toISOString();
+  const baseItem = getRandomWorldItem();
+  const acquiredAt = new Date().toISOString();
 
-    const invItem: InventoryItem = {
-      ...baseItem,
-      acquiredAt,
-    };
-
-    setInventory((prev) => [invItem, ...prev]);
-    setLastEncounterItemName(invItem.name);
-    logItemFound(invItem);
+  const invItem: InventoryItem = {
+    ...baseItem,
+    acquiredAt,
   };
+
+  // add to inventory + journal
+  setInventory((prev) => [invItem, ...prev]);
+  setLastEncounterItemName(invItem.name);
+  logItemFound(invItem);
+
+  // drive encounter UI (pause + bubble)
+  setActiveEncounterItem(invItem);
+
+  const clearDelayMs = 2400;
+  window.setTimeout(() => {
+    setActiveEncounterItem((current) =>
+      current && current.acquiredAt === invItem.acquiredAt ? null : current
+    );
+    setLastEncounterItemName((current) =>
+      current === invItem.name ? null : current
+    );
+  }, clearDelayMs);
+};
+
 
   const renderScreen = () => {
     

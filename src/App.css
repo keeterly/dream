@@ -629,7 +629,7 @@ body {
 }
 
 .world-lane-ground--back {
-  bottom: 11%;
+  bottom: 15%;
   background-image: linear-gradient(
       to top,
       #020617 0%,
@@ -649,7 +649,7 @@ body {
 }
 
 .world-lane-ground--front {
-  bottom: 7%;
+  bottom: 9%;
   background-image: linear-gradient(
       to top,
       #020617 0%,
@@ -664,7 +664,7 @@ body {
       #020617 36px,
       #020617 80px
     );
-  opacity: 1;
+  opacity: 1.1;
   animation: world-lane-scroll-fast 20s linear infinite;
 }
 
@@ -672,7 +672,7 @@ body {
 
 .world-lane-figure {
   position: absolute;
-  bottom: 18%;
+  bottom: 16%;
   left: 50%;
   transform: translateX(-50%);
   width: 90px;

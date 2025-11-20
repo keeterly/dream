@@ -535,6 +535,14 @@ body {
   z-index: 0; /* background only */
 }
 
+/* Encounter banner positioned below the HUD */
+.world-encounter-banner {
+  top: 6rem !important;
+  bottom: auto !important;
+}
+
+
+
 /* ---------- WORLD LANE VISUALS (cloak walk ref) ---------- */
 
 .world-lane {
@@ -3254,7 +3262,7 @@ body {
 
 /* Subtle lift of the avatar so it feels “called out” */
 .world-card--encounter .world-stage-avatar {
-  transform: translateY(28px);
+  transform: none;
 }
 
 

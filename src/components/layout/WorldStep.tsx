@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import type { DreamselfProfile, InventoryItem, JournalEntry } from "../../types";
 import WorldLane from "../WorldLane";
 import { JournalPanel } from "../panels/JournalPanel";
+import { AvatarView } from "../AvatarView";
 
 type WorldPanelId = "inventory" | "character" | "map" | "journal" | "debug";
 
@@ -35,6 +36,17 @@ export const WorldStep: React.FC<WorldStepProps> = ({
           phase={phase}
           encounterItemName={encounterItemName}
         />
+
+        {profile && (
+        <div className="world-stage-avatar">
+            <AvatarView
+                avatar={profile.avatar}
+                traits={profile.traits}
+                dreamName={profile.dreamName}
+            />
+        </div>
+
+
 
         <div className="world-overlay">
           {/* HUD */}

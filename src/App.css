@@ -2289,3 +2289,30 @@ body {
     );
 }
 
+
+
+.world-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.world-stage-avatar {
+  position: absolute;
+  left: 50%;
+  bottom: 8vh; /* tweak until the feet sit nicely on the ground */
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* smaller, world-scale version of the avatar */
+.world-stage-avatar .avatar-view-svg {
+  width: min(12vh, 120px);
+  height: auto;
+}
+
+
+.world-lane-player {
+  display: none;
+}
+

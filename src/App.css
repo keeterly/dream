@@ -2891,3 +2891,70 @@ body {
 .world-lane--paused .world-lane-ribbon {
   animation-play-state: paused;
 }
+
+
+
+.worldstep-container {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background: url("/world/layers/layer_00.png") center / cover no-repeat;
+}
+
+.world-ribbon {
+  position: absolute;
+  width: 300%;   /* long scrolling stripe */
+  height: 30vh;
+  bottom: 0;
+  background: url("/world/layers/layer_05.png") repeat-x;
+  opacity: 0.65;
+}
+
+.world-character {
+  position: absolute;
+  bottom: 10vh;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Floating popup */
+.found-popup {
+  position: absolute;
+  bottom: 140px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10,10,15,0.9);
+  padding: 6px 12px;
+  border-radius: 8px;
+  color: white;
+  text-align: center;
+  font-size: 12px;
+  animation: popupFade 1.8s ease-out forwards;
+}
+
+@keyframes popupFade {
+  0% { opacity: 0; transform: translate(-50%, 10px); }
+  15% { opacity: 1; transform: translate(-50%, 0px); }
+  100% { opacity: 0; transform: translate(-50%, -12px); }
+}
+
+/* UI Buttons */
+.world-ui {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.ui-btn {
+  padding: 8px 14px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.06);
+  color: #ccc;
+  font-size: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+}

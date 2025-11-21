@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 
 interface WorldLaneProps {
   profile: unknown | null;
@@ -18,33 +18,39 @@ const PARALLAX_LAYERS = [
   { file: "layer_05.png", depth: 4, duration: 14, opacity: 1.0, blur: 0 },
 ];
 
-// Your new “found item” sprites in /public/items/foundItems
-const FOUND_ITEM_SVGS = [
-  "items/foundItems/faceted_diamond.svg",
-  "items/foundItems/low_gem_prison.svg",
-  "items/foundItems/rought_cut_stone.svg",
-  "items/foundItems/short_chunky_crystal.svg",
-  "items/foundItems/split_crystal.svg",
+// The five SVGs you added under public/items/foundItems
+const FOUND_ITEM_SPRITES = [
+  "short_chunky_crystal.svg",
+  "faceted_diamond.svg",
+  "low_gem_prison.svg",
+  "split_crystal.svg",
+  "rought_cut_stone.svg", // note: matches your filename “rought_cut_stone.svg”
 ] as const;
 
-// simple deterministic hash so the same relic name tends
-// to give the same icon (but still “feels” random)
-function stringHash(input: string): number {
-  let hash = 0;
-  for (let i = 0; i < input.length; i += 1) {
-    hash = (hash * 31 + input.charCodeAt(i)) | 0;
-  }
-  return Math.abs(hash);
+type SpriteFile = (typeof FOUND_ITEM_SPRITES)[number];
+
+function pickSpriteFile(encounterItemName: string | null): SpriteFile | null {
+  if (!encounterItemName) return null;
+
+  // Simple deterministic hash → index
+  const hash = encounterItemName
+    .toLowerCase()
+    .split("")
+    .reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+
+  return FOUND_ITEM_SPRITES[hash % FOUND_ITEM_SPRITES.length];
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
   phase,
   environmentId,
   encounterItemName,
-  isEncounterActive,
+  isEncounterActive = false,
   isWalking = true,
 }) => {
-  // For GitHub Pages this will be "/dream/"
+  // For GitHub Pages this will be "/dream/" – Vite serves everything under
+  // /public at the root, so our PNGs are at:
+  //   <baseUrl>assets/parallax/<environmentId>/layer_01.png
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   const rootClassName = [
@@ -56,15 +62,11 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  // Pick which SVG to use for this encounter
-  const encounterSpriteSrc = useMemo(() => {
-    if (!isEncounterActive || !encounterItemName) return null;
-
-    const idx =
-      stringHash(encounterItemName) % FOUND_ITEM_SVGS.length;
-
-    return `${baseUrl}${FOUND_ITEM_SVGS[idx]}`;
-  }, [isEncounterActive, encounterItemName, baseUrl]);
+  const spriteFile = pickSpriteFile(encounterItemName);
+  const spriteSrc =
+    spriteFile != null
+      ? `${baseUrl}items/foundItems/${spriteFile}`
+      : null;
 
   return (
     <div className={rootClassName}>
@@ -96,15 +98,28 @@ const WorldLane: React.FC<WorldLaneProps> = ({
         <div className="world-lane-ribbon" />
       </div>
 
-      {/* Loot encounter: pulse + small SVG crystal in front of the avatar */}
-      {isEncounterActive && encounterSpriteSrc && (
+      {/* Loot encounter: pulse + SVG crystal, locked to ribbon center */}
+      {isEncounterActive && spriteSrc && (
         <>
           <div className="world-lane-encounter-pulse" aria-hidden="true" />
           <img
-            src={encounterSpriteSrc}
-            alt=""
-            className="world-lane-item"
+            className="world-lane-found-item"
+            src={spriteSrc}
+            alt={encounterItemName ?? "Found relic"}
             aria-hidden="true"
+            style={{
+              position: "absolute",
+              left: "50%",
+              transform: "translateX(-50%)",
+              // This is tuned to sit just ahead of the avatar’s feet.
+              bottom: "11vh",
+              // Force a consistent on-ribbon size regardless of SVG aspect
+              height: "8vh",
+              maxHeight: "80px",
+              width: "auto",
+              zIndex: 14,
+              pointerEvents: "none",
+            }}
           />
         </>
       )}

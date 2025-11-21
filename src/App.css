@@ -820,81 +820,77 @@ body {
 }
 
 
-/* minimalist Nier-style loot crystal */
+
+
+
+/* Nier-style flat crystal cluster for world pickups */
 
 .world-lane-crystal {
   position: absolute;
   bottom: 19%;
-  left: 56%; /* slightly ahead of the Dreamself so it’s not hidden */
+  left: 54%; /* slightly ahead of avatar */
   transform: translateX(-50%);
-  width: 32px;
-  height: 54px;
-  z-index: 11; /* renders in front of the figure */
+  z-index: 11;
 
-  background: radial-gradient(
-      circle at 50% 25%,
-      #f9fafb 0%,
-      #e5f0ff 18%,
-      rgba(191, 219, 254, 0.2) 38%,
-      transparent 60%
-    ),
-    linear-gradient(
-      135deg,
-      rgba(15, 23, 42, 0.4),
-      rgba(37, 99, 235, 0.9) 45%,
-      rgba(59, 130, 246, 0.3) 70%,
-      rgba(15, 23, 42, 0.8)
+  width: 20px;
+  height: 52px;
+  border-radius: 4px;
+
+  /* center shard */
+  background: linear-gradient(
+      145deg,
+      #f6f2e6 0%,
+      #e0d8c4 40%,
+      #b5aa94 75%,
+      #867b65 100%
     );
-  border-radius: 999px 999px 18px 18px;
-
   box-shadow:
-    0 0 18px rgba(96, 165, 250, 0.75),
-    0 0 40px rgba(37, 99, 235, 0.85);
+    0 0 14px rgba(246, 242, 230, 0.65),
+    0 0 32px rgba(130, 120, 96, 0.9);
 
+  transform-origin: 50% 100%;
   animation: world-lane-crystal-float 1.8s ease-in-out infinite;
 }
 
-
-.world-lane-crystal::before {
-  content: "";
-  position: absolute;
-  inset: 18% 24% 34%;
-  border-radius: 999px 999px 14px 14px;
-  background: radial-gradient(
-    circle at 50% 15%,
-    #ffffff 0%,
-    #e5f0ff 30%,
-    rgba(148, 197, 253, 0.1) 70%,
-    transparent 100%
-  );
-  box-shadow: 0 0 12px rgba(191, 219, 254, 0.9);
-}
-
+/* left shard */
+.world-lane-crystal::before,
 .world-lane-crystal::after {
   content: "";
   position: absolute;
-  left: 50%;
-  top: -16px;
-  width: 8px;
-  height: 8px;
-  transform: translateX(-50%);
-  border-radius: 999px;
-  background: radial-gradient(circle, #f9fafb 0%, transparent 70%);
-  box-shadow: 0 0 12px rgba(191, 219, 254, 0.9);
-  opacity: 0.8;
+  bottom: 0;
+  border-radius: 3px;
+  transform-origin: 50% 100%;
 }
 
-@keyframes world-lane-crystal-float {
-  0% {
-    transform: translateX(-50%) translateY(0);
-  }
-  50% {
-    transform: translateX(-50%) translateY(-4px);
-  }
-  100% {
-    transform: translateX(-50%) translateY(0);
-  }
+/* left shard */
+.world-lane-crystal::before {
+  left: -9px;
+  width: 14px;
+  height: 42px;
+  background: linear-gradient(
+      150deg,
+      #f4efe2 0%,
+      #d7cdb7 45%,
+      #a79980 100%
+    );
+  transform: skewX(-8deg);
 }
+
+/* right shard / plate */
+.world-lane-crystal::after {
+  right: -12px;
+  width: 18px;
+  height: 32px;
+  background: linear-gradient(
+      130deg,
+      #f3eee1 0%,
+      #d0c6b0 35%,
+      #a0937b 80%
+    );
+  transform: skewX(10deg);
+  box-shadow: 0 0 10px rgba(190, 180, 150, 0.4);
+}
+
 
 
 

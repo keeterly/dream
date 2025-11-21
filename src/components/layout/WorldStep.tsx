@@ -45,7 +45,31 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   const [wasAutoWalkingBeforeEncounter, setWasAutoWalkingBeforeEncounter] =
     useState(false);
 
-  const isEncounterActive = !!activeEncounterItem;
+  // --- NEW: "loot is on the ground, walking toward it" state ---
+  const hasLootSpawned = !!encounterItemName;
+  const [hasReachedLoot, setHasReachedLoot] = useState(false);
+
+  // When a new loot spawn happens, start a travel timer that represents
+  // the walk-in from offscreen → ribbon center.
+  useEffect(() => {
+    if (!hasLootSpawned) {
+      setHasReachedLoot(false);
+      return;
+    }
+
+    setHasReachedLoot(false);
+
+    // This should roughly match the CSS loot-approach animation duration.
+    const TRAVEL_MS = 5500;
+    const id = window.setTimeout(() => {
+      setHasReachedLoot(true);
+    }, TRAVEL_MS);
+
+    return () => window.clearTimeout(id);
+  }, [hasLootSpawned, encounterItemName]);
+
+  // Encounter is only "active" once the avatar has reached the loot.
+  const isEncounterActive = !!activeEncounterItem && hasReachedLoot;
   const isWalking = isAutoWalking && !isEncounterActive;
 
   const togglePanel = (panel: WorldPanelId) => {
@@ -76,19 +100,21 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
   /**
    * Auto-encounter roll while auto-walk is on.
+   * We don't spawn a new item if one is already walking in or active.
    */
   useEffect(() => {
-    if (!isAutoWalking || isEncounterActive) return;
+    if (!isAutoWalking || isEncounterActive || hasLootSpawned) return;
 
     const delay = 8000 + Math.random() * 8000; // 8–16s
     const id = window.setTimeout(() => {
       setWasAutoWalkingBeforeEncounter(true);
-      setIsAutoWalking(false);
+      // Let the world keep walking while the loot drifts in; we only
+      // flip walking off once the encounter actually becomes active.
       onSpawnDebugItem();
     }, delay);
 
     return () => window.clearTimeout(id);
-  }, [isAutoWalking, isEncounterActive, onSpawnDebugItem]);
+  }, [isAutoWalking, isEncounterActive, hasLootSpawned, onSpawnDebugItem]);
 
   const handleEncounterBannerClick = () => {
     // Tell parent to finalize the encounter (add to inventory, clear active item)
@@ -99,6 +125,9 @@ export const WorldStep: React.FC<WorldStepProps> = ({
       setIsAutoWalking(true);
       setWasAutoWalkingBeforeEncounter(false);
     }
+
+    // Clear local reach flag; parent will also clear encounterItemName.
+    setHasReachedLoot(false);
   };
 
   const cardClasses = [
@@ -114,6 +143,9 @@ export const WorldStep: React.FC<WorldStepProps> = ({
       ? `world-encounter-banner--${activeEncounterItem.rarity}`
       : "";
 
+  // Encounter UI (glyph + top banner) is only visible after we've reached loot.
+  const showEncounterUI = isEncounterActive;
+
   return (
     <section className="app-screen app-screen-world">
       <div className={cardClasses}>
@@ -123,7 +155,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
           environmentId="dusk_valley"
           phase={phase}
           encounterItemName={encounterItemName}
-          isEncounterActive={isEncounterActive}
+          isEncounterActive={showEncounterUI}
           isWalking={isWalking}
         />
 
@@ -136,8 +168,8 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 : "world-stage-avatar--paused"
             } ${lighting.avatarClass}`}
           >
-            {/* MGS-style alert glyph when a relic is active */}
-            {isEncounterActive && <div className="world-encounter-glyph">!</div>}
+            {/* Alert glyph only when the encounter is actually live */}
+            {showEncounterUI && <div className="world-encounter-glyph">!</div>}
 
             <AvatarView
               avatar={profile.avatar}
@@ -154,7 +186,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
         <div className="world-tint-overlay" />
 
         {/* TOP-CENTER RELIC BANNER */}
-        {isEncounterActive && activeEncounterItem && (
+        {showEncounterUI && activeEncounterItem && (
           <button
             type="button"
             className={`world-encounter-banner ${bannerRarityClass}`}

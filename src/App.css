@@ -823,73 +823,6 @@ body {
 
 
 
-/* Nier-style flat crystal cluster for world pickups */
-
-.world-lane-crystal {
-  position: absolute;
-  bottom: 19%;
-  left: 54%; /* slightly ahead of avatar */
-  transform: translateX(-50%);
-  z-index: 11;
-
-  width: 20px;
-  height: 52px;
-  border-radius: 4px;
-
-  /* center shard */
-  background: linear-gradient(
-      145deg,
-      #f6f2e6 0%,
-      #e0d8c4 40%,
-      #b5aa94 75%,
-      #867b65 100%
-    );
-  box-shadow:
-    0 0 14px rgba(246, 242, 230, 0.65),
-    0 0 32px rgba(130, 120, 96, 0.9);
-
-  transform-origin: 50% 100%;
-  animation: world-lane-crystal-float 1.8s ease-in-out infinite;
-}
-
-/* left shard */
-.world-lane-crystal::before,
-.world-lane-crystal::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  border-radius: 3px;
-  transform-origin: 50% 100%;
-}
-
-/* left shard */
-.world-lane-crystal::before {
-  left: -9px;
-  width: 14px;
-  height: 42px;
-  background: linear-gradient(
-      150deg,
-      #f4efe2 0%,
-      #d7cdb7 45%,
-      #a79980 100%
-    );
-  transform: skewX(-8deg);
-}
-
-/* right shard / plate */
-.world-lane-crystal::after {
-  right: -12px;
-  width: 18px;
-  height: 32px;
-  background: linear-gradient(
-      130deg,
-      #f3eee1 0%,
-      #d0c6b0 35%,
-      #a0937b 80%
-    );
-  transform: skewX(10deg);
-  box-shadow: 0 0 10px rgba(190, 180, 150, 0.4);
-}
 
 
 
@@ -3244,4 +3177,33 @@ body {
   0% { transform: scale(0.3); opacity: 0; }
   50% { transform: scale(1.2); opacity: 1; }
   100% { transform: scale(1); opacity: 1; }
+}
+
+
+
+/* Nier-style encounter item sprite */
+.world-encounter-sprite {
+  position: absolute;
+  bottom: 18%;          /* sits nicely on the ridge */
+  left: 56%;            /* slightly ahead of the avatar */
+  transform: translateX(-50%);
+  width: 52px;          /* feel free to tweak size */
+  height: auto;
+  pointer-events: none;
+
+  filter:
+    drop-shadow(0 0 10px rgba(15, 23, 42, 0.9))
+    drop-shadow(0 10px 20px rgba(0, 0, 0, 0.8));
+  opacity: 0.96;
+}
+
+/* optional subtle hover bob when encounter is active */
+.world-card--encounter .world-encounter-sprite {
+  animation: encounter-crystal-float 1.8s ease-in-out infinite;
+}
+
+@keyframes encounter-crystal-float {
+  0%   { transform: translateX(-50%) translateY(0); }
+  50%  { transform: translateX(-50%) translateY(-4px); }
+  100% { transform: translateX(-50%) translateY(0); }
 }

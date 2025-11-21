@@ -18,26 +18,48 @@ const PARALLAX_LAYERS = [
   { file: "layer_05.png", depth: 4, duration: 14, opacity: 1.0, blur: 0 },
 ];
 
-// New: available “found item” sprites (under public/items/foundItems)
+/**
+ * SVGs you added under:
+ *   public/assets/items/foundItems/
+ *
+ * NOTE: names must match the files exactly.
+ */
 const FOUND_ITEM_SPRITES = [
-  { path: "items/foundItems/faceted_diamond.svg", alt: "Faceted crystal" },
-  { path: "items/foundItems/low_gem_prison.svg", alt: "Gem prism" },
-  { path: "items/foundItems/rought_cut_stone.svg", alt: "Rough cut stone" },
-  { path: "items/foundItems/short_chunky_crystal.svg", alt: "Chunky crystal" },
-  { path: "items/foundItems/split_crystal.svg", alt: "Split crystal" },
-];
+  "faceted_diamond.svg",
+  "low_gem_prison.svg",
+  "rought_cut_stone.svg",
+  "short_chunky_crystal.svg",
+  "split_crystal.svg",
+] as const;
 
-// Stable little hash so the same encounter name always maps to the same sprite
-function pickSpriteForEncounter(name: string | null) {
-  if (!name || FOUND_ITEM_SPRITES.length === 0) return null;
-
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = (hash + name.charCodeAt(i)) | 0;
+/**
+ * Deterministically pick a sprite based on the encounter's name.
+ * There is ALWAYS a fallback so something is drawn.
+ */
+function getSpriteForEncounter(name: string | null): string {
+  if (!name) {
+    return FOUND_ITEM_SPRITES[0];
   }
 
-  const index = Math.abs(hash) % FOUND_ITEM_SPRITES.length;
-  return FOUND_ITEM_SPRITES[index];
+  const n = name.toLowerCase();
+
+  // A few hand-tuned mappings so the vibe matches the name
+  if (n.includes("glass") || n.includes("sigil")) {
+    return FOUND_ITEM_SPRITES[0]; // faceted_diamond
+  }
+  if (n.includes("ember") || n.includes("token")) {
+    return FOUND_ITEM_SPRITES[1]; // low_gem_prison
+  }
+  if (n.includes("stone") || n.includes("rock") || n.includes("ore")) {
+    return FOUND_ITEM_SPRITES[2]; // rought_cut_stone
+  }
+  if (n.includes("thread") || n.includes("charm") || n.includes("weave")) {
+    return FOUND_ITEM_SPRITES[3]; // short_chunky_crystal
+  }
+
+  // Fallback: hash the name into the sprite array so it’s stable per item
+  const hash = Array.from(n).reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+  return FOUND_ITEM_SPRITES[hash % FOUND_ITEM_SPRITES.length];
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
@@ -47,9 +69,10 @@ const WorldLane: React.FC<WorldLaneProps> = ({
   isEncounterActive,
   isWalking = true,
 }) => {
-  // For GitHub Pages this will be "/dream/". Vite serves /public at the root:
+  // For GitHub Pages this will be "/dream/" – Vite serves everything under
+  // /public at the root, so our PNGs/SVGs are at:
   //   <baseUrl>assets/parallax/<environmentId>/layer_01.png
-  //   <baseUrl>items/foundItems/your_sprite.svg
+  //   <baseUrl>assets/items/foundItems/<sprite>.svg
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   const rootClassName = [
@@ -61,7 +84,9 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  const chosenSprite = pickSpriteForEncounter(encounterItemName);
+  // Pick a sprite for the *current* encounter (even if name is weird)
+  const itemSpriteFile = getSpriteForEncounter(encounterItemName);
+  const itemSpritePath = `${baseUrl}assets/items/foundItems/${itemSpriteFile}`;
 
   return (
     <div className={rootClassName}>
@@ -93,19 +118,20 @@ const WorldLane: React.FC<WorldLaneProps> = ({
         <div className="world-lane-ribbon" />
       </div>
 
-      {/* Loot encounter: pulse + item sprite in front of the avatar */}
-      {encounterItemName && (
+      {/* Loot encounter: pulse + sprite in front of the avatar */}
+      {isEncounterActive && (
         <>
           <div className="world-lane-encounter-pulse" aria-hidden="true" />
-          <div className="world-lane-crystal" aria-hidden="true">
-            {chosenSprite && (
-              <img
-                src={`${baseUrl}${chosenSprite.path}`}
-                alt={chosenSprite.alt}
-                className="world-lane-crystal-img"
-              />
-            )}
-          </div>
+          <div
+            className="world-lane-crystal"
+            aria-hidden="true"
+            style={{
+              backgroundImage: `url("${itemSpritePath}")`,
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "center",
+              backgroundSize: "contain",
+            }}
+          />
         </>
       )}
     </div>

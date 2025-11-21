@@ -3272,9 +3272,6 @@ body {
     padding: 0.8rem 1.9rem 1rem;
   }
 
-  .world-card--encounter .world-stage-avatar {
-    transform: translateY(32px);
-  }
 }
 
 

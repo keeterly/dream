@@ -136,57 +136,57 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
         {/* DREAMSELF AVATAR ON THE RIBBON */}
         {profile && (
-          <div
-            className={`world-stage-avatar ${
-              isWalking
-                ? "world-stage-avatar--walking"
-                : "world-stage-avatar--paused"
-            } ${lighting.avatarClass}`}
-          >
-            <AvatarView
-              avatar={profile.avatar}
-              traits={profile.traits}
-              dreamName={profile.dreamName}
-            />
+  <div
+    className={`world-stage-avatar ${
+      isWalking
+        ? "world-stage-avatar--walking"
+        : "world-stage-avatar--paused"
+    } ${lighting.avatarClass}`}
+  >
+    <AvatarView
+      avatar={profile.avatar}
+      traits={profile.traits}
+      dreamName={profile.dreamName}
+    />
 
-            {/* Encounter indicator above head */}
-            {activeEncounterItem && (
-              <>
-                <div className="world-encounter-glyph">!</div>
+    {/* Encounter indicator above head (stays with avatar) */}
+    {activeEncounterItem && (
+      <div className="world-encounter-glyph">!</div>
+    )}
 
-                <button
-                  type="button"
-                  className={
-                    "world-encounter-banner world-encounter-banner--visible " +
-                    bannerRarityClass
-                  }
-                  onClick={handleEncounterBannerClick}
-                >
-                  <div className="world-encounter-banner-label">
-                    Relic Found
-                  </div>
-                  <div className="world-encounter-banner-name">
-                    {activeEncounterItem.name}
-                  </div>
+    {/* ground shadow */}
+    <div className="world-stage-shadow" />
+  </div>
+)}
 
-                  <div className="world-encounter-banner-meta">
-                    <span className="world-encounter-banner-rarity">
-                      {activeEncounterItem.rarity}
-                    </span>
-                    <span className="world-encounter-banner-hint">
-                      Tap to bind
-                    </span>
-                  </div>
+/* Top-center relic banner – OUTSIDE the avatar container */
+{activeEncounterItem && (
+  <button
+    type="button"
+    className={
+      "world-encounter-banner world-encounter-banner--visible " +
+      bannerRarityClass
+    }
+    onClick={handleEncounterBannerClick}
+  >
+    <div className="world-encounter-banner-label">Relic Found</div>
+    <div className="world-encounter-banner-name">
+      {activeEncounterItem.name}
+    </div>
 
-                  <div className="world-encounter-banner-orb" />
-                </button>
-              </>
-            )}
+    <div className="world-encounter-banner-meta">
+      <span className="world-encounter-banner-rarity">
+        {activeEncounterItem.rarity}
+      </span>
+      <span className="world-encounter-banner-hint">
+        Tap to bind
+      </span>
+    </div>
 
-            {/* ground shadow */}
-            <div className="world-stage-shadow" />
-          </div>
-        )}
+    <div className="world-encounter-banner-orb" />
+  </button>
+)}
+
 
 
         {/* GLOBAL TINT OVERLAY */}

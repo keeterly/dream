@@ -2704,86 +2704,6 @@ body {
 
 
 
-.world-encounter-bubble {
-  position: absolute;
-  bottom: 115%;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 0.4rem 0.9rem 0.5rem;
-  border-radius: 999px;
-  background: rgba(6, 10, 20, 0.98);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.8);
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.12rem;
-  font-size: 0.74rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transform-origin: 50% 100%;
-  animation:
-    world-encounter-pop 0.18s ease-out forwards,
-    world-encounter-fade 0.4s ease-out 1.9s forwards;
-}
-
-
-.world-encounter-glyph {
-  position: absolute;
-  bottom: 145%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 1.2rem;
-  height: 1.2rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  background: radial-gradient(
-    circle at 50% 20%,
-    #ffffff 0%,
-    #f9edc7 42%,
-    #4b3712 100%
-  );
-  box-shadow:
-    0 0 14px rgba(249, 230, 185, 0.9),
-    0 8px 16px rgba(0, 0, 0, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  color: #05040a;
-  pointer-events: none;
-  animation:
-    world-encounter-glyph-pop 0.16s ease-out forwards,
-    world-encounter-glyph-fade 0.35s ease-out 0.8s forwards;
-}
-
-@keyframes world-encounter-glyph-pop {
-  0% {
-    opacity: 0;
-    transform: translateX(-50%) translateY(4px) scale(0.7);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
-  }
-}
-
-@keyframes world-encounter-glyph-fade {
-  0% {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-4px) scale(0.92);
-  }
-}
-
 
 
 .world-encounter-label {
@@ -3054,41 +2974,8 @@ body {
 }
 
 
-/* Exclamation marker above the Dreamself when an encounter is active */
-.world-encounter-glyph {
-  position: absolute;
-  top: -3.1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 1.35rem;
-  height: 1.35rem;
-  border-radius: 999px;
-  border: 1px solid rgba(248, 250, 252, 0.9);
-  background: radial-gradient(circle at center, #f97316, #b45309 55%, #020617);
-  color: #020617;
-  font-size: 0.9rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 20px rgba(248, 250, 252, 0.7);
-  animation: world-encounter-glyph-pulse 1.4s ease-out infinite;
-}
 
-@keyframes world-encounter-glyph-pulse {
-  0% {
-    transform: translate(-50%, 0) scale(0.9);
-    opacity: 0.55;
-  }
-  40% {
-    transform: translate(-50%, -3px) scale(1.05);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-50%, 0) scale(0.92);
-    opacity: 0.7;
-  }
-}
+
 
 
 .world-encounter-banner {
@@ -3340,30 +3227,7 @@ body {
 }
 
 
-/* Minimal exclamation mark above the Dreamself */
-.world-encounter-glyph {
-  position: absolute;
-  top: -2.4rem;          /* just above the head */
-  left: 50%;
-  transform: translateX(-50%);
-  width: auto;
-  height: auto;
-  padding: 0;
-  margin: 0;
 
-  border: none;
-  background: transparent;
-
-  color: #facc15;        /* warm warning yellow */
-  font-size: 1.9rem;     /* nice and big */
-  line-height: 1;
-  font-weight: 800;
-
-  text-shadow:
-    0 0 6px rgba(250, 204, 21, 0.7),
-    0 0 16px rgba(250, 204, 21, 0.9);
-  animation: world-encounter-glyph-pulse 1.2s ease-out infinite;
-}
 
 
 /* Minimal loot pill instead of large card */

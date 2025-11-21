@@ -3022,16 +3022,8 @@ body {
   }
 }
 
-.world-encounter-banner-label {
-  opacity: 0.7;
-  font-size: 0.7rem;
-}
 
-.world-encounter-banner-name {
-  margin-top: 0.2rem;
-  font-size: 0.9rem;
-  letter-spacing: 0.25em;
-}
+
 
 .world-encounter-banner-meta {
   margin-top: 0.4rem;
@@ -3201,19 +3193,9 @@ body {
   pointer-events: auto;
 }
 
-/* Top “RELIC FOUND” label – smaller and subtle */
-.world-encounter-banner-label {
-  font-size: 0.62rem;
-  letter-spacing: 0.18em;
-  opacity: 0.7;
-}
 
-/* Item name – main focus */
-.world-encounter-banner-name {
-  margin-top: 0.1rem;
-  font-size: 0.78rem;
-  letter-spacing: 0.18em;
-}
+
+
 
 /* Hide the extra row (rarity + hint) for a cleaner look.
    We can bring this back later if you want. */
@@ -3255,29 +3237,6 @@ body {
 }
 
 
-/* Minimal relic notification */
-.world-encounter-banner {
-  position: absolute;
-  bottom: 4.9rem;        /* just above the dock */
-  left: 50%;
-  transform: translateX(-50%);
-  width: auto;
-  max-width: 90vw;
-
-  padding: 0.6rem 1.4rem 0.75rem;
-  border-radius: 1.4rem;
-
-  background: rgba(12, 18, 32, 0.92);
-  border: 1px solid rgba(148, 163, 184, 0.7);
-  box-shadow:
-    0 10px 24px rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(12, 18, 32, 0.5);
-
-  text-align: center;
-
-  pointer-events: auto;
-  opacity: 0;
-}
 
 /* Slide-fade in */
 .world-encounter-banner--visible {
@@ -3290,25 +3249,11 @@ body {
   100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
 }
 
-/* "RELIC FOUND" label */
-.world-encounter-banner-label {
-  font-size: 0.62rem;
-  letter-spacing: 0.14em;
-  opacity: 0.7;
-}
 
-/* Item Name */
-.world-encounter-banner-name {
-  margin-top: 0.2rem;
-  font-size: 0.85rem;
-  letter-spacing: 0.18em;
-}
 
-/* Hide the row below */
-.world-encounter-banner-meta,
-.world-encounter-banner-orb {
-  display: none;
-}
+
+
+
 /* Avatar stays locked in position during encounters */
 .world-card--encounter .world-stage-avatar {
   transform: translateX(-50%) scale(1.6) !important;

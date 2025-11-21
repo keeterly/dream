@@ -3236,34 +3236,66 @@ body {
 
 /* === Grounded loot on the ribbon ===================================== */
 
-.world-lane-loot {
+/* --- Loot object on the ribbon ---------------------------------------- */
+
+.world-lane-loot-travel {
   position: absolute;
-  /* Center-ish but slightly ahead of the avatar (which is at 50%) */
-  left: 56%;
-  bottom: 9.5vh; /* matches the avatar shadow line */
-  transform: translateX(-50%);
-  z-index: 18; /* under HUD, above ribbon + grass */
+  bottom: 8vh;
+  left: 56%;                /* anchored just ahead of the Dreamself */
+  transform: translateX(32vw); /* start off-screen to the right */
+  animation: loot-travel-in 11s linear forwards;
+  z-index: 11;
+  pointer-events: none;
+}
 
+/* Horizontal travel in from the right edge toward the avatar */
+@keyframes loot-travel-in {
+  0% {
+    transform: translateX(32vw);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* The actual crystal/rock sprite */
+.world-lane-loot {
+  position: relative;
+  width: 3.6vw;
+  max-width: 68px;
+  min-width: 36px;
+  aspect-ratio: 3 / 4;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  pointer-events: none; /* purely decorative; encounter is handled in logic */
+  align-items: flex-end;
+  justify-content: center;
+  animation: loot-idle-bob 2.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.35));
 }
 
-/* Soft ground contact */
-.world-lane-loot-shadow {
-  width: clamp(52px, 4.3vw, 80px);
-  height: clamp(12px, 1vw, 18px);
-  border-radius: 999px;
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgba(0, 0, 0, 0.65),
-    transparent 70%
-  );
-  opacity: 0.85;
-  filter: blur(2px);
-  transform-origin: 50% 50%;
+.world-lane-loot-img {
+  width: 100%;
+  height: auto;
+  pointer-events: none;
 }
+
+/* Gentle vertical bob, no horizontal movement (so it plays nicely with travel) */
+@keyframes loot-idle-bob {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
 
 /* The Nier-style SVG crystal/rock */
 .world-lane-loot-image {
@@ -3348,42 +3380,32 @@ body {
     opacity: 1;
   }
 }
-
-/* DREAM: loot object on the ribbon */
+/* === Loot icon on the ribbon: slides in from the right toward the avatar === */
 .world-lane-loot {
   position: absolute;
   left: 50%;
-  transform: translateX(-50%);
-  bottom: 8.6vh;              /* tweak to match the Dreamself's feet */
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  bottom: 8.8vh; /* hugs the ground near the avatar's feet */
+  width: clamp(36px, 3.2vw, 56px);
+  height: auto;
+  transform: translateX(42vw); /* start off to the right of the avatar */
+  animation: world-lane-loot-slide 9s linear forwards;
+  z-index: 19; /* just in front of the ground, behind HUD */
   pointer-events: none;
-  z-index: 22;                /* above ground, below HUD */
+  image-rendering: auto;
 }
 
-.world-lane-loot-shadow {
-  position: absolute;
-  bottom: 2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 12px;
-  border-radius: 999px;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(15, 23, 42, 0.9),
-    transparent 70%
-  );
-  filter: blur(2px);
-  opacity: 0.9;
+/* smooth slide toward the Dreamself */
+@keyframes world-lane-loot-slide {
+  0% {
+    transform: translateX(42vw);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
-.world-lane-loot-image {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  display: block;
-}

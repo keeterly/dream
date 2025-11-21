@@ -1,4 +1,3 @@
-// src/components/world/WorldLane.tsx
 import React from "react";
 
 interface WorldLaneProps {
@@ -20,57 +19,46 @@ const PARALLAX_LAYERS = [
 ];
 
 /**
- * Explicit mapping from encounter names -> sprite files.
- * This guarantees that "Glass Relic" always points at glass_relic.svg
- * instead of going through the hash / randomiser.
+ * Some item names don't slug nicely, or you want a very specific asset.
+ * Use explicit overrides here.
  */
-const NAMED_SPRITES: Record<string, string> = {
-  "glass relic": "glass_relic.svg",
-  "aether sigil": "faceted_diamond.svg",
-  "shadow thread": "split_crystal.svg",
-  "bloom charm": "short_chunky_crystal.svg",
+const LOOT_FILE_OVERRIDES: Record<string, string> = {
+  // This is the one that was broken:
+  "Glass Relic": "glass_relic.svg",
 };
 
-// Fallback pool used for anything we don't explicitly name above.
-const LOOT_SPRITES = [
-  "faceted_diamond.svg",
-  "low_gem_prison.svg",
-  "rought_cut_stone.svg",
-  "short_chunky_crystal.svg",
-  "split_crystal.svg",
-  "glass_relic.svg",
-];
+function slugToFileName(label: string): string {
+  const trimmed = label.trim();
 
-function getLootSpriteForName(name: string | null): string | null {
-  if (!name) return null;
+  // Explicit override first
+  const override = LOOT_FILE_OVERRIDES[trimmed];
+  if (override) return override;
 
-  const normalized = name.trim().toLowerCase();
+  // Fallback: "Bloom Charm" -> "bloom_charm.svg", "Shadow Thread" -> "shadow_thread.svg"
+  const slug = trimmed
+    .toLowerCase()
+    .replace(/['’]/g, "") // drop apostrophes
+    .replace(/[^a-z0-9]+/g, "_") // spaces & punctuation -> underscores
+    .replace(/^_+|_+$/g, ""); // trim leading/trailing "_"
 
-  // 1. Explicit mapping first (fixes the Glass Relic issue).
-  if (normalized in NAMED_SPRITES) {
-    return NAMED_SPRITES[normalized];
-  }
+  return `${slug}.svg`;
+}
 
-  // 2. Hash-based mapping for everything else, stable per name.
-  let hash = 0;
-  for (let i = 0; i < normalized.length; i += 1) {
-    hash = (hash * 31 + normalized.charCodeAt(i)) >>> 0;
-  }
-
-  const index = hash % LOOT_SPRITES.length;
-  return LOOT_SPRITES[index];
+function resolveLootSprite(encounterItemName: string | null, baseUrl: string) {
+  if (!encounterItemName) return null;
+  const fileName = slugToFileName(encounterItemName);
+  return `${baseUrl}items/foundItems/${fileName}`;
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
   phase,
   environmentId,
   encounterItemName,
-  isEncounterActive,
   isWalking = true,
 }) => {
   // For GitHub Pages this will be "/dream/" – Vite serves everything under
-  // /public at the root, so our SVGs are at:
-  //   <baseUrl>items/foundItems/glass_relic.svg
+  // /public at the root, so our assets are at:
+  //   <baseUrl>assets/parallax/<environmentId>/layer_01.png
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   const rootClassName = [
@@ -82,9 +70,7 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  const lootSprite = getLootSpriteForName(encounterItemName);
-  const lootSrc =
-    lootSprite != null ? `${baseUrl}items/foundItems/${lootSprite}` : null;
+  const lootSpriteSrc = resolveLootSprite(encounterItemName, baseUrl);
 
   return (
     <div className={rootClassName}>
@@ -116,17 +102,13 @@ const WorldLane: React.FC<WorldLaneProps> = ({
         <div className="world-lane-ribbon" />
       </div>
 
-      {/* Loot silhouette on the ground in front of the Dreamself.
-          Hidden once the encounter is active. */}
-      {encounterItemName && !isEncounterActive && lootSrc && (
-        <div className="world-lane-loot" aria-hidden="true">
-          <div className="world-lane-loot-shadow" />
-          <img
-            src={lootSrc}
-            alt={encounterItemName ?? "Found object"}
-            className="world-lane-loot-image"
-          />
-        </div>
+      {/* Loot icon on the ribbon: slides in from the right toward the avatar */}
+      {lootSpriteSrc && (
+        <img
+          className="world-lane-loot"
+          src={lootSpriteSrc}
+          alt={encounterItemName ?? "Found item"}
+        />
       )}
     </div>
   );

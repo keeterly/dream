@@ -159,33 +159,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   </div>
 )}
 
-/* Top-center relic banner – OUTSIDE the avatar container */
-{activeEncounterItem && (
-  <button
-    type="button"
-    className={
-      "world-encounter-banner world-encounter-banner--visible " +
-      bannerRarityClass
-    }
-    onClick={handleEncounterBannerClick}
-  >
-    <div className="world-encounter-banner-label">Relic Found</div>
-    <div className="world-encounter-banner-name">
-      {activeEncounterItem.name}
-    </div>
 
-    <div className="world-encounter-banner-meta">
-      <span className="world-encounter-banner-rarity">
-        {activeEncounterItem.rarity}
-      </span>
-      <span className="world-encounter-banner-hint">
-        Tap to bind
-      </span>
-    </div>
-
-    <div className="world-encounter-banner-orb" />
-  </button>
-)}
 
 
 

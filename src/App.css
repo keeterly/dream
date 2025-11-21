@@ -3096,10 +3096,7 @@ body {
   pointer-events: none;
 }
 
-.world-encounter-banner--visible {
-  pointer-events: auto;
-  animation: relic-pill-in 240ms ease-out forwards;
-}
+
 
 @keyframes relic-pill-in {
   0% {
@@ -3116,21 +3113,11 @@ body {
   }
 }
 
-.world-encounter-banner-label {
-  font-size: 0.6rem;
-  opacity: 0.7;
-}
 
-.world-encounter-banner-name {
-  margin-top: 0.2rem;
-  font-size: 0.82rem;
-  letter-spacing: 0.2em;
-}
 
-.world-encounter-banner-orb,
-.world-encounter-banner-meta {
-  display: none !important;
-}
+
+
+
 
 
 
@@ -3253,24 +3240,11 @@ body {
   pointer-events: auto;
 }
 
-.world-encounter-banner-label {
-  opacity: 0.72;
-}
 
-.world-encounter-banner-name {
-  font-size: 0.82rem;
-  letter-spacing: 0.22em;
-}
 
-.world-encounter-banner-orb {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 999px;
-  background: radial-gradient(circle, #ffe378, #f4a63e);
-  box-shadow:
-    0 0 10px rgba(255, 230, 137, 0.9),
-    0 0 24px rgba(243, 166, 62, 0.95);
-}
+
+
+
 
 /* hide any old “meta” row if it exists */
 .world-encounter-banner-meta {
@@ -3283,8 +3257,46 @@ body {
     padding: 0.55rem 1.1rem;
     font-size: 0.68rem;
   }
-  .world-encounter-banner-name {
-    font-size: 0.76rem;
-    letter-spacing: 0.18em;
-  }
+  
+}
+
+
+
+
+.encounter-top-banner {
+  position: absolute;
+  top: 10vh;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  background: rgba(12, 16, 28, 0.6);
+  backdrop-filter: blur(12px);
+  padding: 12px 28px;
+  border-radius: 24px;
+  color: var(--hud-text);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+  pointer-events: none;
+}
+
+.encounter-top-banner--visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.encounter-alert {
+  position: absolute;
+  bottom: calc(25vh + 60px);
+  font-size: 48px;
+  color: #ffd85a;
+  text-shadow: 0 0 12px rgba(255, 216, 90, 0.9);
+  animation: alert-pop 0.65s ease-out forwards;
+}
+
+@keyframes alert-pop {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
 }

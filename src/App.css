@@ -3339,3 +3339,85 @@ body {
   height: 100%;
 }
 
+
+/* Minimal exclamation mark above the Dreamself */
+.world-encounter-glyph {
+  position: absolute;
+  top: -2.4rem;          /* just above the head */
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #facc15;        /* warm warning yellow */
+  font-size: 1.9rem;     /* nice and big */
+  line-height: 1;
+  font-weight: 800;
+
+  text-shadow:
+    0 0 6px rgba(250, 204, 21, 0.7),
+    0 0 16px rgba(250, 204, 21, 0.9);
+  animation: world-encounter-glyph-pulse 1.2s ease-out infinite;
+}
+
+
+/* Minimal loot pill instead of large card */
+.world-encounter-banner {
+  position: absolute;
+  bottom: 4.3rem;             /* just above the dock */
+  top: auto;                  /* ensure it's not using a top value */
+
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: auto;
+  max-width: 90vw;
+
+  padding: 0.55rem 1.4rem 0.65rem;
+  border-radius: 999px;
+
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.9);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.9);
+
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.7rem;
+}
+
+/* Fade/slide-in still uses your existing keyframes, no change needed */
+.world-encounter-banner--visible {
+  pointer-events: auto;
+}
+
+/* Top “RELIC FOUND” label – smaller and subtle */
+.world-encounter-banner-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  opacity: 0.7;
+}
+
+/* Item name – main focus */
+.world-encounter-banner-name {
+  margin-top: 0.1rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+}
+
+/* Hide the extra row (rarity + hint) for a cleaner look.
+   We can bring this back later if you want. */
+.world-encounter-banner-meta {
+  display: none;
+}
+
+/* Hide the glowing orb under the banner for minimalism */
+.world-encounter-banner-orb {
+  display: none;
+}
+

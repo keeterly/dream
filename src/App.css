@@ -3208,13 +3208,15 @@ body {
 }
 
 @media (max-width: 768px) {
+
+  
   .world-encounter-banner {
     top: 14vh;
     padding: 0.55rem 1.1rem;
     font-size: 0.68rem;
   }
   
-}
+
 
 
 
@@ -3255,4 +3257,5 @@ body {
   0% { transform: scale(0.3); opacity: 0; }
   50% { transform: scale(1.2); opacity: 1; }
   100% { transform: scale(1); opacity: 1; }
+}
 }

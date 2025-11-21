@@ -18,48 +18,25 @@ const PARALLAX_LAYERS = [
   { file: "layer_05.png", depth: 4, duration: 14, opacity: 1.0, blur: 0 },
 ];
 
-/**
- * SVGs you added under:
- *   public/assets/items/foundItems/
- *
- * NOTE: names must match the files exactly.
- */
-const FOUND_ITEM_SPRITES = [
+// Your new found-item SVGs (in public/items/foundItems)
+const FOUND_ITEM_ICONS = [
   "faceted_diamond.svg",
   "low_gem_prison.svg",
   "rought_cut_stone.svg",
   "short_chunky_crystal.svg",
   "split_crystal.svg",
-] as const;
+];
 
-/**
- * Deterministically pick a sprite based on the encounter's name.
- * There is ALWAYS a fallback so something is drawn.
- */
-function getSpriteForEncounter(name: string | null): string {
-  if (!name) {
-    return FOUND_ITEM_SPRITES[0];
-  }
+// Simple deterministic hash so the same relic name always picks the same icon
+function pickIconForEncounter(name: string | null): string {
+  if (!name) return FOUND_ITEM_ICONS[0];
 
-  const n = name.toLowerCase();
-
-  // A few hand-tuned mappings so the vibe matches the name
-  if (n.includes("glass") || n.includes("sigil")) {
-    return FOUND_ITEM_SPRITES[0]; // faceted_diamond
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = (hash * 31 + name.charCodeAt(i)) | 0;
   }
-  if (n.includes("ember") || n.includes("token")) {
-    return FOUND_ITEM_SPRITES[1]; // low_gem_prison
-  }
-  if (n.includes("stone") || n.includes("rock") || n.includes("ore")) {
-    return FOUND_ITEM_SPRITES[2]; // rought_cut_stone
-  }
-  if (n.includes("thread") || n.includes("charm") || n.includes("weave")) {
-    return FOUND_ITEM_SPRITES[3]; // short_chunky_crystal
-  }
-
-  // Fallback: hash the name into the sprite array so it’s stable per item
-  const hash = Array.from(n).reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
-  return FOUND_ITEM_SPRITES[hash % FOUND_ITEM_SPRITES.length];
+  const index = Math.abs(hash) % FOUND_ITEM_ICONS.length;
+  return FOUND_ITEM_ICONS[index];
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
@@ -69,10 +46,7 @@ const WorldLane: React.FC<WorldLaneProps> = ({
   isEncounterActive,
   isWalking = true,
 }) => {
-  // For GitHub Pages this will be "/dream/" – Vite serves everything under
-  // /public at the root, so our PNGs/SVGs are at:
-  //   <baseUrl>assets/parallax/<environmentId>/layer_01.png
-  //   <baseUrl>assets/items/foundItems/<sprite>.svg
+  // For GitHub Pages this will be "/dream/"
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   const rootClassName = [
@@ -84,9 +58,9 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  // Pick a sprite for the *current* encounter (even if name is weird)
-  const itemSpriteFile = getSpriteForEncounter(encounterItemName);
-  const itemSpritePath = `${baseUrl}assets/items/foundItems/${itemSpriteFile}`;
+  // Build the icon path once per render; it’s only used when an encounter is active
+  const iconFile = pickIconForEncounter(encounterItemName);
+  const iconPath = `${baseUrl}items/foundItems/${iconFile}`;
 
   return (
     <div className={rootClassName}>
@@ -118,7 +92,7 @@ const WorldLane: React.FC<WorldLaneProps> = ({
         <div className="world-lane-ribbon" />
       </div>
 
-      {/* Loot encounter: pulse + sprite in front of the avatar */}
+      {/* Loot encounter: pulse + found item icon in front of the avatar */}
       {isEncounterActive && (
         <>
           <div className="world-lane-encounter-pulse" aria-hidden="true" />
@@ -126,9 +100,9 @@ const WorldLane: React.FC<WorldLaneProps> = ({
             className="world-lane-crystal"
             aria-hidden="true"
             style={{
-              backgroundImage: `url("${itemSpritePath}")`,
+              backgroundImage: `url("${iconPath}")`,
               backgroundRepeat: "no-repeat",
-              backgroundPosition: "center",
+              backgroundPosition: "center bottom",
               backgroundSize: "contain",
             }}
           />

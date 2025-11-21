@@ -3207,3 +3207,28 @@ body {
   50%  { transform: translateX(-50%) translateY(-4px); }
   100% { transform: translateX(-50%) translateY(0); }
 }
+
+
+
+/* Container for SVG loot on the ribbon */
+.world-lane-encounter-item {
+  position: absolute;
+  /* line the item up with the ribbon; tweak bottom % to taste */
+  bottom: 14%;
+  /* slightly ahead of the avatar (which is centered) */
+  left: 53%;
+  transform: translateX(-50%);
+  z-index: 19; /* under avatar (20), above ground/parallax */
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.world-lane-encounter-item img {
+  display: block;
+  width: 64px;
+  height: auto;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.85))
+    drop-shadow(0 0 10px rgba(250, 250, 255, 0.35));
+}

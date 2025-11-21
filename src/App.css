@@ -2320,11 +2320,6 @@ body {
 
 
 
-/* smaller, world-scale version of the avatar */
-.world-stage-avatar .avatar-view-svg {
-  width: min(12vh, 120px);
-  height: auto;
-}
 
 
 .world-lane-player {
@@ -2337,12 +2332,6 @@ body {
 
 
 
-/* scale + center the SVG */
-.world-stage-avatar .avatar-view-svg {
-  width: clamp(80px, 13vh, 120px);
-  height: auto;
-  transform: translateX(-50%);
-}
 
 /* Walking / bobbing animation for world mode */
 .world-stage-avatar--walking .avatar-view-svg {
@@ -2362,11 +2351,6 @@ body {
 
 
 
-/* scale the avatar in the world */
-.world-stage-avatar .avatar-view-svg {
-  width: clamp(96px, 16vh, 140px);
-  height: auto;
-}
 
 /* WALK ANIMATION
    Body bobs & sways slightly; robe lags for a cape-y feel.
@@ -3069,49 +3053,57 @@ body {
 
 
 
-/* === Minimal top-center relic notification === */
+/* Top-center glass HUD chip for RELIC FOUND */
 .world-encounter-banner {
-  position: fixed;
-  top: 10vh;              
+  position: absolute;
+  top: 48px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 40;
-
-  max-width: min(22rem, 90vw);
-  padding: 0.6rem 1.4rem 0.75rem;
-  border-radius: 1.25rem;
-
-  background: rgba(12, 18, 32, 0.92);
-  border: 1px solid rgba(148, 163, 184, 0.55);
-  box-shadow:
-    0 8px 18px rgba(15, 23, 42, 0.7),
-    0 0 0 1px rgba(12, 18, 32, 0.6);
-
-  text-align: center;
+  padding: 0.7rem 1.6rem;
+  border-radius: 999px;
+  background: rgba(10, 14, 25, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  backdrop-filter: blur(14px);
   text-transform: uppercase;
   letter-spacing: 0.16em;
   font-size: 0.7rem;
+  color: #e5e7eb;
+  box-shadow:
+    0 10px 30px rgba(15, 23, 42, 0.9),
+    0 0 0 1px rgba(15, 23, 42, 0.8);
+  z-index: 40;
+}
 
-  opacity: 0;
-  pointer-events: none;
+.world-encounter-label {
+  opacity: 0.7;
+  margin-right: 0.6rem;
+}
+
+.world-encounter-name {
+  font-weight: 600;
+}
+
+/* optional rarity tints */
+.world-encounter-banner--common {
+  border-color: rgba(148, 163, 184, 0.6);
+}
+.world-encounter-banner--rare {
+  border-color: rgba(56, 189, 248, 0.9);
+  box-shadow:
+    0 10px 30px rgba(15, 23, 42, 0.9),
+    0 0 12px rgba(56, 189, 248, 0.6);
+}
+.world-encounter-banner--mythic {
+  border-color: rgba(168, 85, 247, 0.9);
+  box-shadow:
+    0 10px 30px rgba(15, 23, 42, 0.9),
+    0 0 14px rgba(168, 85, 247, 0.7);
+}
+
 }
 
 
 
-@keyframes relic-pill-in {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -10px) scale(0.96);
-  }
-  80% {
-    opacity: 1;
-    transform: translate(-50%, 2px) scale(1.02);
-  }
-  100% {
-    opacity: 1;
-    transform: translate(-50%, 0) scale(1);
-  }
-}
 
 
 
@@ -3120,23 +3112,25 @@ body {
 
 
 
-
-
-
-/* === DREAM: world avatar placement (single source of truth) === */
+/* DREAM – world avatar placement (single source of truth) */
 .world-stage-avatar {
   position: absolute;
-  bottom: 80px;        /* previously too low or inherited wrong */
   left: 50%;
+  bottom: 9vh;          /* adjust up/down to taste */
   transform: translateX(-50%);
+  transform-origin: 50% 100%;
   z-index: 20;
   pointer-events: none;
 }
 
-/* scale the SVG by width rather than scaling the whole container */
 .world-stage-avatar .avatar-view-svg {
   width: clamp(96px, 18vh, 140px);
   height: auto;
+  margin: 0;
+}
+
+.world-stage-avatar .avatar-root {
+  margin: 0;
 }
 
 
@@ -3155,19 +3149,6 @@ body {
   height: 100%;
 }
 
-.world-stage-avatar {
-  position: absolute;
-  left: 50%;
-  bottom: 9vh;                 /* tweak up/down to taste */
-  transform: translateX(-50%);
-  transform-origin: 50% 100%;
-  margin: 0;
-}
-
-.world-stage-avatar .avatar-root,
-.world-stage-avatar .avatar-view-svg {
-  margin: 0;
-}
 
 /* 2. Kill the old “mini relic card” that hugs the avatar */
 .found-popup,
@@ -3178,17 +3159,17 @@ body {
   display: none !important;
 }
 
-/* 3. Big MGS-style “!” floating above the head */
+/* Clean, floating exclamation above avatar */
 .world-encounter-glyph {
   position: absolute;
   left: 50%;
+  bottom: 180px; /* sits above the avatar head */
   transform: translateX(-50%);
-  bottom: 180px;
   font-size: 42px;
   font-weight: 700;
   color: #fce87a;
   text-shadow: 0 0 12px rgba(255, 230, 120, 0.9);
-  animation: glyphPulse 1.2s infinite ease-in-out;
+  animation: glyphPulse 1.2s ease-in-out infinite;
 }
 
 @keyframes glyphPulse {

@@ -75,8 +75,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   }, [isEncounterActive, isAutoWalking]);
 
   /**
-   * Auto-encounter roll: while auto-walk is ON and nothing is happening,
-   * roll for a relic encounter every 8–16 seconds.
+   * Auto-encounter roll while auto-walk is on.
    */
   useEffect(() => {
     if (!isAutoWalking || isEncounterActive) return;
@@ -112,13 +111,13 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
   const bannerRarityClass =
     activeEncounterItem != null
-      ? `world-encounter-banner--${activeEncounterItem.rarity.toLowerCase()}`
+      ? `world-encounter-banner--${activeEncounterItem.rarity}`
       : "";
 
   return (
     <section className="app-screen app-screen-world">
       <div className={cardClasses}>
-        {/* WORLD LANE / PARALLAX */}
+        {/* WORLD LANE / PARALLAX BACKGROUND */}
         <WorldLane
           profile={profile}
           environmentId="dusk_valley"
@@ -137,16 +136,14 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 : "world-stage-avatar--paused"
             } ${lighting.avatarClass}`}
           >
+            {/* MGS-style alert glyph when a relic is active */}
+            {isEncounterActive && <div className="world-encounter-glyph">!</div>}
+
             <AvatarView
               avatar={profile.avatar}
               traits={profile.traits}
               dreamName={profile.dreamName}
             />
-
-            {/* MGS-style alert glyph */}
-            {isEncounterActive && (
-              <div className="world-encounter-glyph">!</div>
-            )}
 
             {/* ground shadow */}
             <div className="world-stage-shadow" />
@@ -156,22 +153,22 @@ export const WorldStep: React.FC<WorldStepProps> = ({
         {/* GLOBAL TINT OVERLAY */}
         <div className="world-tint-overlay" />
 
+        {/* TOP-CENTER RELIC BANNER */}
+        {isEncounterActive && activeEncounterItem && (
+          <button
+            type="button"
+            className={`world-encounter-banner ${bannerRarityClass}`}
+            onClick={handleEncounterBannerClick}
+          >
+            <span className="world-encounter-label">Relic Found</span>
+            <span className="world-encounter-name">
+              {activeEncounterItem.name}
+            </span>
+          </button>
+        )}
+
         {/* OVERLAY: HUD + DOCK + PANELS */}
         <div className="world-overlay">
-          {/* Top-center relic banner */}
-          {isEncounterActive && activeEncounterItem && (
-            <button
-              type="button"
-              className={`world-encounter-banner ${bannerRarityClass}`}
-              onClick={handleEncounterBannerClick}
-            >
-              <span className="world-encounter-banner-label">Relic Found</span>
-              <span className="world-encounter-banner-name">
-                {activeEncounterItem.name}
-              </span>
-            </button>
-          )}
-
           {/* HUD */}
           <div className="world-hud">
             <div className="world-hud-left">
@@ -185,7 +182,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 <span className="world-hud-pill">LV 01</span>
               </div>
               <div className="world-hud-meta">
-                <span className="hud-label">DREAMSELF</span>
+                <span className="hud-label">Dreamself</span>
                 <span className="hud-value">
                   {profile.traits.primaryArchetype}
                 </span>
@@ -194,7 +191,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
             <div className="world-hud-right">
               <div className="world-hud-phase">
-                <span className="hud-label">PHASE</span>
+                <span className="hud-label">Phase</span>
                 <span className="hud-value">{phase}</span>
               </div>
 

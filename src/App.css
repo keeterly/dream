@@ -2321,13 +2321,7 @@ body {
   height: 100%;
 }
 
-.world-stage-avatar {
-  position: absolute;
-  left: 50%;
-  bottom: 8vh; /* tweak until the feet sit nicely on the ground */
-  transform: translateX(-50%) scale(2);
-  pointer-events: none;
-}
+
 
 /* smaller, world-scale version of the avatar */
 .world-stage-avatar .avatar-view-svg {
@@ -2345,12 +2339,6 @@ body {
 }
 
 /* Position the Dreamself avatar in the world */
-.world-stage-avatar {
-  position: absolute;
-  left: 50%;
-  bottom: 8vh;              /* tweak until feet sit on the ground */
-  pointer-events: none;
-}
 
 /* scale + center the SVG */
 .world-stage-avatar .avatar-view-svg {
@@ -2714,12 +2702,7 @@ body {
 }
 
 
-.world-stage-avatar {
-  position: absolute; /* you likely already have this */
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 7vh; /* or whatever you're currently using */
-}
+
 
 .world-encounter-bubble {
   position: absolute;
@@ -3260,10 +3243,7 @@ body {
     );
 }
 
-/* Subtle lift of the avatar so it feels “called out” */
-.world-card--encounter .world-stage-avatar {
-  transform: none;
-}
+
 
 
 @media (max-height: 780px) {

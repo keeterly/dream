@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+// src/components/WorldLane.tsx
+import React from "react";
 
 interface WorldLaneProps {
   profile: unknown | null;
@@ -10,7 +11,6 @@ interface WorldLaneProps {
   isWalking?: boolean;
 }
 
-// Parallax PNGs
 const PARALLAX_LAYERS = [
   { file: "layer_01.png", depth: 0, duration: 70, opacity: 0.4, blur: 1.6 },
   { file: "layer_02.png", depth: 1, duration: 50, opacity: 0.7, blur: 1.0 },
@@ -19,37 +19,37 @@ const PARALLAX_LAYERS = [
   { file: "layer_05.png", depth: 4, duration: 14, opacity: 1.0, blur: 0 },
 ];
 
-// Your new “found item” SVGs that live in /public/items/foundItems
-const FOUND_ITEM_SPRITES = [
+// Your Nier-style loot SVGs – they live in public/items/foundItems
+const LOOT_SPRITES = [
   "faceted_diamond.svg",
   "low_gem_prison.svg",
   "rought_cut_stone.svg",
   "short_chunky_crystal.svg",
   "split_crystal.svg",
-] as const;
+];
 
-type FoundSprite = (typeof FOUND_ITEM_SPRITES)[number];
-
-function pickSpriteForName(name: string | null): FoundSprite {
-  if (!name) return FOUND_ITEM_SPRITES[0];
-
-  // Tiny deterministic hash so the same relic name always maps
-  // to the same SVG, but spreads names across the set.
-  const hash = Array.from(name).reduce(
-    (acc, ch) => acc + ch.charCodeAt(0),
-    0
-  );
-  const index = hash % FOUND_ITEM_SPRITES.length;
-  return FOUND_ITEM_SPRITES[index];
+/**
+ * Choose a sprite based on the encounter item name so the same item
+ * always feels like “the same little rock/gem”.
+ */
+function getLootSpriteForName(name: string | null): string | null {
+  if (!name) return null;
+  let hash = 0;
+  for (let i = 0; i < name.length; i += 1) {
+    hash = (hash * 31 + name.charCodeAt(i)) | 0;
+  }
+  const index = Math.abs(hash) % LOOT_SPRITES.length;
+  return LOOT_SPRITES[index] ?? null;
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
   phase,
   environmentId,
   encounterItemName,
-  isEncounterActive = false,
+  isEncounterActive,
   isWalking = true,
 }) => {
+  // For GitHub Pages this will be "/dream/"
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   const rootClassName = [
@@ -61,11 +61,12 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  const spritePath = useMemo(() => {
-    if (!encounterItemName) return null;
-    const fileName = pickSpriteForName(encounterItemName);
-    return `${baseUrl}items/foundItems/${fileName}`;
-  }, [baseUrl, encounterItemName]);
+  const lootSprite = getLootSpriteForName(encounterItemName);
+
+  // URL to the chosen SVG if we have one
+  const lootSrc = lootSprite
+    ? `${baseUrl}items/foundItems/${lootSprite}`
+    : null;
 
   return (
     <div className={rootClassName}>
@@ -93,21 +94,27 @@ const WorldLane: React.FC<WorldLaneProps> = ({
           );
         })}
 
-        {/* Ground strip the character walks on */}
+        {/* The actual ribbon the Dreamself stands/walks on */}
         <div className="world-lane-ribbon" />
       </div>
 
-      {/* Loot sitting on the ribbon, in front of the avatar */}
-      {spritePath && isEncounterActive && (
-        <>
-          {/* ground glow */}
-          <div className="world-lane-encounter-pulse" aria-hidden="true" />
-
-          {/* the actual found item sprite */}
-          <div className="world-lane-encounter-item" aria-hidden="true">
-            <img src={spritePath} alt={encounterItemName ?? "Found item"} />
-          </div>
-        </>
+      {/* Loot on the ribbon: grounded, slightly ahead of the avatar */}
+      {lootSrc && (
+        <div
+          className={[
+            "world-lane-loot",
+            isEncounterActive ? "world-lane-loot--active" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          <div className="world-lane-loot-shadow" aria-hidden="true" />
+          <img
+            src={lootSrc}
+            alt={encounterItemName ?? "Found object"}
+            className="world-lane-loot-image"
+          />
+        </div>
       )}
     </div>
   );

@@ -18,25 +18,27 @@ const PARALLAX_LAYERS = [
   { file: "layer_05.png", depth: 4, duration: 14, opacity: 1.0, blur: 0 },
 ];
 
-// Your new found-item SVGs (in public/items/foundItems)
-const FOUND_ITEM_ICONS = [
+/**
+ * Nier-style found-item sprites that live in:
+ *   public/items/foundItems/<name>.svg
+ */
+const FOUND_ITEM_SVGS = [
   "faceted_diamond.svg",
   "low_gem_prison.svg",
-  "rought_cut_stone.svg",
+  "rought_cut_stone.svg",      // note: matches your actual filename
   "short_chunky_crystal.svg",
   "split_crystal.svg",
-];
+] as const;
 
-// Simple deterministic hash so the same relic name always picks the same icon
-function pickIconForEncounter(name: string | null): string {
-  if (!name) return FOUND_ITEM_ICONS[0];
-
+function pickSpriteIndexFromName(name: string | null): number {
+  if (!name) return 0;
+  // simple deterministic hash so the same relic name always maps
   let hash = 0;
-  for (let i = 0; i < name.length; i++) {
+  for (let i = 0; i < name.length; i += 1) {
     hash = (hash * 31 + name.charCodeAt(i)) | 0;
   }
-  const index = Math.abs(hash) % FOUND_ITEM_ICONS.length;
-  return FOUND_ITEM_ICONS[index];
+  if (hash < 0) hash = -hash;
+  return hash % FOUND_ITEM_SVGS.length;
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
@@ -46,8 +48,9 @@ const WorldLane: React.FC<WorldLaneProps> = ({
   isEncounterActive,
   isWalking = true,
 }) => {
-  // For GitHub Pages this will be "/dream/"
+  // For GitHub Pages this will be "/dream/".
   const baseUrl = import.meta.env.BASE_URL || "/";
+  const assetRoot = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
 
   const rootClassName = [
     "world-lane",
@@ -58,16 +61,20 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  // Build the icon path once per render; it’s only used when an encounter is active
-  const iconFile = pickIconForEncounter(encounterItemName);
-  const iconPath = `${baseUrl}items/foundItems/${iconFile}`;
+  // Decide which SVG to show for this encounter (if any)
+  let foundItemSrc: string | null = null;
+  if (isEncounterActive && encounterItemName) {
+    const spriteIndex = pickSpriteIndexFromName(encounterItemName);
+    const fileName = FOUND_ITEM_SVGS[spriteIndex];
+    foundItemSrc = `${assetRoot}items/foundItems/${fileName}`;
+  }
 
   return (
     <div className={rootClassName}>
       <div className="world-lane-inner">
         {/* Parallax art layers */}
         {PARALLAX_LAYERS.map((layer) => {
-          const imgPath = `${baseUrl}assets/parallax/${environmentId}/${layer.file}`;
+          const imgPath = `${assetRoot}assets/parallax/${environmentId}/${layer.file}`;
           return (
             <div
               key={layer.file}
@@ -92,20 +99,25 @@ const WorldLane: React.FC<WorldLaneProps> = ({
         <div className="world-lane-ribbon" />
       </div>
 
-      {/* Loot encounter: pulse + found item icon in front of the avatar */}
+      {/* Loot encounter: glowing sprite + ground pulse in front of the avatar */}
       {isEncounterActive && (
         <>
           <div className="world-lane-encounter-pulse" aria-hidden="true" />
-          <div
-            className="world-lane-crystal"
-            aria-hidden="true"
-            style={{
-              backgroundImage: `url("${iconPath}")`,
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "center bottom",
-              backgroundSize: "contain",
-            }}
-          />
+
+          <div className="world-lane-found-item-shell" aria-hidden="true">
+            <div className="world-lane-found-item-glow" />
+            {foundItemSrc && (
+              <img
+                className="world-lane-found-item"
+                src={foundItemSrc}
+                alt={encounterItemName ?? "Found relic"}
+                onError={(e) => {
+                  // If an SVG path is wrong, just hide the image and keep the glow.
+                  (e.currentTarget as HTMLImageElement).style.display = "none";
+                }}
+              />
+            )}
+          </div>
         </>
       )}
     </div>

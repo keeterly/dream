@@ -106,7 +106,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     }
   };
 
-
   const cardClasses = [
     "world-card",
     lighting.worldClass,
@@ -120,8 +119,15 @@ export const WorldStep: React.FC<WorldStepProps> = ({
       ? `world-encounter-banner--${activeEncounterItem.rarity}`
       : "";
 
+  const bannerClasses = [
+    "world-encounter-banner",
+    activeEncounterItem ? "world-encounter-banner--visible" : "",
+    bannerRarityClass,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-    return (
+  return (
     <section className="app-screen app-screen-world">
       <div className={cardClasses}>
         {/* WORLD LANE / PARALLAX */}
@@ -136,32 +142,53 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
         {/* DREAMSELF AVATAR ON THE RIBBON */}
         {profile && (
-  <div
-    className={`world-stage-avatar ${
-      isWalking
-        ? "world-stage-avatar--walking"
-        : "world-stage-avatar--paused"
-    } ${lighting.avatarClass}`}
-  >
-    <AvatarView
-      avatar={profile.avatar}
-      traits={profile.traits}
-      dreamName={profile.dreamName}
-    />
+          <div
+            className={`world-stage-avatar ${
+              isWalking
+                ? "world-stage-avatar--walking"
+                : "world-stage-avatar--paused"
+            } ${lighting.avatarClass}`}
+          >
+            <AvatarView
+              avatar={profile.avatar}
+              traits={profile.traits}
+              dreamName={profile.dreamName}
+            />
 
-    {/* Encounter indicator above head (stays with avatar) */}
-    {activeEncounterItem && (
-      <div className="world-encounter-glyph">!</div>
-    )}
+            {/* Encounter indicator above head (MGS-style "!") */}
+            {activeEncounterItem && (
+              <div className="world-encounter-glyph">!</div>
+            )}
 
-    {/* ground shadow */}
-    <div className="world-stage-shadow" />
-  </div>
-)}
+            {/* ground shadow */}
+            <div className="world-stage-shadow" />
+          </div>
+        )}
 
+        {/* TOP-CENTER RELIC BANNER (HUD) */}
+        {activeEncounterItem && (
+          <button
+            type="button"
+            className={bannerClasses}
+            onClick={handleEncounterBannerClick}
+          >
+            <div className="world-encounter-banner-label">Relic Found</div>
+            <div className="world-encounter-banner-name">
+              {activeEncounterItem.name}
+            </div>
 
+            <div className="world-encounter-banner-meta">
+              <span className="world-encounter-banner-rarity">
+                {activeEncounterItem.rarity}
+              </span>
+              <span className="world-encounter-banner-hint">
+                Tap to bind
+              </span>
+            </div>
 
-
+            <div className="world-encounter-banner-orb" />
+          </button>
+        )}
 
         {/* GLOBAL TINT OVERLAY */}
         <div className="world-tint-overlay" />

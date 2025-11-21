@@ -3126,10 +3126,10 @@ body {
 /* === DREAM: world avatar placement (single source of truth) === */
 .world-stage-avatar {
   position: absolute;
+  bottom: 80px;        /* previously too low or inherited wrong */
   left: 50%;
-  bottom: 11vh;                 /* tweak up/down to taste */
-  transform: translateX(-50%);  /* keep perfectly centered */
-  transform-origin: 50% 100%;
+  transform: translateX(-50%);
+  z-index: 20;
   pointer-events: none;
 }
 
@@ -3182,62 +3182,37 @@ body {
 .world-encounter-glyph {
   position: absolute;
   left: 50%;
-  bottom: calc(100% + 1.6rem);
   transform: translateX(-50%);
-  font-size: 2.4rem;
-  line-height: 1;
+  bottom: 180px;
+  font-size: 42px;
   font-weight: 700;
-  color: #ffe378;
-  text-shadow:
-    0 0 10px rgba(255, 244, 170, 0.9),
-    0 0 26px rgba(255, 185, 85, 0.95);
-  animation: worldEncounterGlyphPulse 1.25s ease-in-out infinite;
+  color: #fce87a;
+  text-shadow: 0 0 12px rgba(255, 230, 120, 0.9);
+  animation: glyphPulse 1.2s infinite ease-in-out;
 }
 
-@keyframes worldEncounterGlyphPulse {
-  0% {
-    transform: translateX(-50%) translateY(0);
-    opacity: 0.0;
-  }
-  20% {
-    opacity: 1;
-  }
-  50% {
-    transform: translateX(-50%) translateY(-4px);
-  }
-  100% {
-    transform: translateX(-50%) translateY(0);
-    opacity: 0.85;
-  }
+@keyframes glyphPulse {
+  0% { opacity: 0.4; transform: translateX(-50%) translateY(0); }
+  50% { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+  100% { opacity: 0.4; transform: translateX(-50%) translateY(0); }
 }
 
 /* 4. Minimal glass HUD chip for “RELIC FOUND” at the top center */
 .world-encounter-banner {
-  position: fixed;
-  top: 12vh;
+  position: absolute;
+  top: 48px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 0.65rem 1.4rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background:
-    radial-gradient(circle at top left,
-      rgba(255, 255, 255, 0.10),
-      rgba(4, 10, 24, 0.96));
-  box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.85),
-    0 0 0 1px rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  color: #f7f9ff;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 0.72rem;
-  z-index: 40;
-  pointer-events: auto;
+  padding: 14px 24px;
+  background: rgba(15,15,25,0.55);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 28px;
+  backdrop-filter: blur(10px);
+  color: white;
+  font-size: 14px;
+  text-align: center;
+  letter-spacing: 0.08em;
+  z-index: 999;
 }
 
 

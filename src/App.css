@@ -2338,7 +2338,7 @@ body {
   display: none;
 }
 
-/* Position the Dreamself avatar in the world */
+
 
 /* scale + center the SVG */
 .world-stage-avatar .avatar-view-svg {
@@ -2365,8 +2365,9 @@ body {
 .world-stage-avatar {
   position: absolute;
   left: 50%;
-  bottom: 7.5vh;                 /* tweak if feet aren't exactly on the ground */
-  transform: translateX(-50%);
+  bottom: 4.5vh;
+  transform: translateX(-50%) scale(1.6);
+  transform-origin: 50% 100%;
   pointer-events: none;
 }
 
@@ -3374,3 +3375,45 @@ body {
 }
 
 
+/* Top-center relic notification overlay */
+.world-encounter-banner {
+  position: fixed;         /* <— key: anchor to viewport, not avatar */
+  top: 12vh;               /* tweak to taste; ~under the HUD */
+  bottom: auto;
+  left: 50%;
+  transform: translateX(-50%);
+
+  max-width: min(26rem, 90vw);
+  padding: 0.7rem 1.6rem 0.85rem;
+  border-radius: 1.4rem;
+
+  background: rgba(12, 18, 32, 0.94);
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  box-shadow:
+    0 16px 30px rgba(15, 23, 42, 0.8),
+    0 0 0 1px rgba(12, 18, 32, 0.6);
+
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.7rem;
+  z-index: 40;
+}
+
+/* Keep your simple text styling */
+.world-encounter-banner-label {
+  font-size: 0.62rem;
+  opacity: 0.7;
+}
+
+.world-encounter-banner-name {
+  margin-top: 0.15rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.18em;
+}
+
+/* Hide extra chrome for a clean look */
+.world-encounter-banner-meta,
+.world-encounter-banner-orb {
+  display: none;
+}

@@ -212,22 +212,20 @@ export const App: React.FC = () => {
     }
 
    if (screen === "world" && profile) {
-  const encounterNameForLane =
-    activeEncounterItem ? null : lastEncounterItemName;
-
   return (
     <WorldStep
       profile={profile}
       inventory={inventory}
       journalEntries={journalEntries as JournalEntry[]}
       onSpawnDebugItem={handleSpawnDebugItem}
-      encounterItemName={encounterNameForLane}
+      encounterItemName={lastEncounterItemName}   // <— key change
       phase={phase}
       activeEncounterItem={activeEncounterItem}
       onResolveEncounter={handleResolveEncounter}
     />
   );
 }
+
 
 
     return <IntroStep onBegin={handleBegin} />;

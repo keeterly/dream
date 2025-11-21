@@ -3072,29 +3072,26 @@ body {
 
 
 
-/* Avatar stays locked in position during encounters */
-.world-card--encounter .world-stage-avatar {
-  transform: translateX(-50%) scale(1.6) !important;
-}
+
 
 
 
 /* === Minimal top-center relic notification === */
 .world-encounter-banner {
-  position: fixed;           /* Attach to viewport */
-  top: 12vh;                 /* Under the HUD; tweak if needed */
+  position: fixed;
+  top: 10vh;              
   left: 50%;
   transform: translateX(-50%);
   z-index: 40;
 
-  max-width: min(24rem, 90vw);
-  padding: 0.7rem 1.6rem 0.85rem;
-  border-radius: 1.4rem;
+  max-width: min(22rem, 90vw);
+  padding: 0.6rem 1.4rem 0.75rem;
+  border-radius: 1.25rem;
 
-  background: rgba(12, 18, 32, 0.94);
-  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: rgba(12, 18, 32, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.55);
   box-shadow:
-    0 16px 30px rgba(15, 23, 42, 0.8),
+    0 8px 18px rgba(15, 23, 42, 0.7),
     0 0 0 1px rgba(12, 18, 32, 0.6);
 
   text-align: center;
@@ -3106,18 +3103,17 @@ body {
   pointer-events: none;
 }
 
-/* Visible state (uses a subtle slide/fade in) */
 .world-encounter-banner--visible {
   pointer-events: auto;
-  animation: relic-pill-in 260ms ease-out forwards;
+  animation: relic-pill-in 240ms ease-out forwards;
 }
 
 @keyframes relic-pill-in {
   0% {
     opacity: 0;
-    transform: translate(-50%, -12px) scale(0.96);
+    transform: translate(-50%, -10px) scale(0.96);
   }
-  70% {
+  80% {
     opacity: 1;
     transform: translate(-50%, 2px) scale(1.02);
   }
@@ -3127,22 +3123,18 @@ body {
   }
 }
 
-/* Top label: RELIC FOUND */
 .world-encounter-banner-label {
-  font-size: 0.62rem;
-  letter-spacing: 0.14em;
+  font-size: 0.6rem;
   opacity: 0.7;
 }
 
-/* Item name */
 .world-encounter-banner-name {
-  margin-top: 0.18rem;
-  font-size: 0.85rem;
-  letter-spacing: 0.18em;
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.2em;
 }
 
-/* Hide extra chrome for minimal look */
-.world-encounter-banner-meta,
-.world-encounter-banner-orb {
-  display: none;
+.world-encounter-banner-orb,
+.world-encounter-banner-meta {
+  display: none !important;
 }

@@ -1,0 +1,16 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke="none">
+    <ellipse cx="32" cy="54" rx="13" ry="4" fill="#171717" opacity="0.34"></ellipse>
+
+    <!-- left shard -->
+    <path fill="#F5F0E3" d="M20 50 L16 30 L24 10 L30 26 L28 50 Z"></path>
+    <path fill="#D3C9B3" d="M24 10 L30 26 L28 50 L22 50 Z"></path>
+    <path fill="#A79B84" d="M17 32 L27 30 L26 33 L18 35 Z" opacity="0.8"></path>
+
+    <!-- right shard -->
+    <path fill="#F5F0E3" d="M36 52 L34 26 L42 12 L50 32 L46 52 Z"></path>
+    <path fill="#D0C6B0" d="M42 12 L50 32 L46 52 L40 52 Z"></path>
+    <path fill="#B3A893" d="M35 30 L47 28 L46 31 L36 33 Z" opacity="0.8"></path>
+    <path fill="#8F8573" d="M36 40 L45 38 L44 41 L37 43 Z" opacity="0.9"></path>
+  </g>
+</svg>

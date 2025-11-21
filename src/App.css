@@ -535,11 +535,7 @@ body {
   z-index: 0; /* background only */
 }
 
-/* Encounter banner positioned below the HUD */
-.world-encounter-banner {
-  top: 6rem !important;
-  bottom: auto !important;
-}
+
 
 
 
@@ -3134,40 +3130,8 @@ body {
 
 
 
-@media (max-height: 780px) {
-  .world-encounter-banner {
-    top: 5rem;
-    padding: 0.8rem 1.9rem 1rem;
-  }
-
-}
 
 
-.world-encounter-banner {
-  position: absolute;
-  top: 6.2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 1rem 2.4rem 1.3rem;
-  border-radius: 1.9rem;
-  width: min(90vw, 24rem);
-
-  border: 1px solid rgba(148, 163, 184, 0.9);
-  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.96), #020617);
-  box-shadow:
-    0 18px 40px rgba(15, 23, 42, 0.9),
-    0 0 0 1px rgba(15, 23, 42, 0.8);
-
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 0.72rem;
-  color: #e5e7eb;
-
-  cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-}
 
 .world-encounter-banner--visible {
   pointer-events: auto;
@@ -3231,30 +3195,6 @@ body {
 
 
 
-/* Minimal loot pill instead of large card */
-.world-encounter-banner {
-  position: absolute;
-  bottom: 4.3rem;             /* just above the dock */
-  top: auto;                  /* ensure it's not using a top value */
-
-  left: 50%;
-  transform: translateX(-50%);
-
-  width: auto;
-  max-width: 90vw;
-
-  padding: 0.55rem 1.4rem 0.65rem;
-  border-radius: 999px;
-
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(148, 163, 184, 0.9);
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.9);
-
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 0.7rem;
-}
 
 /* Fade/slide-in still uses your existing keyframes, no change needed */
 .world-encounter-banner--visible {

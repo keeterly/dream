@@ -797,12 +797,13 @@ body {
 @keyframes world-lane-walk-bob {
   0%,
   100% {
-    transform: translate(50%, 0);
+    transform: translateX(-50%) translateY(0);
   }
   50% {
-    transform: translate(50%, -4px);
+    transform: translateX(-50%) translateY(-4px);
   }
 }
+
 
 @keyframes world-lane-pulse {
   0% {
@@ -2877,14 +2878,6 @@ body {
 }
 
 
-.world-stage-avatar {
-  position: absolute;
-  left: 50%;
-  bottom: 4.5vh;
-  transform: translateX(-50%) scale(1.6); /* <— sizing lives here */
-  transform-origin: 50% 100%;
-  pointer-events: none;
-}
 
 /* When auto-walk is paused (or an encounter is active) stop all background motion */
 .world-lane--paused .world-lane-layer,
@@ -3137,4 +3130,24 @@ body {
 .world-encounter-banner-orb,
 .world-encounter-banner-meta {
   display: none !important;
+}
+
+
+
+
+
+/* === DREAM: world avatar placement (single source of truth) === */
+.world-stage-avatar {
+  position: absolute;
+  left: 50%;
+  bottom: 11vh;                 /* tweak up/down to taste */
+  transform: translateX(-50%);  /* keep perfectly centered */
+  transform-origin: 50% 100%;
+  pointer-events: none;
+}
+
+/* scale the SVG by width rather than scaling the whole container */
+.world-stage-avatar .avatar-view-svg {
+  width: clamp(96px, 18vh, 140px);
+  height: auto;
 }

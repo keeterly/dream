@@ -3348,3 +3348,42 @@ body {
     opacity: 1;
   }
 }
+
+/* DREAM: loot object on the ribbon */
+.world-lane-loot {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 8.6vh;              /* tweak to match the Dreamself's feet */
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 22;                /* above ground, below HUD */
+}
+
+.world-lane-loot-shadow {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 12px;
+  border-radius: 999px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(15, 23, 42, 0.9),
+    transparent 70%
+  );
+  filter: blur(2px);
+  opacity: 0.9;
+}
+
+.world-lane-loot-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 interface WorldLaneProps {
   profile: unknown | null;
@@ -18,27 +18,23 @@ const PARALLAX_LAYERS = [
   { file: "layer_05.png", depth: 4, duration: 14, opacity: 1.0, blur: 0 },
 ];
 
-/**
- * Nier-style found-item sprites that live in:
- *   public/items/foundItems/<name>.svg
- */
+// Your new “found item” sprites in /public/items/foundItems
 const FOUND_ITEM_SVGS = [
-  "faceted_diamond.svg",
-  "low_gem_prison.svg",
-  "rought_cut_stone.svg",      // note: matches your actual filename
-  "short_chunky_crystal.svg",
-  "split_crystal.svg",
+  "items/foundItems/faceted_diamond.svg",
+  "items/foundItems/low_gem_prison.svg",
+  "items/foundItems/rought_cut_stone.svg",
+  "items/foundItems/short_chunky_crystal.svg",
+  "items/foundItems/split_crystal.svg",
 ] as const;
 
-function pickSpriteIndexFromName(name: string | null): number {
-  if (!name) return 0;
-  // simple deterministic hash so the same relic name always maps
+// simple deterministic hash so the same relic name tends
+// to give the same icon (but still “feels” random)
+function stringHash(input: string): number {
   let hash = 0;
-  for (let i = 0; i < name.length; i += 1) {
-    hash = (hash * 31 + name.charCodeAt(i)) | 0;
+  for (let i = 0; i < input.length; i += 1) {
+    hash = (hash * 31 + input.charCodeAt(i)) | 0;
   }
-  if (hash < 0) hash = -hash;
-  return hash % FOUND_ITEM_SVGS.length;
+  return Math.abs(hash);
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
@@ -48,9 +44,8 @@ const WorldLane: React.FC<WorldLaneProps> = ({
   isEncounterActive,
   isWalking = true,
 }) => {
-  // For GitHub Pages this will be "/dream/".
+  // For GitHub Pages this will be "/dream/"
   const baseUrl = import.meta.env.BASE_URL || "/";
-  const assetRoot = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
 
   const rootClassName = [
     "world-lane",
@@ -61,20 +56,22 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  // Decide which SVG to show for this encounter (if any)
-  let foundItemSrc: string | null = null;
-  if (isEncounterActive && encounterItemName) {
-    const spriteIndex = pickSpriteIndexFromName(encounterItemName);
-    const fileName = FOUND_ITEM_SVGS[spriteIndex];
-    foundItemSrc = `${assetRoot}items/foundItems/${fileName}`;
-  }
+  // Pick which SVG to use for this encounter
+  const encounterSpriteSrc = useMemo(() => {
+    if (!isEncounterActive || !encounterItemName) return null;
+
+    const idx =
+      stringHash(encounterItemName) % FOUND_ITEM_SVGS.length;
+
+    return `${baseUrl}${FOUND_ITEM_SVGS[idx]}`;
+  }, [isEncounterActive, encounterItemName, baseUrl]);
 
   return (
     <div className={rootClassName}>
       <div className="world-lane-inner">
         {/* Parallax art layers */}
         {PARALLAX_LAYERS.map((layer) => {
-          const imgPath = `${assetRoot}assets/parallax/${environmentId}/${layer.file}`;
+          const imgPath = `${baseUrl}assets/parallax/${environmentId}/${layer.file}`;
           return (
             <div
               key={layer.file}
@@ -99,25 +96,16 @@ const WorldLane: React.FC<WorldLaneProps> = ({
         <div className="world-lane-ribbon" />
       </div>
 
-      {/* Loot encounter: glowing sprite + ground pulse in front of the avatar */}
-      {isEncounterActive && (
+      {/* Loot encounter: pulse + small SVG crystal in front of the avatar */}
+      {isEncounterActive && encounterSpriteSrc && (
         <>
           <div className="world-lane-encounter-pulse" aria-hidden="true" />
-
-          <div className="world-lane-found-item-shell" aria-hidden="true">
-            <div className="world-lane-found-item-glow" />
-            {foundItemSrc && (
-              <img
-                className="world-lane-found-item"
-                src={foundItemSrc}
-                alt={encounterItemName ?? "Found relic"}
-                onError={(e) => {
-                  // If an SVG path is wrong, just hide the image and keep the glow.
-                  (e.currentTarget as HTMLImageElement).style.display = "none";
-                }}
-              />
-            )}
-          </div>
+          <img
+            src={encounterSpriteSrc}
+            alt=""
+            className="world-lane-item"
+            aria-hidden="true"
+          />
         </>
       )}
     </div>

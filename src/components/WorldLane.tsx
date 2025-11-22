@@ -5,7 +5,7 @@ interface WorldLaneProps {
   phase: string;
   environmentId: string;
   encounterItemName: string | null;
-  isEncounterActive?: boolean; // "Relic found" banner / encounter is live
+  isEncounterActive?: boolean;
   /** Whether the Dreamself is currently walking (controls parallax scroll) */
   isWalking?: boolean;
 }
@@ -52,7 +52,6 @@ const WorldLane: React.FC<WorldLaneProps> = ({
   phase,
   environmentId,
   encounterItemName,
-  isEncounterActive = false,
   isWalking = true,
 }) => {
   // For GitHub Pages this will be "/dream/" – Vite serves everything under
@@ -72,89 +71,96 @@ const WorldLane: React.FC<WorldLaneProps> = ({
   const lootSpriteSrc = resolveLootSprite(encounterItemName, baseUrl);
 
   /**
-   * PICKUP ANIMATION STATE
+   * We animate the loot by changing its `left` percentage.
+   * CSS keeps it sitting on the ribbon:
+   *   .world-lane-loot { bottom: 10vh; transform: translateX(-50%); }
    *
-   * We want:
-   *  - Item slides in along the ribbon while encounterItemName is set.
-   *  - When isEncounterActive is true, the loot parks beside the avatar.
-   *  - Only AFTER the player confirms (parent clears encounterItemName),
-   *    we play a short "pickup" animation instead of the item vanishing.
+   * Here we drive `left` from ~130% (off-screen right) down to ~52%,
+   * which is just a couple of steps in front of the avatar (50%).
    */
+  const [lootLeftPercent, setLootLeftPercent] = useState<number | null>(null);
+  const animFrameRef = useRef<number | null>(null);
+  const lastItemNameRef = useRef<string | null>(null);
 
-  type PickupSprite = { name: string; src: string } | null;
-  const [pickupSprite, setPickupSprite] = useState<PickupSprite>(null);
-
-  const prevNameRef = useRef<string | null>(null);
-  const prevSrcRef = useRef<string | null>(null);
-  const pickupTimeoutRef = useRef<number | null>(null);
-
-  // Track transitions of the encounter item so we can detect when it is cleared.
   useEffect(() => {
-    const prevName = prevNameRef.current;
-    const prevSrc = prevSrcRef.current;
-
-    // When the parent clears encounterItemName (after player confirms),
-    // we still want to show a short pickup animation using the last sprite.
-    if (!encounterItemName && prevName && prevSrc) {
-      // Kill any in-progress pickup.
-      if (pickupTimeoutRef.current !== null) {
-        window.clearTimeout(pickupTimeoutRef.current);
-        pickupTimeoutRef.current = null;
+    // If there is no active loot item, reset everything and hide it.
+    if (!encounterItemName || !lootSpriteSrc) {
+      if (animFrameRef.current !== null) {
+        cancelAnimationFrame(animFrameRef.current);
+        animFrameRef.current = null;
       }
-
-      setPickupSprite({ name: prevName, src: prevSrc });
-
-      // After the pickup animation duration, clear the local sprite.
-      pickupTimeoutRef.current = window.setTimeout(() => {
-        setPickupSprite(null);
-        pickupTimeoutRef.current = null;
-      }, 700); // keep slightly longer than the CSS 650ms
+      setLootLeftPercent(null);
+      lastItemNameRef.current = null;
+      return;
     }
 
-    // Update previous values for next tick.
-    prevNameRef.current = encounterItemName;
-    prevSrcRef.current = lootSpriteSrc;
+    // If this is the same item as before and we already have a position,
+    // don't restart the animation.
+    if (
+      encounterItemName === lastItemNameRef.current &&
+      lootLeftPercent !== null
+    ) {
+      return;
+    }
+
+    lastItemNameRef.current = encounterItemName;
+
+    // Spawn well off-screen to the right.
+    const SPAWN_LEFT = 130; // %
+    const TARGET_LEFT = 52; // % – closer to the avatar at 50%
+    const SPEED_PERCENT_PER_SECOND = 25; // tweak for faster/slower slide
+
+    let currentLeft = SPAWN_LEFT;
+    let lastTimestamp: number | null = null;
+
+    setLootLeftPercent(currentLeft);
+
+    const step = (timestamp: number) => {
+      // If walking is paused, freeze the loot in place but keep the RAF going
+      // so it resumes smoothly when walking resumes.
+      if (!isWalking) {
+        animFrameRef.current = requestAnimationFrame(step);
+        return;
+      }
+
+      if (lastTimestamp == null) {
+        lastTimestamp = timestamp;
+        animFrameRef.current = requestAnimationFrame(step);
+        return;
+      }
+
+      const dtSeconds = (timestamp - lastTimestamp) / 1000;
+      lastTimestamp = timestamp;
+
+      currentLeft = Math.max(
+        TARGET_LEFT,
+        currentLeft - SPEED_PERCENT_PER_SECOND * dtSeconds
+      );
+
+      setLootLeftPercent(currentLeft);
+
+      // Keep animating until we reach the target.
+      if (currentLeft > TARGET_LEFT) {
+        animFrameRef.current = requestAnimationFrame(step);
+      } else {
+        animFrameRef.current = null;
+      }
+    };
+
+    // Start / restart the animation for this new item.
+    if (animFrameRef.current !== null) {
+      cancelAnimationFrame(animFrameRef.current);
+    }
+    animFrameRef.current = requestAnimationFrame(step);
 
     return () => {
-      if (pickupTimeoutRef.current !== null) {
-        window.clearTimeout(pickupTimeoutRef.current);
-        pickupTimeoutRef.current = null;
+      if (animFrameRef.current !== null) {
+        cancelAnimationFrame(animFrameRef.current);
+        animFrameRef.current = null;
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [encounterItemName, lootSpriteSrc]);
-
-  /**
-   * Decide what loot (if any) to render and which CSS class to apply:
-   *
-   * 1. New/ongoing encounter (encounterItemName present):
-   *    - !isEncounterActive  -> slide-in along ribbon  ( --approach )
-   *    - isEncounterActive   -> parked beside avatar  ( --idle )
-   *
-   * 2. Encounter just confirmed (encounterItemName cleared):
-   *    - use pickupSprite    -> play pickup anim       ( --pickup )
-   *
-   * 3. Otherwise: no loot rendered.
-   */
-
-  let lootClassName: string | null = null;
-  let lootName: string | null = null;
-  let lootSrcToRender: string | null = null;
-
-  if (encounterItemName && lootSpriteSrc) {
-    lootName = encounterItemName;
-    lootSrcToRender = lootSpriteSrc;
-    lootClassName = [
-      "world-lane-loot",
-      isEncounterActive ? "world-lane-loot--idle" : "world-lane-loot--approach",
-    ]
-      .filter(Boolean)
-      .join(" ");
-  } else if (pickupSprite) {
-    lootName = pickupSprite.name;
-    lootSrcToRender = pickupSprite.src;
-    lootClassName = "world-lane-loot world-lane-loot--pickup";
-  }
+  }, [encounterItemName, lootSpriteSrc, isWalking]);
 
   return (
     <div className={rootClassName}>
@@ -186,15 +192,21 @@ const WorldLane: React.FC<WorldLaneProps> = ({
         <div className="world-lane-ribbon" />
       </div>
 
-      {/* Grounded loot on the ribbon */}
-      {lootClassName && lootSrcToRender && (
-        <div className={lootClassName}>
+      {/* Loot icon on the ribbon: slides in from off-screen and parks near the avatar */}
+      {lootSpriteSrc && lootLeftPercent !== null && (
+        <div
+          className="world-lane-loot"
+          style={{ left: `${lootLeftPercent}%` }}
+        >
           <div className="world-lane-loot-shadow" aria-hidden="true" />
           <img
             className="world-lane-loot-image"
-            src={lootSrcToRender}
-            alt={lootName ?? "Found item"}
+            src={lootSpriteSrc}
+            alt={encounterItemName ?? "Found item"}
           />
+          <div className="world-lane-loot-label">
+            {encounterItemName ?? ""}
+          </div>
         </div>
       )}
     </div>

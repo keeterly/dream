@@ -3324,11 +3324,11 @@ body {
 
 /* === DREAM – CLEAN GROUNDED LOOT SYSTEM v2 ============================= */
 
-/* Anchor loot on the ribbon */
+/* Base loot container anchored to the ribbon */
 .world-lane-loot {
   position: absolute;
-  bottom: 10vh;              /* sits on the ribbon */
-  left: 110%;                /* spawn off-screen to the right */
+  bottom: 10vh;              /* sync this to the avatar's feet */
+  left: 110%;               /* start off-screen to the right */
   transform: translateX(-50%);
   width: 56px;
   pointer-events: none;
@@ -3336,61 +3336,60 @@ body {
   opacity: 0;
 }
 
-/* While the character is walking toward it */
+/* While the character is still walking toward it */
 .world-lane-loot--approach {
   opacity: 1;
-  animation: loot-approach 12s linear forwards;
+  animation: world-lane-loot-approach 16s linear forwards;
 }
 
-/* Once the encounter is active (banner up) – loot stays next to avatar */
+/* Once the encounter is active (banner up) – freeze a few steps ahead */
 .world-lane-loot--idle {
   opacity: 1;
-  left: 52%;                 /* parked just ahead of the avatar */
+  left: 56%;                 /* a couple steps in front of the avatar at 50% */
   animation: none;
 }
 
-/* After the encounter is confirmed and the item is picked up */
+/* After the encounter is confirmed (parent clears encounterItemName) */
 .world-lane-loot--pickup {
   opacity: 1;
-  left: 52%;
-  animation: loot-pickup 650ms ease-out forwards;
+  left: 56%;
+  animation: world-lane-loot-pickup 650ms ease-out forwards;
 }
 
-/* Slide in from off-screen and stop near the avatar */
-@keyframes loot-approach {
+/* Approach: slide in along the ribbon and stop near the avatar */
+@keyframes world-lane-loot-approach {
   0% {
-    left: 115%;
+    left: 120%;   /* further off-screen for a nicer drift-in */
     opacity: 0;
   }
-  10% {
+  15% {
     opacity: 1;
   }
-  80% {
-    left: 60%;
+  70% {
+    left: 62%;    /* still a bit away */
     opacity: 1;
   }
   100% {
-    left: 52%;
-    opacity: 1; /* stays visible when it reaches the player */
+    left: 56%;    /* final resting spot before encounter */
+    opacity: 1;
   }
 }
 
-/* JRPG-style "pop into inventory" */
-@keyframes loot-pickup {
+/* Pickup: small JRPG-style "pop into inventory" */
+@keyframes world-lane-loot-pickup {
   0% {
     transform: translateX(-50%) translateY(0) scale(1);
     opacity: 1;
   }
   40% {
-    transform: translateX(-50%) translateY(-22px) scale(1.12);
+    transform: translateX(-50%) translateY(-24px) scale(1.1);
   }
   100% {
-    transform: translateX(-50%) translateY(-56px) scale(0.4);
+    transform: translateX(-50%) translateY(-56px) scale(0.35);
     opacity: 0;
   }
 }
 
-/* Shadow under the loot */
 .world-lane-loot-shadow {
   position: absolute;
   left: 50%;
@@ -3401,22 +3400,19 @@ body {
   border-radius: 999px;
   background: radial-gradient(
     ellipse at center,
-    rgba(0, 0, 0, 0.6),
+    rgba(0, 0, 0, 0.65),
     transparent 70%
   );
-  opacity: 0.7;
+  opacity: 0.75;
   filter: blur(2px);
 }
 
-/* Loot sprite styling */
 .world-lane-loot-image {
   display: block;
   width: 100%;
   height: auto;
-  filter:
-    drop-shadow(0 0 6px rgba(255, 255, 255, 0.15))
-    drop-shadow(0 8px 20px rgba(0, 0, 0, 0.8));
 }
+
 
 /* Freeze loot animation when the lane itself is paused */
 .world-lane--paused .world-lane-loot {

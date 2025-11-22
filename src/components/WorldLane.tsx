@@ -90,6 +90,16 @@ const WorldLane: React.FC<WorldLaneProps> = ({
   // It will disappear only when the parent clears encounterItemName.
   const showLoot = Boolean(lootSpriteSrc && encounterItemName);
 
+  // Approach vs pickup state:
+  //  - approach: sliding in from off-screen
+  //  - pickup: play pickup animation instead of instantly vanishing
+  const lootStateClass =
+    lootSpriteUrl && encounterItemName
+      ? isEncounterActive
+        ? "world-lane-loot--pickup"
+        : "world-lane-loot--approach"
+      : "";
+
   return (
     <div className={rootClassName}>
       <div className="world-lane-inner">

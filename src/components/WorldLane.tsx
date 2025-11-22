@@ -103,8 +103,8 @@ const WorldLane: React.FC<WorldLaneProps> = ({
 
     // Spawn well off-screen to the right.
     const SPAWN_LEFT = 120; // %
-    const TARGET_LEFT = 60; // % – just a couple steps in front of avatar at 50%
-    const SPEED_PERCENT_PER_SECOND = 10; // tweak for faster/slower slide
+    const TARGET_LEFT = 56; // % – just a couple steps in front of avatar at 50%
+    const SPEED_PERCENT_PER_SECOND = 8; // tweak for faster/slower slide
 
     let currentLeft = SPAWN_LEFT;
     let lastTimestamp: number | null = null;

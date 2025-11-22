@@ -19,35 +19,47 @@ const PARALLAX_LAYERS = [
 ];
 
 /**
- * Some item names don't slug nicely, or you want a very specific asset.
- * Use explicit overrides here.
+ * Available loot sprite files in /public/items/foundItems
+ * (filenames only, no paths).
+ */
+const LOOT_SPRITES = [
+  "faceted_diamond.svg",
+  "low_gem_prison.svg",
+  "rough_cut_stone.svg",
+  "short_chunky_crystal.svg",
+  "split_crystal.svg",
+  "glass_relic.svg", // new dedicated art
+];
+
+/**
+ * Explicit overrides for specific item display names.
+ * e.g. "Glass Relic" should always use glass_relic.svg.
  */
 const LOOT_FILE_OVERRIDES: Record<string, string> = {
-  // This is the one that was broken:
   "Glass Relic": "glass_relic.svg",
 };
 
-function slugToFileName(label: string): string {
-  const trimmed = label.trim();
+/**
+ * Deterministically pick a sprite for a given item name so that
+ * the same relic name always maps to the same SVG.
+ */
+function pickLootSprite(encounterItemName: string | null): string | null {
+  if (!encounterItemName) return null;
 
-  // Explicit override first
+  const trimmed = encounterItemName.trim();
+
+  // 1. Explicit override if we have one
   const override = LOOT_FILE_OVERRIDES[trimmed];
   if (override) return override;
 
-  // Fallback: "Bloom Charm" -> "bloom_charm.svg", "Shadow Thread" -> "shadow_thread.svg"
-  const slug = trimmed
-    .toLowerCase()
-    .replace(/['’]/g, "") // drop apostrophes
-    .replace(/[^a-z0-9]+/g, "_") // spaces & punctuation -> underscores
-    .replace(/^_+|_+$/g, ""); // trim leading/trailing "_"
+  // 2. Stable hash → index into LOOT_SPRITES
+  let hash = 0;
+  for (let i = 0; i < trimmed.length; i += 1) {
+    hash = (hash * 31 + trimmed.charCodeAt(i)) | 0;
+  }
 
-  return `${slug}.svg`;
-}
-
-function resolveLootSprite(encounterItemName: string | null, baseUrl: string) {
-  if (!encounterItemName) return null;
-  const fileName = slugToFileName(encounterItemName);
-  return `${baseUrl}items/foundItems/${fileName}`;
+  const index = Math.abs(hash) % LOOT_SPRITES.length;
+  return LOOT_SPRITES[index];
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
@@ -70,7 +82,10 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  const lootSpriteSrc = resolveLootSprite(encounterItemName, baseUrl);
+  const lootSprite = pickLootSprite(encounterItemName);
+  const lootSpriteSrc = lootSprite
+    ? `${baseUrl}items/foundItems/${lootSprite}`
+    : null;
 
   return (
     <div className={rootClassName}>

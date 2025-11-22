@@ -26,6 +26,7 @@ const FOUND_ITEM_SVGS = [
   "rough_cut_stone.svg",
   "short_chunky_crystal.svg",
   "low_gem_prison.svg",
+  "glass_relic.svg",
 ];
 
 // Deterministically map a name → one of the sprites

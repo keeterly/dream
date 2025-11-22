@@ -2,33 +2,39 @@ import { WorldItem } from "./types";
 
 export const WORLD_ITEMS: WorldItem[] = [
   {
+    id: "faceted_diamond",
+    name: "Faceted Diamond",
+    description: "A flawless geometric shard that reflects the version of you that tries the hardest.",
+    rarity: "mythic",
+  },
+  {
     id: "glass_relic",
     name: "Glass Relic",
-    description: "A fractured prism that remembers every outfit you’ve worn.",
+    description: "A translucent remnant that hums when you're close to remembering something important.",
     rarity: "common",
   },
   {
-    id: "shadow_thread",
-    name: "Shadow Thread",
-    description: "Stitches the space between your reflection and your self.",
+    id: "low_gem_prison",
+    name: "Low Gem Prison",
+    description: "A small crystalline cage that once held an emotion you refused to feel.",
+    rarity: "rare",
+  },
+  {
+    id: "rough_cut_stone",
+    name: "Rough-Cut Stone",
+    description: "An imperfect mineral fragment warm to the touch, carrying the weight of untold beginnings.",
     rarity: "common",
   },
   {
-    id: "ember_token",
-    name: "Ember Token",
-    description: "A soft heat that flares whenever you step into risk.",
-    rarity: "rare",
+    id: "short_chunky_crystal",
+    name: "Short Chunky Crystal",
+    description: "A dense crystal that pulses softly, steady like a heartbeat you almost forgot.",
+    rarity: "uncommon",
   },
   {
-    id: "bloom_charm",
-    name: "Bloom Charm",
-    description: "A small sigil that makes unfamiliar places feel like home.",
+    id: "split_crystal",
+    name: "Split Crystal",
+    description: "Two halves of a once-whole gem — one holds what you show the world, the other what you hide.",
     rarity: "rare",
-  },
-  {
-    id: "aether_sigil",
-    name: "Aether Sigil",
-    description: "Rumored to unlock hidden branches of the Dream journey.",
-    rarity: "mythic",
   },
 ];

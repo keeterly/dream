@@ -1,3 +1,4 @@
+// src/components/WorldLane.tsx
 import React from "react";
 
 interface WorldLaneProps {
@@ -18,59 +19,42 @@ const PARALLAX_LAYERS = [
   { file: "layer_05.png", depth: 4, duration: 14, opacity: 1.0, blur: 0 },
 ];
 
-/**
- * Available loot sprite files in /public/items/foundItems
- * (filenames only, no paths).
- */
-const LOOT_SPRITES = [
-  "faceted_diamond.svg",
-  "low_gem_prison.svg",
-  "rough_cut_stone.svg",
-  "short_chunky_crystal.svg",
-  "split_crystal.svg",
-  "glass_relic.svg", // new dedicated art
-];
+// Map encounter names -> SVG filenames in /public/items/foundItems
+const LOOT_SPRITES: Record<string, string> = {
+  // new dedicated asset
+  glass_relic: "glass_relic.svg",
 
-/**
- * Explicit overrides for specific item display names.
- * e.g. "Glass Relic" should always use glass_relic.svg.
- */
-const LOOT_FILE_OVERRIDES: Record<string, string> = {
-  "Glass Relic": "glass_relic.svg",
+  // reuse the crystal set
+  ember_token: "short_chunky_crystal.svg",
+  bloom_charm: "faceted_diamond.svg",
+  shadow_thread: "low_gem_prison.svg",
+  aether_sigil: "rough_cut_stone.svg",
+
+  // fallback if we ever get an unknown name
+  default: "split_crystal.svg",
 };
 
-/**
- * Deterministically pick a sprite for a given item name so that
- * the same relic name always maps to the same SVG.
- */
-function pickLootSprite(encounterItemName: string | null): string | null {
-  if (!encounterItemName) return null;
+function slugifyItemName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
 
-  const trimmed = encounterItemName.trim();
-
-  // 1. Explicit override if we have one
-  const override = LOOT_FILE_OVERRIDES[trimmed];
-  if (override) return override;
-
-  // 2. Stable hash → index into LOOT_SPRITES
-  let hash = 0;
-  for (let i = 0; i < trimmed.length; i += 1) {
-    hash = (hash * 31 + trimmed.charCodeAt(i)) | 0;
-  }
-
-  const index = Math.abs(hash) % LOOT_SPRITES.length;
-  return LOOT_SPRITES[index];
+function getLootSpriteForName(itemName: string, baseUrl: string): string {
+  const slug = slugifyItemName(itemName);
+  const fileName = LOOT_SPRITES[slug] ?? LOOT_SPRITES.default;
+  return `${baseUrl}items/foundItems/${fileName}`;
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
   phase,
   environmentId,
   encounterItemName,
+  isEncounterActive,
   isWalking = true,
 }) => {
-  // For GitHub Pages this will be "/dream/" – Vite serves everything under
-  // /public at the root, so our assets are at:
-  //   <baseUrl>assets/parallax/<environmentId>/layer_01.png
+  // For GitHub Pages this will be "/dream/"
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   const rootClassName = [
@@ -82,10 +66,30 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  const lootSprite = pickLootSprite(encounterItemName);
-  const lootSpriteSrc = lootSprite
-    ? `${baseUrl}items/foundItems/${lootSprite}`
-    : null;
+  // We only want to see the object on the ribbon while we’re walking up to it,
+  // not during the “encounter” overlay itself.
+  const shouldShowLoot = Boolean(encounterItemName && !isEncounterActive);
+
+  const lootSpriteUrl =
+    shouldShowLoot && encounterItemName
+      ? getLootSpriteForName(encounterItemName, baseUrl)
+      : null;
+
+  // Changing this key restarts the CSS travel animation whenever a new
+  // encounter item appears.
+  const [lootSpawnKey, setLootSpawnKey] = React.useState(0);
+  const lastEncounterName = React.useRef<string | null>(null);
+
+  React.useEffect(() => {
+    if (
+      encounterItemName &&
+      encounterItemName !== lastEncounterName.current &&
+      !isEncounterActive
+    ) {
+      setLootSpawnKey((k) => k + 1);
+    }
+    lastEncounterName.current = encounterItemName;
+  }, [encounterItemName, isEncounterActive]);
 
   return (
     <div className={rootClassName}>
@@ -113,18 +117,30 @@ const WorldLane: React.FC<WorldLaneProps> = ({
           );
         })}
 
-        {/* The actual “ribbon” strip the character walks on */}
+        {/* The ground ribbon the character walks on */}
         <div className="world-lane-ribbon" />
-      </div>
 
-      {/* Loot icon on the ribbon: slides in from the right toward the avatar */}
-      {lootSpriteSrc && (
-        <img
-          className="world-lane-loot"
-          src={lootSpriteSrc}
-          alt={encounterItemName ?? "Found item"}
-        />
-      )}
+        {/* Loot object on the ribbon, walking in from the right */}
+        {shouldShowLoot && lootSpriteUrl && (
+          <div
+            key={lootSpawnKey}
+            className="world-lane-loot-travel"
+            style={{
+              // Sync travel with walking; if auto-walk is off, the object “waits”
+              animationPlayState: isWalking ? "running" : "paused",
+            }}
+          >
+            <div className="world-lane-loot" aria-hidden="true">
+              <img
+                src={lootSpriteUrl}
+                alt={encounterItemName ?? "Found item"}
+                className="world-lane-loot-img"
+                draggable={false}
+              />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

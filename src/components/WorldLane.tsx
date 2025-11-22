@@ -1,5 +1,4 @@
-// src/components/world/WorldLane.tsx
-import React from "react";
+import React, { useMemo } from "react";
 
 interface WorldLaneProps {
   profile: unknown | null;
@@ -11,6 +10,7 @@ interface WorldLaneProps {
   isWalking?: boolean;
 }
 
+// Parallax PNGs
 const PARALLAX_LAYERS = [
   { file: "layer_01.png", depth: 0, duration: 70, opacity: 0.4, blur: 1.6 },
   { file: "layer_02.png", depth: 1, duration: 50, opacity: 0.7, blur: 1.0 },
@@ -19,58 +19,37 @@ const PARALLAX_LAYERS = [
   { file: "layer_05.png", depth: 4, duration: 14, opacity: 1.0, blur: 0 },
 ];
 
-/**
- * Explicit mapping from encounter names -> sprite files.
- * This guarantees that "Glass Relic" always points at glass_relic.svg
- * instead of going through the hash / randomiser.
- */
-const NAMED_SPRITES: Record<string, string> = {
-  "glass relic": "glass_relic.svg",
-  "aether sigil": "faceted_diamond.svg",
-  "shadow thread": "split_crystal.svg",
-  "bloom charm": "short_chunky_crystal.svg",
-};
-
-// Fallback pool used for anything we don't explicitly name above.
-const LOOT_SPRITES = [
+// Your new “found item” SVGs that live in /public/items/foundItems
+const FOUND_ITEM_SPRITES = [
   "faceted_diamond.svg",
   "low_gem_prison.svg",
   "rought_cut_stone.svg",
   "short_chunky_crystal.svg",
   "split_crystal.svg",
-  "glass_relic.svg",
-];
+] as const;
 
-function getLootSpriteForName(name: string | null): string | null {
-  if (!name) return null;
+type FoundSprite = (typeof FOUND_ITEM_SPRITES)[number];
 
-  const normalized = name.trim().toLowerCase();
+function pickSpriteForName(name: string | null): FoundSprite {
+  if (!name) return FOUND_ITEM_SPRITES[0];
 
-  // 1. Explicit mapping first (fixes the Glass Relic issue).
-  if (normalized in NAMED_SPRITES) {
-    return NAMED_SPRITES[normalized];
-  }
-
-  // 2. Hash-based mapping for everything else, stable per name.
-  let hash = 0;
-  for (let i = 0; i < normalized.length; i += 1) {
-    hash = (hash * 31 + normalized.charCodeAt(i)) >>> 0;
-  }
-
-  const index = hash % LOOT_SPRITES.length;
-  return LOOT_SPRITES[index];
+  // Tiny deterministic hash so the same relic name always maps
+  // to the same SVG, but spreads names across the set.
+  const hash = Array.from(name).reduce(
+    (acc, ch) => acc + ch.charCodeAt(0),
+    0
+  );
+  const index = hash % FOUND_ITEM_SPRITES.length;
+  return FOUND_ITEM_SPRITES[index];
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
   phase,
   environmentId,
   encounterItemName,
-  isEncounterActive,
+  isEncounterActive = false,
   isWalking = true,
 }) => {
-  // For GitHub Pages this will be "/dream/" – Vite serves everything under
-  // /public at the root, so our SVGs are at:
-  //   <baseUrl>items/foundItems/glass_relic.svg
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   const rootClassName = [
@@ -82,9 +61,11 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  const lootSprite = getLootSpriteForName(encounterItemName);
-  const lootSrc =
-    lootSprite != null ? `${baseUrl}items/foundItems/${lootSprite}` : null;
+  const spritePath = useMemo(() => {
+    if (!encounterItemName) return null;
+    const fileName = pickSpriteForName(encounterItemName);
+    return `${baseUrl}items/foundItems/${fileName}`;
+  }, [baseUrl, encounterItemName]);
 
   return (
     <div className={rootClassName}>
@@ -112,21 +93,21 @@ const WorldLane: React.FC<WorldLaneProps> = ({
           );
         })}
 
-        {/* The actual “ribbon” strip the character walks on */}
+        {/* Ground strip the character walks on */}
         <div className="world-lane-ribbon" />
       </div>
 
-      {/* Loot silhouette on the ground in front of the Dreamself.
-          Hidden once the encounter is active. */}
-      {encounterItemName && !isEncounterActive && lootSrc && (
-        <div className="world-lane-loot" aria-hidden="true">
-          <div className="world-lane-loot-shadow" />
-          <img
-            src={lootSrc}
-            alt={encounterItemName ?? "Found object"}
-            className="world-lane-loot-image"
-          />
-        </div>
+      {/* Loot sitting on the ribbon, in front of the avatar */}
+      {spritePath && isEncounterActive && (
+        <>
+          {/* ground glow */}
+          <div className="world-lane-encounter-pulse" aria-hidden="true" />
+
+          {/* the actual found item sprite */}
+          <div className="world-lane-encounter-item" aria-hidden="true">
+            <img src={spritePath} alt={encounterItemName ?? "Found item"} />
+          </div>
+        </>
       )}
     </div>
   );

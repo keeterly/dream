@@ -3419,3 +3419,116 @@ body {
   animation-play-state: paused;
 }
 
+/* =========================================================
+   DREAM — FINAL CLEAN LOOT MOVEMENT (works with WorldLane.tsx)
+   ========================================================= */
+
+/* Base loot container anchored to the ribbon */
+.world-lane-loot {
+  position: absolute;
+  bottom: 9.5vh;            /* aligns with ribbon + avatar shadow */
+  left: 110%;               /* spawn far off-screen right */
+  transform: translateX(-50%);
+  width: clamp(54px, 4.4vw, 82px);
+  pointer-events: none;
+  z-index: 18;
+  opacity: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Shadow under loot */
+.world-lane-loot-shadow {
+  width: clamp(48px, 4vw, 74px);
+  height: clamp(12px, 1vw, 18px);
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.65), transparent 70%);
+  opacity: 0.85;
+  filter: blur(2px);
+  transform-origin: center;
+}
+
+/* Loot sprite */
+.world-lane-loot-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  transform-origin: 50% 100%;
+  filter:
+    drop-shadow(0 0 6px rgba(248, 250, 252, 0.22))
+    drop-shadow(0 10px 26px rgba(15, 23, 42, 0.9));
+  animation: loot-idle 2.4s ease-in-out infinite;
+}
+
+/* Gentle float while sitting on the ground */
+@keyframes loot-idle {
+  0%   { transform: translateY(-4px) scale(1) rotate(-3deg); }
+  50%  { transform: translateY(-7px) scale(1.02) rotate(-3deg); }
+  100% { transform: translateY(-4px) scale(1) rotate(-3deg); }
+}
+
+/* ===============================
+   APPROACH — item drifts in slowly
+   =============================== */
+.world-lane-loot--approach {
+  opacity: 1;
+  animation: world-lane-loot-approach 14s linear forwards;
+}
+
+@keyframes world-lane-loot-approach {
+  0% {
+    left: 125%;
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  70% {
+    left: 63%;   /* still a short distance away */
+  }
+  100% {
+    left: 56%;   /* final stop ≈ 2 steps ahead of avatar */
+  }
+}
+
+/* ===============================
+   IDLE — encounter active (freeze)
+   =============================== */
+.world-lane-loot--idle {
+  left: 56% !important;
+  opacity: 1 !important;
+  animation: none !important;
+}
+
+/* ===============================
+   PICKUP — optional “pop to inventory”
+   =============================== */
+.world-lane-loot--pickup {
+  animation: world-lane-loot-pickup 0.6s ease-out forwards;
+}
+
+@keyframes world-lane-loot-pickup {
+  0% {
+    transform: translateX(-50%) translateY(0) scale(1);
+    opacity: 1;
+  }
+  45% {
+    transform: translateX(-50%) translateY(-22px) scale(1.12);
+  }
+  100% {
+    transform: translateX(-50%) translateY(-56px) scale(0.2);
+    opacity: 0;
+  }
+}
+
+/* ===============================
+   PAUSE — lane paused or encounter frozen
+   =============================== */
+.world-lane--paused .world-lane-loot {
+  animation-play-state: paused !important;
+}
+
+.world-lane--paused .world-lane-loot-image {
+  animation-play-state: paused !important;
+}

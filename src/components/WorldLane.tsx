@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 
 interface WorldLaneProps {
   profile: unknown | null;
@@ -28,7 +28,7 @@ const LOOT_FILE_OVERRIDES: Record<string, string> = {
 function slugToFileName(label: string): string {
   const trimmed = label.trim();
 
-  // Explicit override first.
+  // Explicit override first
   const override = LOOT_FILE_OVERRIDES[trimmed];
   if (override) return override;
 
@@ -52,6 +52,7 @@ const WorldLane: React.FC<WorldLaneProps> = ({
   phase,
   environmentId,
   encounterItemName,
+  isEncounterActive = false,
   isWalking = true,
 }) => {
   // For GitHub Pages this will be "/dream/" – Vite serves everything under
@@ -63,103 +64,22 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     "world-lane",
     `world-lane--${environmentId}`,
     `world-lane--phase-${phase.toLowerCase()}`,
-    !isWalking ? "world-lane--paused" : "",
+    (!isWalking || isEncounterActive) && "world-lane--paused",
   ]
     .filter(Boolean)
     .join(" ");
 
   const lootSpriteSrc = resolveLootSprite(encounterItemName, baseUrl);
 
-  /**
-   * We animate the loot by changing its `left` percentage.
-   * Avatar is at ~50%; we want the item to end slightly in front of them.
-   */
-  const [lootLeftPercent, setLootLeftPercent] = useState<number | null>(null);
-  const animFrameRef = useRef<number | null>(null);
-  const lastItemNameRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    // If there is no active loot item, reset everything and hide it.
-    if (!encounterItemName || !lootSpriteSrc) {
-      if (animFrameRef.current !== null) {
-        cancelAnimationFrame(animFrameRef.current);
-        animFrameRef.current = null;
-      }
-      setLootLeftPercent(null);
-      lastItemNameRef.current = null;
-      return;
-    }
-
-    // If this is the same item as before and we already have a position,
-    // don't restart the animation.
-    if (
-      encounterItemName === lastItemNameRef.current &&
-      lootLeftPercent !== null
-    ) {
-      return;
-    }
-
-    lastItemNameRef.current = encounterItemName;
-
-    // Spawn well off-screen to the right.
-    const SPAWN_LEFT = 130; // %
-    const TARGET_LEFT = 52; // % – just a couple steps in front of avatar at 50%
-
-    // ↓↓↓ SLOWER so it feels like you're walking toward a grounded item ↓↓↓
-    const SPEED_PERCENT_PER_SECOND = 6; // was 25 – much gentler “approach”
-    // ↑↑↑ tweak this value if you want it even slower / faster ↑↑↑
-
-    let currentLeft = SPAWN_LEFT;
-    let lastTimestamp: number | null = null;
-
-    setLootLeftPercent(currentLeft);
-
-    const step = (timestamp: number) => {
-      // If walking is paused, freeze the loot in place but keep RAF going
-      // so it resumes smoothly when walking resumes.
-      if (!isWalking) {
-        animFrameRef.current = requestAnimationFrame(step);
-        return;
-      }
-
-      if (lastTimestamp == null) {
-        lastTimestamp = timestamp;
-        animFrameRef.current = requestAnimationFrame(step);
-        return;
-      }
-
-      const dtSeconds = (timestamp - lastTimestamp) / 1000;
-      lastTimestamp = timestamp;
-
-      currentLeft = Math.max(
-        TARGET_LEFT,
-        currentLeft - SPEED_PERCENT_PER_SECOND * dtSeconds
-      );
-
-      setLootLeftPercent(currentLeft);
-
-      // Keep animating until we reach the target.
-      if (currentLeft > TARGET_LEFT) {
-        animFrameRef.current = requestAnimationFrame(step);
-      } else {
-        animFrameRef.current = null;
-      }
-    };
-
-    // Start / restart the animation for this new item.
-    if (animFrameRef.current !== null) {
-      cancelAnimationFrame(animFrameRef.current);
-    }
-    animFrameRef.current = requestAnimationFrame(step);
-
-    return () => {
-      if (animFrameRef.current !== null) {
-        cancelAnimationFrame(animFrameRef.current);
-        animFrameRef.current = null;
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [encounterItemName, lootSpriteSrc, isWalking]);
+  // Match the CSS states:
+  // - approach: item sliding in along the ribbon
+  // - idle: item parked near the avatar once encounter is active
+  const lootStateClass =
+    lootSpriteSrc && encounterItemName
+      ? isEncounterActive
+        ? "world-lane-loot--idle"
+        : "world-lane-loot--approach"
+      : "";
 
   return (
     <div className={rootClassName}>
@@ -191,25 +111,15 @@ const WorldLane: React.FC<WorldLaneProps> = ({
         <div className="world-lane-ribbon" />
       </div>
 
-      {/* Loot icon on the ribbon: slides in from off-screen and parks near the avatar */}
-      {lootSpriteSrc && lootLeftPercent !== null && (
-        <div
-          className="world-lane-loot"
-          style={{
-            left: `${lootLeftPercent}%`,
-            opacity: 1,        // override any CSS opacity: 0
-            animation: "none", // disable CSS keyframes on this node
-          }}
-        >
+      {/* Loot icon on the ribbon: comes in from off-screen and parks near the avatar */}
+      {lootSpriteSrc && encounterItemName && (
+        <div className={["world-lane-loot", lootStateClass].join(" ").trim()}>
           <div className="world-lane-loot-shadow" aria-hidden="true" />
           <img
             className="world-lane-loot-image"
             src={lootSpriteSrc}
-            alt={encounterItemName ?? "Found item"}
+            alt={encounterItemName}
           />
-          <div className="world-lane-loot-label">
-            {encounterItemName ?? ""}
-          </div>
         </div>
       )}
     </div>

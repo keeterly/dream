@@ -3234,12 +3234,101 @@ body {
 }
 
 
+/* === Grounded loot on the ribbon ===================================== */
 
-/* Anchor on the ribbon */
+.world-lane-loot {
+  position: absolute;
+  /* Center-ish but slightly ahead of the avatar (which is at 50%) */
+  left: 56%;
+  bottom: 9.5vh; /* matches the avatar shadow line */
+  transform: translateX(-50%);
+  z-index: 18; /* under HUD, above ribbon + grass */
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none; /* purely decorative; encounter is handled in logic */
+}
+
+/* Soft ground contact */
+.world-lane-loot-shadow {
+  width: clamp(52px, 4.3vw, 80px);
+  height: clamp(12px, 1vw, 18px);
+  border-radius: 999px;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(0, 0, 0, 0.65),
+    transparent 70%
+  );
+  opacity: 0.85;
+  filter: blur(2px);
+  transform-origin: 50% 50%;
+}
+
+/* The Nier-style SVG crystal/rock */
+.world-lane-loot-image {
+  width: clamp(52px, 4.3vw, 82px);  /* responsive size */
+  height: auto;
+  display: block;
+
+  /* Tilt slightly so it feels “sitting” in perspective */
+  transform: translateY(-4px) scale(1) rotate(-3deg);
+  transform-origin: 50% 100%;
+
+  /* Subtle glow + hover float */
+  filter:
+    drop-shadow(0 0 6px rgba(248, 250, 252, 0.14))
+    drop-shadow(0 10px 26px rgba(15, 23, 42, 0.9));
+  animation: loot-idle-float 2.2s ease-in-out infinite;
+}
+
+/* When the encounter actually triggers, make it flare a bit */
+.world-lane-loot--active .world-lane-loot-image {
+  animation: loot-pulse 0.6s ease-out, loot-idle-float 2.2s ease-in-out 0.6s infinite;
+}
+
+/* Idle micro-float while the Dreamself walks toward it */
+@keyframes loot-idle-float {
+  0%   { transform: translateY(-4px) scale(1) rotate(-3deg); }
+  50%  { transform: translateY(-7px) scale(1.02) rotate(-3deg); }
+  100% { transform: translateY(-4px) scale(1) rotate(-3deg); }
+}
+
+/* Pick-up flash when encounter fires */
+@keyframes loot-pulse {
+  0% {
+    filter:
+      drop-shadow(0 0 0 rgba(248, 250, 252, 0))
+      drop-shadow(0 10px 26px rgba(15, 23, 42, 0.9));
+    transform: translateY(-6px) scale(1);
+  }
+  45% {
+    filter:
+      drop-shadow(0 0 26px rgba(248, 250, 252, 0.85))
+      drop-shadow(0 18px 34px rgba(15, 23, 42, 0.95));
+    transform: translateY(-10px) scale(1.06);
+  }
+  100% {
+    filter:
+      drop-shadow(0 0 10px rgba(248, 250, 252, 0.2))
+      drop-shadow(0 10px 26px rgba(15, 23, 42, 0.9));
+    transform: translateY(-4px) scale(1);
+  }
+}
+
+/* Keep loot still if the whole lane is paused */
+.world-lane--paused .world-lane-loot-image {
+  animation-play-state: paused;
+}
+
+
+/* === DREAM – CLEAN GROUNDED LOOT SYSTEM v2 ============================= */
+
+/* Anchor loot on the ribbon */
 .world-lane-loot {
   position: absolute;
   bottom: 10vh;              /* sits on the ribbon */
-  left: 110%;                /* spawn off-screen */
+  left: 110%;                /* spawn off-screen to the right */
   transform: translateX(-50%);
   width: 56px;
   pointer-events: none;
@@ -3247,42 +3336,61 @@ body {
   opacity: 0;
 }
 
-/* Slide in from the right until it reaches the avatar */
+/* While the character is walking toward it */
 .world-lane-loot--approach {
   opacity: 1;
   animation: loot-approach 12s linear forwards;
 }
 
-/* When encounter is active: item stays beside avatar, doesn't disappear */
+/* Once the encounter is active (banner up) – loot stays next to avatar */
 .world-lane-loot--idle {
   opacity: 1;
-  left: 52%;                 /* parked just ahead of avatar */
+  left: 52%;                 /* parked just ahead of the avatar */
   animation: none;
 }
 
-/* After confirming pickup */
+/* After the encounter is confirmed and the item is picked up */
 .world-lane-loot--pickup {
   opacity: 1;
   left: 52%;
   animation: loot-pickup 650ms ease-out forwards;
 }
 
-/* Smooth controlled travel */
+/* Slide in from off-screen and stop near the avatar */
 @keyframes loot-approach {
-  0%   { left: 115%; opacity: 0; }
-  10%  { opacity: 1; }
-  80%  { left: 60%; opacity: 1; }
-  100% { left: 52%; opacity: 1; }
+  0% {
+    left: 115%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  80% {
+    left: 60%;
+    opacity: 1;
+  }
+  100% {
+    left: 52%;
+    opacity: 1; /* stays visible when it reaches the player */
+  }
 }
 
-/* JRPG-style pickup */
+/* JRPG-style "pop into inventory" */
 @keyframes loot-pickup {
-  0%   { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
-  40%  { transform: translateX(-50%) translateY(-22px) scale(1.12); }
-  100% { transform: translateX(-50%) translateY(-60px) scale(0.4); opacity: 0; }
+  0% {
+    transform: translateX(-50%) translateY(0) scale(1);
+    opacity: 1;
+  }
+  40% {
+    transform: translateX(-50%) translateY(-22px) scale(1.12);
+  }
+  100% {
+    transform: translateX(-50%) translateY(-56px) scale(0.4);
+    opacity: 0;
+  }
 }
 
-/* Shadow */
+/* Shadow under the loot */
 .world-lane-loot-shadow {
   position: absolute;
   left: 50%;
@@ -3291,20 +3399,27 @@ body {
   height: 10px;
   transform: translateX(-50%);
   border-radius: 999px;
-  background: radial-gradient(ellipse at center,
-    rgba(0,0,0,0.6),
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.6),
     transparent 70%
   );
   opacity: 0.7;
   filter: blur(2px);
 }
 
-/* Sprite styling */
+/* Loot sprite styling */
 .world-lane-loot-image {
   display: block;
   width: 100%;
   height: auto;
   filter:
-    drop-shadow(0 0 6px rgba(255,255,255,0.15))
-    drop-shadow(0 8px 20px rgba(0,0,0,0.8));
+    drop-shadow(0 0 6px rgba(255, 255, 255, 0.15))
+    drop-shadow(0 8px 20px rgba(0, 0, 0, 0.8));
 }
+
+/* Freeze loot animation when the lane itself is paused */
+.world-lane--paused .world-lane-loot {
+  animation-play-state: paused;
+}
+

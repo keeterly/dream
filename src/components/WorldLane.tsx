@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface WorldLaneProps {
   profile: unknown | null;
@@ -19,55 +19,32 @@ const PARALLAX_LAYERS = [
 ];
 
 /**
- * Map the in-game relic names to the actual SVG filenames in
- * public/items/foundItems.
- *
- * Keys are LOWER-CASED display names.
+ * Explicit overrides for items whose filenames don't match
+ * the slug pattern. Keys are LOWER-CASED item names.
  */
-const LOOT_FILENAME_BY_NAME: Record<string, string> = {
+const LOOT_FILE_OVERRIDES: Record<string, string> = {
   "glass relic": "glass_relic.svg",
-  "ember token": "faceted_diamond.svg",
-  "shadow thread": "low_gem_prison.svg",
-  "aether sigil": "split_crystal.svg",
-  "bloom charm": "short_chunky_crystal.svg",
-  "lonely pebble": "rought_cut_stone.svg", // note: matches your file name
 };
 
-function makeSlugFileName(label: string): string {
-  return (
-    label
-      .trim()
-      .toLowerCase()
-      .replace(/['’]/g, "")
-      .replace(/[^a-z0-9]+/g, "_")
-      .replace(/^_+|_+$/g, "") + ".svg"
-  );
+function slugToFileName(label: string): string {
+  const slug = label
+    .trim()
+    .toLowerCase()
+    .replace(/['’]/g, "") // drop apostrophes
+    .replace(/[^a-z0-9]+/g, "_") // spaces & punctuation -> underscores
+    .replace(/^_+|_+$/g, ""); // trim leading/trailing "_"
+
+  return `${slug}.svg`;
 }
 
-/**
- * Resolve the full sprite URL for the current encounter item.
- * 1. Try explicit mapping (for all the current relics).
- * 2. Fallback to slug-based filename for any future items,
- *    assuming you drop a matching SVG in the folder.
- */
-function getLootSpriteUrl(
-  encounterItemName: string | null,
-  baseUrl: string
-): string | null {
-  if (!encounterItemName) return null;
+function resolveLootSprite(itemName: string | null, baseUrl: string): string | null {
+  if (!itemName) return null;
 
-  const key = encounterItemName.trim().toLowerCase();
-  const explicitFile = LOOT_FILENAME_BY_NAME[key];
-  const fileName = explicitFile ?? makeSlugFileName(encounterItemName);
+  const key = itemName.trim().toLowerCase();
+  const fileName = LOOT_FILE_OVERRIDES[key] ?? slugToFileName(itemName);
 
-  const normalizedBase =
-    baseUrl === "" || baseUrl === "/"
-      ? "/"
-      : baseUrl.endsWith("/")
-      ? baseUrl
-      : `${baseUrl}/`;
-
-  return `${normalizedBase}items/foundItems/${fileName}`;
+  // This matches how your other assets are referenced and keeps GitHub Pages happy
+  return `${baseUrl}items/foundItems/${fileName}`;
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
@@ -77,9 +54,6 @@ const WorldLane: React.FC<WorldLaneProps> = ({
   isEncounterActive,
   isWalking = true,
 }) => {
-  // For GitHub Pages this will be "/dream/" – Vite serves everything under
-  // /public at the root, so our assets are at:
-  //   <baseUrl>assets/parallax/<environmentId>/layer_01.png
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   const rootClassName = [
@@ -91,17 +65,47 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  const lootSpriteUrl = getLootSpriteUrl(encounterItemName, baseUrl);
+  // --- APPROACH / IDLE LOOT (while encounterItemName is non-null) ---
+  const lootSpriteSrc = resolveLootSprite(encounterItemName, baseUrl);
 
-  // Approach vs pickup state:
-  //  - approach: sliding in from off-screen
-  //  - pickup: play pickup animation instead of instantly vanishing
   const lootStateClass =
-    lootSpriteUrl && encounterItemName
+    lootSpriteSrc && encounterItemName
       ? isEncounterActive
-        ? "world-lane-loot--pickup"
-        : "world-lane-loot--approach"
+        ? "world-lane-loot--idle" // character is next to it; stop moving
+        : "world-lane-loot--approach" // sliding in from off-screen
       : "";
+
+  // --- PICKUP ANIMATION (after confirm button pressed) ---
+  // We detect the transition from "had an item" to "no item"
+  // and play a short pickup animation using the previous item sprite.
+  const prevEncounterRef = useRef<string | null>(null);
+  const [pickupSprite, setPickupSprite] = useState<string | null>(null);
+  const [pickupName, setPickupName] = useState<string | null>(null);
+  const [isPickingUp, setIsPickingUp] = useState(false);
+
+  useEffect(() => {
+    const prevName = prevEncounterRef.current;
+
+    // Parent cleared encounterItemName -> treat as "confirmed / picked up"
+    if (prevName && !encounterItemName) {
+      const sprite = resolveLootSprite(prevName, baseUrl);
+      if (sprite) {
+        setPickupSprite(sprite);
+        setPickupName(prevName);
+        setIsPickingUp(true);
+
+        const timeout = window.setTimeout(() => {
+          setIsPickingUp(false);
+          setPickupSprite(null);
+          setPickupName(null);
+        }, 650); // match CSS pickup duration
+
+        return () => window.clearTimeout(timeout);
+      }
+    }
+
+    prevEncounterRef.current = encounterItemName;
+  }, [encounterItemName, baseUrl]);
 
   return (
     <div className={rootClassName}>
@@ -129,20 +133,32 @@ const WorldLane: React.FC<WorldLaneProps> = ({
           );
         })}
 
-        {/* The actual “ribbon” strip the character walks on */}
+        {/* The actual ribbon strip the character walks on */}
         <div className="world-lane-ribbon" />
       </div>
 
-      {/* Loot icon on the ribbon */}
-      {lootSpriteUrl && encounterItemName && (
+      {/* Loot sliding in along the ribbon, then waiting beside the character */}
+      {lootSpriteSrc && encounterItemName && (
         <div
           className={`world-lane-loot ${lootStateClass}`}
           aria-hidden="true"
         >
           <div className="world-lane-loot-shadow" />
           <img
-            src={lootSpriteUrl}
+            src={lootSpriteSrc}
             alt={encounterItemName}
+            className="world-lane-loot-image"
+          />
+        </div>
+      )}
+
+      {/* Pickup animation AFTER the encounter is confirmed (item added to inventory) */}
+      {isPickingUp && pickupSprite && (
+        <div className="world-lane-loot world-lane-loot--pickup" aria-hidden="true">
+          <div className="world-lane-loot-shadow" />
+          <img
+            src={pickupSprite}
+            alt={pickupName ?? "Found item"}
             className="world-lane-loot-image"
           />
         </div>

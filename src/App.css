@@ -3540,3 +3540,93 @@ body {
   width: 100%;
   height: auto;
 }
+
+
+/* Base loot container anchored to the ribbon */
+.world-lane-loot {
+  position: absolute;
+  bottom: 10vh;              /* sync this to the avatar's feet */
+  left: 110%;                /* start off-screen to the right */
+  transform: translateX(-50%);
+  width: 56px;
+  pointer-events: none;
+  z-index: 8;
+  opacity: 0;
+}
+
+/* While the character is still walking toward it */
+.world-lane-loot--approach {
+  opacity: 1;
+  animation: world-lane-loot-approach 16s linear forwards;
+}
+
+/* Once the encounter is active (banner up) – freeze beside the avatar */
+.world-lane-loot--idle {
+  opacity: 1;
+  left: 52%;                 /* just in front of the avatar */
+  animation: none;
+}
+
+/* After the encounter is confirmed (parent clears encounterItemName) */
+.world-lane-loot--pickup {
+  opacity: 1;
+  left: 52%;
+  animation: world-lane-loot-pickup 650ms ease-out forwards;
+}
+
+/* Approach: slide in along the ribbon and stop near the avatar */
+@keyframes world-lane-loot-approach {
+  0% {
+    left: 115%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  70% {
+    left: 60%;
+    opacity: 1;
+  }
+  100% {
+    left: 52%;
+    opacity: 1; /* stays visible when it reaches the player */
+  }
+}
+
+/* Pickup: small JRPG-style "pop into inventory" */
+@keyframes world-lane-loot-pickup {
+  0% {
+    transform: translateX(-50%) translateY(0) scale(1);
+    opacity: 1;
+  }
+  40% {
+    transform: translateX(-50%) translateY(-24px) scale(1.1);
+  }
+  100% {
+    transform: translateX(-50%) translateY(-56px) scale(0.35);
+    opacity: 0;
+  }
+}
+
+.world-lane-loot-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 40px;
+  height: 10px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.65),
+    transparent 70%
+  );
+  opacity: 0.75;
+  filter: blur(2px);
+}
+
+.world-lane-loot-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}

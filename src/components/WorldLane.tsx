@@ -102,9 +102,9 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     lastItemNameRef.current = encounterItemName;
 
     // Spawn well off-screen to the right.
-    const SPAWN_LEFT = 120; // %
-    const TARGET_LEFT = 52; // % – just a couple steps in front of avatar at 50%
-    const SPEED_PERCENT_PER_SECOND = 6; // tweak for faster/slower slide
+    const SPAWN_LEFT = 130; // %
+    const TARGET_LEFT = 50; // % – just a couple steps in front of avatar at 50%
+    const SPEED_PERCENT_PER_SECOND = 25; // tweak for faster/slower slide
 
     let currentLeft = SPAWN_LEFT;
     let lastTimestamp: number | null = null;

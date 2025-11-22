@@ -1,0 +1,16 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke="none">
+    <ellipse cx="32" cy="52" rx="15" ry="4" fill="#171717" opacity="0.35"></ellipse>
+
+    <!-- outer silhouette -->
+    <path fill="#D8D0BF" d="M14 36 L22 18 L38 12 L50 20 L56 34 L50 46 L36 52 L22 48 Z"></path>
+
+    <!-- major facets -->
+    <path fill="#B8AF9A" d="M22 18 L38 12 L46 18 L36 22 Z"></path>
+    <path fill="#B0A58F" d="M38 12 L50 20 L46 30 L36 22 Z"></path>
+    <path fill="#9E947F" d="M22 18 L36 22 L30 32 L18 30 Z"></path>
+    <path fill="#8B8170" d="M18 30 L30 32 L26 44 L14 36 Z"></path>
+    <path fill="#776D5E" d="M30 32 L46 30 L50 46 L36 52 Z"></path>
+    <path fill="#645C4F" d="M26 44 L36 52 L22 48 Z" opacity="0.9"></path>
+  </g>
+</svg>

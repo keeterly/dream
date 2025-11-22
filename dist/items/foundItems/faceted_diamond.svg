@@ -1,0 +1,16 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke="none">
+    <ellipse cx="32" cy="54" rx="13" ry="4" fill="#171717" opacity="0.3"></ellipse>
+
+    <!-- base rhombus -->
+    <path fill="#F4F0E2" d="M10 32 L30 10 L54 28 L34 52 Z"></path>
+    <!-- underside / depth -->
+    <path fill="#C9BFA7" d="M34 52 L10 32 L10 37 L34 57 Z"></path>
+    <path fill="#B2A58C" d="M34 52 L54 28 L54 33 L34 57 Z"></path>
+
+    <!-- diagonal banding -->
+    <path fill="#B0A691" d="M14 30 L32 12 L40 18 L22 36 Z"></path>
+    <path fill="#8F8673" d="M22 36 L40 18 L47 23 L29 41 Z"></path>
+    <path fill="#6F6757" d="M29 41 L47 23 L51 26 L33 44 Z" opacity="0.9"></path>
+  </g>
+</svg>

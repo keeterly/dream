@@ -3249,7 +3249,13 @@ body {
   align-items: center;
   pointer-events: none;
   opacity: 1;
+
+  /* make loot scroll with the lane */
+  animation: world-lane-scroll-fast 20s linear infinite;
+
 }
+
+
 
 /* Shadow */
 .world-lane-loot-shadow {

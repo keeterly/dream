@@ -72,11 +72,7 @@ const WorldLane: React.FC<WorldLaneProps> = ({
 
   /**
    * We animate the loot by changing its `left` percentage.
-   * CSS keeps it sitting on the ribbon:
-   *   .world-lane-loot { bottom: 10vh; transform: translateX(-50%); }
-   *
-   * Here we drive `left` from ~130% (off-screen right) down to ~52%,
-   * which is just a couple of steps in front of the avatar (50%).
+   * Avatar is at ~50%; we want the item to end slightly in front of them.
    */
   const [lootLeftPercent, setLootLeftPercent] = useState<number | null>(null);
   const animFrameRef = useRef<number | null>(null);
@@ -107,7 +103,7 @@ const WorldLane: React.FC<WorldLaneProps> = ({
 
     // Spawn well off-screen to the right.
     const SPAWN_LEFT = 130; // %
-    const TARGET_LEFT = 52; // % – closer to the avatar at 50%
+    const TARGET_LEFT = 52; // % – just a couple steps in front of avatar at 50%
     const SPEED_PERCENT_PER_SECOND = 25; // tweak for faster/slower slide
 
     let currentLeft = SPAWN_LEFT;
@@ -116,7 +112,7 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     setLootLeftPercent(currentLeft);
 
     const step = (timestamp: number) => {
-      // If walking is paused, freeze the loot in place but keep the RAF going
+      // If walking is paused, freeze the loot in place but keep RAF going
       // so it resumes smoothly when walking resumes.
       if (!isWalking) {
         animFrameRef.current = requestAnimationFrame(step);
@@ -196,7 +192,11 @@ const WorldLane: React.FC<WorldLaneProps> = ({
       {lootSpriteSrc && lootLeftPercent !== null && (
         <div
           className="world-lane-loot"
-          style={{ left: `${lootLeftPercent}%` }}
+          style={{
+            left: `${lootLeftPercent}%`,
+            opacity: 1,          // override CSS opacity: 0
+            animation: "none",   // disable any CSS keyframe animation on this node
+          }}
         >
           <div className="world-lane-loot-shadow" aria-hidden="true" />
           <img

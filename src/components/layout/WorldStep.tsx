@@ -45,7 +45,31 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   const [wasAutoWalkingBeforeEncounter, setWasAutoWalkingBeforeEncounter] =
     useState(false);
 
-  const isEncounterActive = !!activeEncounterItem;
+  // --- NEW: "loot is on the ground, walking toward it" state ---
+  const hasLootSpawned = !!encounterItemName;
+  const [hasReachedLoot, setHasReachedLoot] = useState(false);
+
+  // When a new loot spawn happens, start a travel timer that represents
+  // the walk-in from offscreen → ribbon center.
+  useEffect(() => {
+    if (!hasLootSpawned) {
+      setHasReachedLoot(false);
+      return;
+    }
+
+    setHasReachedLoot(false);
+
+    // This should roughly match the CSS loot-approach animation duration.
+    const TRAVEL_MS = 5500;
+    const id = window.setTimeout(() => {
+      setHasReachedLoot(true);
+    }, TRAVEL_MS);
+
+    return () => window.clearTimeout(id);
+  }, [hasLootSpawned, encounterItemName]);
+
+  // Encounter is only "active" once the avatar has reached the loot.
+  const isEncounterActive = !!activeEncounterItem && hasReachedLoot;
   const isWalking = isAutoWalking && !isEncounterActive;
 
   const togglePanel = (panel: WorldPanelId) => {
@@ -75,25 +99,22 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   }, [isEncounterActive, isAutoWalking]);
 
   /**
-   * Auto-encounter roll:
-   * While auto-walk is ON and nothing is happening,
-   * roll for a relic encounter every 8–16 seconds.
-   *
-   * For now this just reuses onSpawnDebugItem, which should
-   * create a new activeEncounterItem in the parent.
+   * Auto-encounter roll while auto-walk is on.
+   * We don't spawn a new item if one is already walking in or active.
    */
   useEffect(() => {
-    if (!isAutoWalking || isEncounterActive) return;
+    if (!isAutoWalking || isEncounterActive || hasLootSpawned) return;
 
     const delay = 8000 + Math.random() * 8000; // 8–16s
     const id = window.setTimeout(() => {
       setWasAutoWalkingBeforeEncounter(true);
-      setIsAutoWalking(false);
+      // Let the world keep walking while the loot drifts in; we only
+      // flip walking off once the encounter actually becomes active.
       onSpawnDebugItem();
     }, delay);
 
     return () => window.clearTimeout(id);
-  }, [isAutoWalking, isEncounterActive, onSpawnDebugItem]);
+  }, [isAutoWalking, isEncounterActive, hasLootSpawned, onSpawnDebugItem]);
 
   const handleEncounterBannerClick = () => {
     // Tell parent to finalize the encounter (add to inventory, clear active item)
@@ -104,6 +125,9 @@ export const WorldStep: React.FC<WorldStepProps> = ({
       setIsAutoWalking(true);
       setWasAutoWalkingBeforeEncounter(false);
     }
+
+    // Clear local reach flag; parent will also clear encounterItemName.
+    setHasReachedLoot(false);
   };
 
   const cardClasses = [
@@ -119,24 +143,19 @@ export const WorldStep: React.FC<WorldStepProps> = ({
       ? `world-encounter-banner--${activeEncounterItem.rarity}`
       : "";
 
-  const bannerClasses = [
-    "world-encounter-banner",
-    activeEncounterItem ? "world-encounter-banner--visible" : "",
-    bannerRarityClass,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  // Encounter UI (glyph + top banner) is only visible after we've reached loot.
+  const showEncounterUI = isEncounterActive;
 
   return (
     <section className="app-screen app-screen-world">
       <div className={cardClasses}>
-        {/* WORLD LANE / PARALLAX */}
+        {/* WORLD LANE / PARALLAX BACKGROUND */}
         <WorldLane
           profile={profile}
           environmentId="dusk_valley"
           phase={phase}
           encounterItemName={encounterItemName}
-          isEncounterActive={isEncounterActive}
+          isEncounterActive={showEncounterUI}
           isWalking={isWalking}
         />
 
@@ -149,49 +168,36 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 : "world-stage-avatar--paused"
             } ${lighting.avatarClass}`}
           >
+            {/* Alert glyph only when the encounter is actually live */}
+            {showEncounterUI && <div className="world-encounter-glyph">!</div>}
+
             <AvatarView
               avatar={profile.avatar}
               traits={profile.traits}
               dreamName={profile.dreamName}
             />
 
-            {/* Encounter indicator above head (MGS-style "!") */}
-            {activeEncounterItem && (
-              <div className="world-encounter-glyph">!</div>
-            )}
-
             {/* ground shadow */}
             <div className="world-stage-shadow" />
           </div>
         )}
 
-        {/* TOP-CENTER RELIC BANNER (HUD) */}
-        {activeEncounterItem && (
-          <button
-            type="button"
-            className={bannerClasses}
-            onClick={handleEncounterBannerClick}
-          >
-            <div className="world-encounter-banner-label">Relic Found</div>
-            <div className="world-encounter-banner-name">
-              {activeEncounterItem.name}
-            </div>
-
-            <div className="world-encounter-banner-meta">
-              <span className="world-encounter-banner-rarity">
-                {activeEncounterItem.rarity}
-              </span>
-              <span className="world-encounter-banner-hint">
-                Tap to bind
-              </span>
-            </div>
-
-            <div className="world-encounter-banner-orb" />
-          </button>
-        )}
-
         {/* GLOBAL TINT OVERLAY */}
         <div className="world-tint-overlay" />
+
+        {/* TOP-CENTER RELIC BANNER */}
+        {showEncounterUI && activeEncounterItem && (
+          <button
+            type="button"
+            className={`world-encounter-banner ${bannerRarityClass}`}
+            onClick={handleEncounterBannerClick}
+          >
+            <span className="world-encounter-label">Relic Found</span>
+            <span className="world-encounter-name">
+              {activeEncounterItem.name}
+            </span>
+          </button>
+        )}
 
         {/* OVERLAY: HUD + DOCK + PANELS */}
         <div className="world-overlay">
@@ -208,7 +214,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 <span className="world-hud-pill">LV 01</span>
               </div>
               <div className="world-hud-meta">
-                <span className="hud-label">DREAMSELF</span>
+                <span className="hud-label">Dreamself</span>
                 <span className="hud-value">
                   {profile.traits.primaryArchetype}
                 </span>
@@ -217,7 +223,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
             <div className="world-hud-right">
               <div className="world-hud-phase">
-                <span className="hud-label">PHASE</span>
+                <span className="hud-label">Phase</span>
                 <span className="hud-value">{phase}</span>
               </div>
 
@@ -243,7 +249,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
           {/* DOCK BUTTONS */}
           <div className="world-dock">
-            {/* Inventory */}
             <button
               className={
                 "world-dock-button" +
@@ -255,7 +260,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
               <span className="world-dock-label">Inventory</span>
             </button>
 
-            {/* Dreamself */}
             <button
               className={
                 "world-dock-button" +
@@ -267,7 +271,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
               <span className="world-dock-label">Dreamself</span>
             </button>
 
-            {/* Map */}
             <button
               className={
                 "world-dock-button" +
@@ -279,7 +282,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
               <span className="world-dock-label">Map</span>
             </button>
 
-            {/* Journal */}
             <button
               className={
                 "world-dock-button" +
@@ -291,7 +293,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
               <span className="world-dock-label">Journal</span>
             </button>
 
-            {/* Debug */}
             <button
               className={
                 "world-dock-button" +
@@ -306,7 +307,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
           {/* PANELS */}
           <div className="world-panels">
-            {/* Inventory panel */}
             {activePanel === "inventory" && (
               <div className="world-panel world-panel-inventory">
                 <div className="world-panel-header">
@@ -347,22 +347,18 @@ export const WorldStep: React.FC<WorldStepProps> = ({
               </div>
             )}
 
-            {/* Dreamself panel */}
             {activePanel === "character" && (
               <DreamselfPanel profile={profile} inventory={inventory} />
             )}
 
-            {/* Map panel */}
             {activePanel === "map" && (
               <MapPanel currentBiomeId="dusk_valley" phase={phase} />
             )}
 
-            {/* Journal panel */}
             {activePanel === "journal" && (
               <JournalPanel entries={journalEntries} />
             )}
 
-            {/* Debug panel */}
             {activePanel === "debug" && (
               <div className="world-panel world-panel-debug">
                 <div className="world-panel-header">

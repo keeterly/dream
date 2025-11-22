@@ -1,3 +1,4 @@
+// src/components/world/WorldLane.tsx
 import React from "react";
 
 interface WorldLaneProps {
@@ -19,47 +20,45 @@ const PARALLAX_LAYERS = [
 ];
 
 /**
- * SVGs you added under:
- *   public/assets/items/foundItems/
- *
- * NOTE: names must match the files exactly.
+ * Explicit mapping from encounter names -> sprite files.
+ * This guarantees that "Glass Relic" always points at glass_relic.svg
+ * instead of going through the hash / randomiser.
  */
-const FOUND_ITEM_SPRITES = [
+const NAMED_SPRITES: Record<string, string> = {
+  "glass relic": "glass_relic.svg",
+  "aether sigil": "faceted_diamond.svg",
+  "shadow thread": "split_crystal.svg",
+  "bloom charm": "short_chunky_crystal.svg",
+};
+
+// Fallback pool used for anything we don't explicitly name above.
+const LOOT_SPRITES = [
   "faceted_diamond.svg",
   "low_gem_prison.svg",
   "rought_cut_stone.svg",
   "short_chunky_crystal.svg",
   "split_crystal.svg",
-] as const;
+  "glass_relic.svg",
+];
 
-/**
- * Deterministically pick a sprite based on the encounter's name.
- * There is ALWAYS a fallback so something is drawn.
- */
-function getSpriteForEncounter(name: string | null): string {
-  if (!name) {
-    return FOUND_ITEM_SPRITES[0];
-  }
+function getLootSpriteForName(name: string | null): string | null {
+  if (!name) return null;
 
-  const n = name.toLowerCase();
+  const normalized = name.trim().toLowerCase();
 
-  // A few hand-tuned mappings so the vibe matches the name
-  if (n.includes("glass") || n.includes("sigil")) {
-    return FOUND_ITEM_SPRITES[0]; // faceted_diamond
-  }
-  if (n.includes("ember") || n.includes("token")) {
-    return FOUND_ITEM_SPRITES[1]; // low_gem_prison
-  }
-  if (n.includes("stone") || n.includes("rock") || n.includes("ore")) {
-    return FOUND_ITEM_SPRITES[2]; // rought_cut_stone
-  }
-  if (n.includes("thread") || n.includes("charm") || n.includes("weave")) {
-    return FOUND_ITEM_SPRITES[3]; // short_chunky_crystal
+  // 1. Explicit mapping first (fixes the Glass Relic issue).
+  if (normalized in NAMED_SPRITES) {
+    return NAMED_SPRITES[normalized];
   }
 
-  // Fallback: hash the name into the sprite array so it’s stable per item
-  const hash = Array.from(n).reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
-  return FOUND_ITEM_SPRITES[hash % FOUND_ITEM_SPRITES.length];
+  // 2. Hash-based mapping for everything else, stable per name.
+  let hash = 0;
+  for (let i = 0; i < normalized.length; i += 1) {
+    hash = (hash * 31 + normalized.charCodeAt(i)) >>> 0;
+  }
+
+  const index = hash % LOOT_SPRITES.length;
+  return LOOT_SPRITES[index];
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
@@ -70,9 +69,8 @@ const WorldLane: React.FC<WorldLaneProps> = ({
   isWalking = true,
 }) => {
   // For GitHub Pages this will be "/dream/" – Vite serves everything under
-  // /public at the root, so our PNGs/SVGs are at:
-  //   <baseUrl>assets/parallax/<environmentId>/layer_01.png
-  //   <baseUrl>assets/items/foundItems/<sprite>.svg
+  // /public at the root, so our SVGs are at:
+  //   <baseUrl>items/foundItems/glass_relic.svg
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   const rootClassName = [
@@ -84,9 +82,9 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  // Pick a sprite for the *current* encounter (even if name is weird)
-  const itemSpriteFile = getSpriteForEncounter(encounterItemName);
-  const itemSpritePath = `${baseUrl}assets/items/foundItems/${itemSpriteFile}`;
+  const lootSprite = getLootSpriteForName(encounterItemName);
+  const lootSrc =
+    lootSprite != null ? `${baseUrl}items/foundItems/${lootSprite}` : null;
 
   return (
     <div className={rootClassName}>
@@ -118,21 +116,17 @@ const WorldLane: React.FC<WorldLaneProps> = ({
         <div className="world-lane-ribbon" />
       </div>
 
-      {/* Loot encounter: pulse + sprite in front of the avatar */}
-      {isEncounterActive && (
-        <>
-          <div className="world-lane-encounter-pulse" aria-hidden="true" />
-          <div
-            className="world-lane-crystal"
-            aria-hidden="true"
-            style={{
-              backgroundImage: `url("${itemSpritePath}")`,
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "center",
-              backgroundSize: "contain",
-            }}
+      {/* Loot silhouette on the ground in front of the Dreamself.
+          Hidden once the encounter is active. */}
+      {encounterItemName && !isEncounterActive && lootSrc && (
+        <div className="world-lane-loot" aria-hidden="true">
+          <div className="world-lane-loot-shadow" />
+          <img
+            src={lootSrc}
+            alt={encounterItemName ?? "Found object"}
+            className="world-lane-loot-image"
           />
-        </>
+        </div>
       )}
     </div>
   );

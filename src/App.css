@@ -3461,3 +3461,82 @@ body {
   }
 }
 
+/* Base loot anchor: sits on the ribbon, centered under the avatar line */
+.world-lane-loot {
+  position: absolute;
+  bottom: 11vh;
+  left: 56%;
+  transform: translateX(-50%);
+  width: 56px;
+  height: auto;
+  pointer-events: none;
+  z-index: 8;
+  opacity: 0;
+}
+
+/* Loot sliding in from off-screen on the right */
+.world-lane-loot--approach {
+  opacity: 1;
+  animation: world-lane-loot-approach 18s linear forwards;
+}
+
+/* Loot being picked up (triggered when isEncounterActive === true) */
+.world-lane-loot--pickup {
+  opacity: 1;
+  animation: world-lane-loot-pickup 650ms ease-out forwards;
+}
+
+@keyframes world-lane-loot-approach {
+  0% {
+    transform: translateX(60vw); /* start way off-screen right */
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1; /* fully visible as it approaches the avatar */
+  }
+  100% {
+    transform: translateX(-10vw); /* drift left past the avatar */
+    opacity: 0;
+  }
+}
+
+@keyframes world-lane-loot-pickup {
+  0% {
+    transform: translateX(-50%) translateY(0) scale(1);
+    opacity: 1;
+  }
+  40% {
+    transform: translateX(-50%) translateY(-24px) scale(1.1);
+  }
+  100% {
+    transform: translateX(-50%) translateY(-60px) scale(0.4);
+    opacity: 0;
+  }
+}
+
+/* You can keep your existing shadow & sprite styling */
+.world-lane-loot-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 40px;
+  height: 10px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.6),
+    transparent 70%
+  );
+  opacity: 0.7;
+  filter: blur(2px);
+}
+
+.world-lane-loot-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}

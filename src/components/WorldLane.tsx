@@ -104,7 +104,10 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     // Spawn well off-screen to the right.
     const SPAWN_LEFT = 130; // %
     const TARGET_LEFT = 52; // % – just a couple steps in front of avatar at 50%
-    const SPEED_PERCENT_PER_SECOND = 25; // tweak for faster/slower slide
+
+    // ↓↓↓ SLOWER so it feels like you're walking toward a grounded item ↓↓↓
+    const SPEED_PERCENT_PER_SECOND = 6; // was 25 – much gentler “approach”
+    // ↑↑↑ tweak this value if you want it even slower / faster ↑↑↑
 
     let currentLeft = SPAWN_LEFT;
     let lastTimestamp: number | null = null;
@@ -194,8 +197,8 @@ const WorldLane: React.FC<WorldLaneProps> = ({
           className="world-lane-loot"
           style={{
             left: `${lootLeftPercent}%`,
-            opacity: 1,          // override CSS opacity: 0
-            animation: "none",   // disable any CSS keyframe animation on this node
+            opacity: 1,        // override any CSS opacity: 0
+            animation: "none", // disable CSS keyframes on this node
           }}
         >
           <div className="world-lane-loot-shadow" aria-hidden="true" />

@@ -18,62 +18,68 @@ const PARALLAX_LAYERS = [
   { file: "layer_05.png", depth: 4, duration: 14, opacity: 1.0, blur: 0 },
 ];
 
-// Canonical mapping from encounter name -> sprite file
-const LOOT_SPRITES = [
-  { key: "glass_relic", file: "glass_relic.svg" },
-  { key: "faceted_diamond", file: "faceted_diamond.svg" },
-  { key: "low_gem_prison", file: "low_gem_prison.svg" },
-  { key: "rough_cut_stone", file: "rough_cut_stone.svg" },
-  { key: "short_chunky_crystal", file: "short_chunky_crystal.svg" },
-  { key: "split_crystal", file: "split_crystal.svg" },
-] as const;
-
-type LootKey = (typeof LOOT_SPRITES)[number]["key"];
-
-// Explicit overrides for weird names
-const NAMED_SPRITES: Record<string, LootKey> = {
-  "Glass Relic": "glass_relic",
+/**
+ * Map the in-game relic names to the actual SVG filenames in
+ * public/items/foundItems.
+ *
+ * Keys are LOWER-CASED display names.
+ */
+const LOOT_FILENAME_BY_NAME: Record<string, string> = {
+  "glass relic": "glass_relic.svg",
+  "ember token": "faceted_diamond.svg",
+  "shadow thread": "low_gem_prison.svg",
+  "aether sigil": "split_crystal.svg",
+  "bloom charm": "short_chunky_crystal.svg",
+  "lonely pebble": "rought_cut_stone.svg", // note: matches your file name
 };
 
-function getLootSpriteForName(
+function makeSlugFileName(label: string): string {
+  return (
+    label
+      .trim()
+      .toLowerCase()
+      .replace(/['’]/g, "")
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "") + ".svg"
+  );
+}
+
+/**
+ * Resolve the full sprite URL for the current encounter item.
+ * 1. Try explicit mapping (for all the current relics).
+ * 2. Fallback to slug-based filename for any future items,
+ *    assuming you drop a matching SVG in the folder.
+ */
+function getLootSpriteUrl(
   encounterItemName: string | null,
   baseUrl: string
 ): string | null {
   if (!encounterItemName) return null;
 
-  const trimmed = encounterItemName.trim();
+  const key = encounterItemName.trim().toLowerCase();
+  const explicitFile = LOOT_FILENAME_BY_NAME[key];
+  const fileName = explicitFile ?? makeSlugFileName(encounterItemName);
 
-  // 1) Hard-coded mapping
-  const explicitKey = NAMED_SPRITES[trimmed];
-  const explicitSprite = LOOT_SPRITES.find((s) => s.key === explicitKey);
-  if (explicitSprite) {
-    return `${baseUrl}items/foundItems/${explicitSprite.file}`;
-  }
+  const normalizedBase =
+    baseUrl === "" || baseUrl === "/"
+      ? "/"
+      : baseUrl.endsWith("/")
+      ? baseUrl
+      : `${baseUrl}/`;
 
-  // 2) Slugged key mapping, e.g. "Bloom Charm" -> "bloom_charm"
-  const slug = trimmed
-    .toLowerCase()
-    .replace(/['’]/g, "")
-    .replace(/[^a-z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "");
-
-  const guessedSprite = LOOT_SPRITES.find((s) => s.key === slug);
-  if (guessedSprite) {
-    return `${baseUrl}items/foundItems/${guessedSprite.file}`;
-  }
-
-  // 3) Fallback assume a literal file name
-  return `${baseUrl}items/foundItems/${slug}.svg`;
+  return `${normalizedBase}items/foundItems/${fileName}`;
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
   phase,
   environmentId,
   encounterItemName,
-  isEncounterActive = false,
+  isEncounterActive,
   isWalking = true,
 }) => {
-  // For GitHub Pages this will be "/dream/"
+  // For GitHub Pages this will be "/dream/" – Vite serves everything under
+  // /public at the root, so our assets are at:
+  //   <baseUrl>assets/parallax/<environmentId>/layer_01.png
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   const rootClassName = [
@@ -85,10 +91,7 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  const lootSpriteSrc = getLootSpriteForName(encounterItemName, baseUrl);
-  // IMPORTANT: we now show loot any time there is an encounterItemName.
-  // It will disappear only when the parent clears encounterItemName.
-  const showLoot = Boolean(lootSpriteSrc && encounterItemName);
+  const lootSpriteUrl = getLootSpriteUrl(encounterItemName, baseUrl);
 
   // Approach vs pickup state:
   //  - approach: sliding in from off-screen
@@ -130,21 +133,19 @@ const WorldLane: React.FC<WorldLaneProps> = ({
         <div className="world-lane-ribbon" />
       </div>
 
-      {/* Loot icon on the ribbon.
-          - Slides in from the right (CSS).
-          - Stays visible when the encounter becomes active.
-          - When isEncounterActive flips to true we add a pickup class so CSS
-            can animate it into the Dreamself / inventory. */}
-      {showLoot && (
-        <img
-          className={
-            "world-lane-loot" +
-            (isEncounterActive ? " world-lane-loot--pickup" : "")
-          }
-          src={lootSpriteSrc!}
-          alt={encounterItemName ?? "Found item"}
-          aria-hidden={!encounterItemName}
-        />
+      {/* Loot icon on the ribbon */}
+      {lootSpriteUrl && encounterItemName && (
+        <div
+          className={`world-lane-loot ${lootStateClass}`}
+          aria-hidden="true"
+        >
+          <div className="world-lane-loot-shadow" />
+          <img
+            src={lootSpriteUrl}
+            alt={encounterItemName}
+            className="world-lane-loot-image"
+          />
+        </div>
       )}
     </div>
   );

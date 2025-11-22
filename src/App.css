@@ -3409,3 +3409,54 @@ body {
   }
 }
 
+/* Loot starts off-screen to the right and slides along the ribbon.
+   (Keep / tweak these to match what you already had.) */
+.world-lane-loot {
+  position: absolute;
+  bottom: 11vh;        /* tweak until it sits perfectly on the ribbon */
+  right: -6vw;         /* off-screen start */
+  width: 52px;
+  height: auto;
+  pointer-events: none;
+  image-rendering: auto;
+  animation: world-lane-loot-slide 26s linear forwards;
+}
+
+/* When the encounter fires we freeze the slide and play a pickup anim.
+   The class is toggled by isEncounterActive in WorldLane.tsx. */
+.world-lane-loot.world-lane-loot--pickup {
+  animation: loot-pickup 600ms ease-out forwards;
+}
+
+/* This is the “walk toward the player” slide; reuse or adjust if you
+   already have something similar. */
+@keyframes world-lane-loot-slide {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    /* Item ends roughly under the Dreamself’s feet */
+    transform: translateX(-55vw);
+    opacity: 1;
+  }
+}
+
+/* Pickup animation: pop upward into the Dreamself / inventory and fade. */
+@keyframes loot-pickup {
+  0% {
+    transform: translateX(-55vw) translateY(0) scale(1);
+    opacity: 1;
+  }
+  60% {
+    transform: translateX(-55vw) translateY(-4vh) scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-55vw) translateY(-9vh) scale(0.4);
+    opacity: 0;
+  }
+}

@@ -1,4 +1,3 @@
-// src/components/world/WorldLane.tsx
 import React from "react";
 
 interface WorldLaneProps {
@@ -19,58 +18,62 @@ const PARALLAX_LAYERS = [
   { file: "layer_05.png", depth: 4, duration: 14, opacity: 1.0, blur: 0 },
 ];
 
-/**
- * Explicit mapping from encounter names -> sprite files.
- * This guarantees that "Glass Relic" always points at glass_relic.svg
- * instead of going through the hash / randomiser.
- */
-const NAMED_SPRITES: Record<string, string> = {
-  "glass relic": "glass_relic.svg",
-  "aether sigil": "faceted_diamond.svg",
-  "shadow thread": "split_crystal.svg",
-  "bloom charm": "short_chunky_crystal.svg",
+// Canonical mapping from encounter name -> sprite file
+const LOOT_SPRITES = [
+  { key: "glass_relic", file: "glass_relic.svg" },
+  { key: "faceted_diamond", file: "faceted_diamond.svg" },
+  { key: "low_gem_prison", file: "low_gem_prison.svg" },
+  { key: "rough_cut_stone", file: "rough_cut_stone.svg" },
+  { key: "short_chunky_crystal", file: "short_chunky_crystal.svg" },
+  { key: "split_crystal", file: "split_crystal.svg" },
+] as const;
+
+type LootKey = (typeof LOOT_SPRITES)[number]["key"];
+
+// Explicit overrides for weird names
+const NAMED_SPRITES: Record<string, LootKey> = {
+  "Glass Relic": "glass_relic",
 };
 
-// Fallback pool used for anything we don't explicitly name above.
-const LOOT_SPRITES = [
-  "faceted_diamond.svg",
-  "low_gem_prison.svg",
-  "rought_cut_stone.svg",
-  "short_chunky_crystal.svg",
-  "split_crystal.svg",
-  "glass_relic.svg",
-];
+function getLootSpriteForName(
+  encounterItemName: string | null,
+  baseUrl: string
+): string | null {
+  if (!encounterItemName) return null;
 
-function getLootSpriteForName(name: string | null): string | null {
-  if (!name) return null;
+  const trimmed = encounterItemName.trim();
 
-  const normalized = name.trim().toLowerCase();
-
-  // 1. Explicit mapping first (fixes the Glass Relic issue).
-  if (normalized in NAMED_SPRITES) {
-    return NAMED_SPRITES[normalized];
+  // 1) Hard-coded mapping
+  const explicitKey = NAMED_SPRITES[trimmed];
+  const explicitSprite = LOOT_SPRITES.find((s) => s.key === explicitKey);
+  if (explicitSprite) {
+    return `${baseUrl}items/foundItems/${explicitSprite.file}`;
   }
 
-  // 2. Hash-based mapping for everything else, stable per name.
-  let hash = 0;
-  for (let i = 0; i < normalized.length; i += 1) {
-    hash = (hash * 31 + normalized.charCodeAt(i)) >>> 0;
+  // 2) Slugged key mapping, e.g. "Bloom Charm" -> "bloom_charm"
+  const slug = trimmed
+    .toLowerCase()
+    .replace(/['’]/g, "")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+
+  const guessedSprite = LOOT_SPRITES.find((s) => s.key === slug);
+  if (guessedSprite) {
+    return `${baseUrl}items/foundItems/${guessedSprite.file}`;
   }
 
-  const index = hash % LOOT_SPRITES.length;
-  return LOOT_SPRITES[index];
+  // 3) Fallback assume a literal file name
+  return `${baseUrl}items/foundItems/${slug}.svg`;
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
   phase,
   environmentId,
   encounterItemName,
-  isEncounterActive,
+  isEncounterActive = false,
   isWalking = true,
 }) => {
-  // For GitHub Pages this will be "/dream/" – Vite serves everything under
-  // /public at the root, so our SVGs are at:
-  //   <baseUrl>items/foundItems/glass_relic.svg
+  // For GitHub Pages this will be "/dream/"
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   const rootClassName = [
@@ -82,9 +85,10 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  const lootSprite = getLootSpriteForName(encounterItemName);
-  const lootSrc =
-    lootSprite != null ? `${baseUrl}items/foundItems/${lootSprite}` : null;
+  const lootSpriteSrc = getLootSpriteForName(encounterItemName, baseUrl);
+  // IMPORTANT: we now show loot any time there is an encounterItemName.
+  // It will disappear only when the parent clears encounterItemName.
+  const showLoot = Boolean(lootSpriteSrc && encounterItemName);
 
   return (
     <div className={rootClassName}>
@@ -116,17 +120,21 @@ const WorldLane: React.FC<WorldLaneProps> = ({
         <div className="world-lane-ribbon" />
       </div>
 
-      {/* Loot silhouette on the ground in front of the Dreamself.
-          Hidden once the encounter is active. */}
-      {encounterItemName && !isEncounterActive && lootSrc && (
-        <div className="world-lane-loot" aria-hidden="true">
-          <div className="world-lane-loot-shadow" />
-          <img
-            src={lootSrc}
-            alt={encounterItemName ?? "Found object"}
-            className="world-lane-loot-image"
-          />
-        </div>
+      {/* Loot icon on the ribbon.
+          - Slides in from the right (CSS).
+          - Stays visible when the encounter becomes active.
+          - When isEncounterActive flips to true we add a pickup class so CSS
+            can animate it into the Dreamself / inventory. */}
+      {showLoot && (
+        <img
+          className={
+            "world-lane-loot" +
+            (isEncounterActive ? " world-lane-loot--pickup" : "")
+          }
+          src={lootSpriteSrc!}
+          alt={encounterItemName ?? "Found item"}
+          aria-hidden={!encounterItemName}
+        />
       )}
     </div>
   );

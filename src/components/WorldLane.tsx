@@ -1,4 +1,4 @@
-// src/components/WorldLane.tsx
+// src/components/world/WorldLane.tsx
 import React from "react";
 
 interface WorldLaneProps {
@@ -19,32 +19,46 @@ const PARALLAX_LAYERS = [
   { file: "layer_05.png", depth: 4, duration: 14, opacity: 1.0, blur: 0 },
 ];
 
-// Map encounter names -> SVG filenames in /public/items/foundItems
-const LOOT_SPRITES: Record<string, string> = {
-  // new dedicated asset
-  glass_relic: "glass_relic.svg",
-
-  // reuse the crystal set
-  ember_token: "short_chunky_crystal.svg",
-  bloom_charm: "faceted_diamond.svg",
-  shadow_thread: "low_gem_prison.svg",
-  aether_sigil: "rough_cut_stone.svg",
-
-  // fallback if we ever get an unknown name
-  default: "split_crystal.svg",
+/**
+ * Explicit mapping from encounter names -> sprite files.
+ * This guarantees that "Glass Relic" always points at glass_relic.svg
+ * instead of going through the hash / randomiser.
+ */
+const NAMED_SPRITES: Record<string, string> = {
+  "glass relic": "glass_relic.svg",
+  "aether sigil": "faceted_diamond.svg",
+  "shadow thread": "split_crystal.svg",
+  "bloom charm": "short_chunky_crystal.svg",
 };
 
-function slugifyItemName(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "");
-}
+// Fallback pool used for anything we don't explicitly name above.
+const LOOT_SPRITES = [
+  "faceted_diamond.svg",
+  "low_gem_prison.svg",
+  "rought_cut_stone.svg",
+  "short_chunky_crystal.svg",
+  "split_crystal.svg",
+  "glass_relic.svg",
+];
 
-function getLootSpriteForName(itemName: string, baseUrl: string): string {
-  const slug = slugifyItemName(itemName);
-  const fileName = LOOT_SPRITES[slug] ?? LOOT_SPRITES.default;
-  return `${baseUrl}items/foundItems/${fileName}`;
+function getLootSpriteForName(name: string | null): string | null {
+  if (!name) return null;
+
+  const normalized = name.trim().toLowerCase();
+
+  // 1. Explicit mapping first (fixes the Glass Relic issue).
+  if (normalized in NAMED_SPRITES) {
+    return NAMED_SPRITES[normalized];
+  }
+
+  // 2. Hash-based mapping for everything else, stable per name.
+  let hash = 0;
+  for (let i = 0; i < normalized.length; i += 1) {
+    hash = (hash * 31 + normalized.charCodeAt(i)) >>> 0;
+  }
+
+  const index = hash % LOOT_SPRITES.length;
+  return LOOT_SPRITES[index];
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
@@ -54,7 +68,9 @@ const WorldLane: React.FC<WorldLaneProps> = ({
   isEncounterActive,
   isWalking = true,
 }) => {
-  // For GitHub Pages this will be "/dream/"
+  // For GitHub Pages this will be "/dream/" – Vite serves everything under
+  // /public at the root, so our SVGs are at:
+  //   <baseUrl>items/foundItems/glass_relic.svg
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   const rootClassName = [
@@ -66,30 +82,9 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  // We only want to see the object on the ribbon while we’re walking up to it,
-  // not during the “encounter” overlay itself.
-  const shouldShowLoot = Boolean(encounterItemName && !isEncounterActive);
-
-  const lootSpriteUrl =
-    shouldShowLoot && encounterItemName
-      ? getLootSpriteForName(encounterItemName, baseUrl)
-      : null;
-
-  // Changing this key restarts the CSS travel animation whenever a new
-  // encounter item appears.
-  const [lootSpawnKey, setLootSpawnKey] = React.useState(0);
-  const lastEncounterName = React.useRef<string | null>(null);
-
-  React.useEffect(() => {
-    if (
-      encounterItemName &&
-      encounterItemName !== lastEncounterName.current &&
-      !isEncounterActive
-    ) {
-      setLootSpawnKey((k) => k + 1);
-    }
-    lastEncounterName.current = encounterItemName;
-  }, [encounterItemName, isEncounterActive]);
+  const lootSprite = getLootSpriteForName(encounterItemName);
+  const lootSrc =
+    lootSprite != null ? `${baseUrl}items/foundItems/${lootSprite}` : null;
 
   return (
     <div className={rootClassName}>
@@ -117,30 +112,22 @@ const WorldLane: React.FC<WorldLaneProps> = ({
           );
         })}
 
-        {/* The ground ribbon the character walks on */}
+        {/* The actual “ribbon” strip the character walks on */}
         <div className="world-lane-ribbon" />
-
-        {/* Loot object on the ribbon, walking in from the right */}
-        {shouldShowLoot && lootSpriteUrl && (
-          <div
-            key={lootSpawnKey}
-            className="world-lane-loot-travel"
-            style={{
-              // Sync travel with walking; if auto-walk is off, the object “waits”
-              animationPlayState: isWalking ? "running" : "paused",
-            }}
-          >
-            <div className="world-lane-loot" aria-hidden="true">
-              <img
-                src={lootSpriteUrl}
-                alt={encounterItemName ?? "Found item"}
-                className="world-lane-loot-img"
-                draggable={false}
-              />
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Loot silhouette on the ground in front of the Dreamself.
+          Hidden once the encounter is active. */}
+      {encounterItemName && !isEncounterActive && lootSrc && (
+        <div className="world-lane-loot" aria-hidden="true">
+          <div className="world-lane-loot-shadow" />
+          <img
+            src={lootSrc}
+            alt={encounterItemName ?? "Found object"}
+            className="world-lane-loot-image"
+          />
+        </div>
+      )}
     </div>
   );
 };

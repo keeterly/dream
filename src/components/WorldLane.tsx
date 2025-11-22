@@ -19,67 +19,74 @@ const PARALLAX_LAYERS = [
 ];
 
 /**
- * Explicit filename overrides for items that don't slug nicely.
+ * SVGs you added under:
+ *   public/assets/items/foundItems/
+ *
+ * NOTE: names must match the files exactly.
  */
-const LOOT_FILE_OVERRIDES: Record<string, string> = {
-  "Glass Relic": "glass_relic.svg",
-};
+const FOUND_ITEM_SPRITES = [
+  "faceted_diamond.svg",
+  "low_gem_prison.svg",
+  "rought_cut_stone.svg",
+  "short_chunky_crystal.svg",
+  "split_crystal.svg",
+] as const;
 
-function slugToFileName(label: string): string {
-  const trimmed = label.trim();
+/**
+ * Deterministically pick a sprite based on the encounter's name.
+ * There is ALWAYS a fallback so something is drawn.
+ */
+function getSpriteForEncounter(name: string | null): string {
+  if (!name) {
+    return FOUND_ITEM_SPRITES[0];
+  }
 
-  // Explicit override first
-  const override = LOOT_FILE_OVERRIDES[trimmed];
-  if (override) return override;
+  const n = name.toLowerCase();
 
-  // Fallback: "Bloom Charm" -> "bloom_charm.svg"
-  const slug = trimmed
-    .toLowerCase()
-    .replace(/['’]/g, "") // drop apostrophes
-    .replace(/[^a-z0-9]+/g, "_") // spaces & punctuation -> underscores
-    .replace(/^_+|_+$/g, ""); // trim leading/trailing "_"
+  // A few hand-tuned mappings so the vibe matches the name
+  if (n.includes("glass") || n.includes("sigil")) {
+    return FOUND_ITEM_SPRITES[0]; // faceted_diamond
+  }
+  if (n.includes("ember") || n.includes("token")) {
+    return FOUND_ITEM_SPRITES[1]; // low_gem_prison
+  }
+  if (n.includes("stone") || n.includes("rock") || n.includes("ore")) {
+    return FOUND_ITEM_SPRITES[2]; // rought_cut_stone
+  }
+  if (n.includes("thread") || n.includes("charm") || n.includes("weave")) {
+    return FOUND_ITEM_SPRITES[3]; // short_chunky_crystal
+  }
 
-  return `${slug}.svg`;
-}
-
-function resolveLootSprite(encounterItemName: string | null, baseUrl: string) {
-  if (!encounterItemName) return null;
-  const fileName = slugToFileName(encounterItemName);
-  return `${baseUrl}items/foundItems/${fileName}`;
+  // Fallback: hash the name into the sprite array so it’s stable per item
+  const hash = Array.from(n).reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+  return FOUND_ITEM_SPRITES[hash % FOUND_ITEM_SPRITES.length];
 }
 
 const WorldLane: React.FC<WorldLaneProps> = ({
   phase,
   environmentId,
   encounterItemName,
-  isEncounterActive = false,
+  isEncounterActive,
   isWalking = true,
 }) => {
   // For GitHub Pages this will be "/dream/" – Vite serves everything under
-  // /public at the root, so our assets are at:
+  // /public at the root, so our PNGs/SVGs are at:
   //   <baseUrl>assets/parallax/<environmentId>/layer_01.png
+  //   <baseUrl>assets/items/foundItems/<sprite>.svg
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   const rootClassName = [
     "world-lane",
     `world-lane--${environmentId}`,
     `world-lane--phase-${phase.toLowerCase()}`,
-    (!isWalking || isEncounterActive) && "world-lane--paused",
+    !isWalking ? "world-lane--paused" : "",
   ]
     .filter(Boolean)
     .join(" ");
 
-  const lootSpriteSrc = resolveLootSprite(encounterItemName, baseUrl);
-
-  // Match the CSS states:
-  // - approach: item sliding in along the ribbon
-  // - idle: item parked near the avatar once encounter is active
-  const lootStateClass =
-    lootSpriteSrc && encounterItemName
-      ? isEncounterActive
-        ? "world-lane-loot--idle"
-        : "world-lane-loot--approach"
-      : "";
+  // Pick a sprite for the *current* encounter (even if name is weird)
+  const itemSpriteFile = getSpriteForEncounter(encounterItemName);
+  const itemSpritePath = `${baseUrl}assets/items/foundItems/${itemSpriteFile}`;
 
   return (
     <div className={rootClassName}>
@@ -111,16 +118,21 @@ const WorldLane: React.FC<WorldLaneProps> = ({
         <div className="world-lane-ribbon" />
       </div>
 
-      {/* Loot icon on the ribbon: comes in from off-screen and parks near the avatar */}
-      {lootSpriteSrc && encounterItemName && (
-        <div className={["world-lane-loot", lootStateClass].join(" ").trim()}>
-          <div className="world-lane-loot-shadow" aria-hidden="true" />
-          <img
-            className="world-lane-loot-image"
-            src={lootSpriteSrc}
-            alt={encounterItemName}
+      {/* Loot encounter: pulse + sprite in front of the avatar */}
+      {isEncounterActive && (
+        <>
+          <div className="world-lane-encounter-pulse" aria-hidden="true" />
+          <div
+            className="world-lane-crystal"
+            aria-hidden="true"
+            style={{
+              backgroundImage: `url("${itemSpritePath}")`,
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "center",
+              backgroundSize: "contain",
+            }}
           />
-        </div>
+        </>
       )}
     </div>
   );

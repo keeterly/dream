@@ -3233,106 +3233,178 @@ body {
     drop-shadow(0 0 10px rgba(250, 250, 255, 0.35));
 }
 
-/* =========================================================
-   DREAM — FINAL CLEAN LOOT SYSTEM (JS controls movement)
-   ========================================================= */
 
-/* Single source of truth for loot placement */
-.world-lane-loot {
- position: absolute;
-   bottom: 9.5vh;            /* aligned with ribbon + avatar */
-  left: 0;                  /* JS will control "left" (% of lane width) */
-  transform: translateX(-50%);
-  z-index: 18;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* === Grounded loot on the ribbon ===================================== */
+
+/* --- Loot object on the ribbon ---------------------------------------- */
+
+.world-lane-loot-travel {
+  position: absolute;
+  bottom: 8vh;
+  left: 56%;                /* anchored just ahead of the Dreamself */
+  transform: translateX(32vw); /* start off-screen to the right */
+  animation: loot-travel-in 11s linear forwards;
+  z-index: 11;
   pointer-events: none;
-  opacity: 1;
+}
 
-   /* smooth glide from off-screen → avatar */
-  transition: left 1.6s cubic-bezier(0.23, 1, 0.32, 1);
+/* Horizontal travel in from the right edge toward the avatar */
+@keyframes loot-travel-in {
+  0% {
+    transform: translateX(32vw);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
 
+/* The actual crystal/rock sprite */
+.world-lane-loot {
+  position: relative;
+  width: 3.6vw;
+  max-width: 68px;
+  min-width: 36px;
+  aspect-ratio: 3 / 4;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: loot-idle-bob 2.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.35));
+}
+
+.world-lane-loot-img {
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+/* Gentle vertical bob, no horizontal movement (so it plays nicely with travel) */
+@keyframes loot-idle-bob {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 
-
-/* Shadow */
-.world-lane-loot-shadow {
-  width: clamp(48px, 4vw, 74px);
-  height: clamp(12px, 1vw, 18px);
-  border-radius: 999px;
-  background: radial-gradient(circle, rgba(0,0,0,0.65), transparent 70%);
-  opacity: 0.85;
-  filter: blur(2px);
-}
-
-/* Sprite */
+/* The Nier-style SVG crystal/rock */
 .world-lane-loot-image {
-  width: clamp(52px, 4.3vw, 82px);
+  width: clamp(52px, 4.3vw, 82px);  /* responsive size */
   height: auto;
   display: block;
+
+  /* Tilt slightly so it feels “sitting” in perspective */
+  transform: translateY(-4px) scale(1) rotate(-3deg);
   transform-origin: 50% 100%;
+
+  /* Subtle glow + hover float */
   filter:
-    drop-shadow(0 0 6px rgba(248, 250, 252, 0.22))
+    drop-shadow(0 0 6px rgba(248, 250, 252, 0.14))
     drop-shadow(0 10px 26px rgba(15, 23, 42, 0.9));
-  animation: loot-idle 2.4s ease-in-out infinite;
+  animation: loot-idle-float 2.2s ease-in-out infinite;
 }
 
-/* Idle float only – NO horizontal movement here */
-@keyframes loot-idle {
+/* When the encounter actually triggers, make it flare a bit */
+.world-lane-loot--active .world-lane-loot-image {
+  animation: loot-pulse 0.6s ease-out, loot-idle-float 2.2s ease-in-out 0.6s infinite;
+}
+
+/* Idle micro-float while the Dreamself walks toward it */
+@keyframes loot-idle-float {
   0%   { transform: translateY(-4px) scale(1) rotate(-3deg); }
   50%  { transform: translateY(-7px) scale(1.02) rotate(-3deg); }
   100% { transform: translateY(-4px) scale(1) rotate(-3deg); }
 }
 
-/* When the loot has arrived at the player, give a little pulse */
-.world-lane-loot--active .world-lane-loot-image {
-  animation: loot-pulse 0.6s ease-out,
-             loot-idle 2.4s ease-in-out 0.6s infinite;
-}
-
+/* Pick-up flash when encounter fires */
 @keyframes loot-pulse {
   0% {
     filter:
-      drop-shadow(0 0 0 rgba(248,250,252,0))
-      drop-shadow(0 10px 26px rgba(15,23,42,0.9));
+      drop-shadow(0 0 0 rgba(248, 250, 252, 0))
+      drop-shadow(0 10px 26px rgba(15, 23, 42, 0.9));
     transform: translateY(-6px) scale(1);
   }
   45% {
     filter:
-      drop-shadow(0 0 22px rgba(248,250,252,0.8))
-      drop-shadow(0 18px 34px rgba(15,23,42,0.95));
-    transform: translateY(-12px) scale(1.08);
+      drop-shadow(0 0 26px rgba(248, 250, 252, 0.85))
+      drop-shadow(0 18px 34px rgba(15, 23, 42, 0.95));
+    transform: translateY(-10px) scale(1.06);
   }
   100% {
+    filter:
+      drop-shadow(0 0 10px rgba(248, 250, 252, 0.2))
+      drop-shadow(0 10px 26px rgba(15, 23, 42, 0.9));
     transform: translateY(-4px) scale(1);
   }
 }
 
-/* "Flying to inventory" animation */
-.world-lane-loot--collecting {
-  animation: loot-collect 0.85s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-}
-
-@keyframes loot-collect {
-  0% {
-    opacity: 1;
-    transform: translateX(-50%) translateY(-4px) scale(1);
-  }
-  100% {
-    opacity: 0;
-    /* arc down/right towards your dock/inventory area */
-    transform: translate(180px, 160px) scale(0.35);
-  }
-}
-
-/* JS can pause the idle bob if you ever need to */
+/* Keep loot still if the whole lane is paused */
 .world-lane--paused .world-lane-loot-image {
   animation-play-state: paused;
 }
 
-/* make sure Relic banner is clickable even inside world-overlay */
-.world-encounter-banner {
-  pointer-events: auto;
+
+/* Loot states: walking in vs reached */
+.world-lane-loot--approach {
+  /* Slides from off-screen right → ribbon position */
+  animation: loot-approach 5.5s ease-out forwards;
+}
+
+.world-lane-loot--active {
+  /* Stop horizontal motion; keep it locked under the avatar */
+  animation: none;
+  transform: translateX(-50%);
+}
+
+/* Match the travel time in WorldStep (TRAVEL_MS) */
+@keyframes loot-approach {
+  0% {
+    transform: translateX(220%) translateY(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+/* === Loot icon on the ribbon: slides in from the right toward the avatar === */
+.world-lane-loot {
+  position: absolute;
+  left: 50%;
+  bottom: 8.8vh; /* hugs the ground near the avatar's feet */
+  width: clamp(36px, 3.2vw, 56px);
+  height: auto;
+  transform: translateX(42vw); /* start off to the right of the avatar */
+  animation: world-lane-loot-slide 9s linear forwards;
+  z-index: 19; /* just in front of the ground, behind HUD */
+  pointer-events: none;
+  image-rendering: auto;
+}
+
+/* smooth slide toward the Dreamself */
+@keyframes world-lane-loot-slide {
+  0% {
+    transform: translateX(42vw);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }

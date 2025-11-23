@@ -39,8 +39,10 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     "inventory"
   );
 
-  // Auto-walk toggle for HUD
+  // Auto-walk & auto-pickup toggles for HUD
   const [isAutoWalking, setIsAutoWalking] = useState(true);
+  const [isAutoPickup, setIsAutoPickup] = useState(true); // NEW
+
   // Did we start the encounter while auto-walk was on?
   const [wasAutoWalkingBeforeEncounter, setWasAutoWalkingBeforeEncounter] =
     useState(false);
@@ -48,21 +50,20 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   // --- Loot lifecycle state ---
   const hasLootSpawned = !!encounterItemName;
   const [hasReachedLoot, setHasReachedLoot] = useState(false);
-  const [isLootCollected, setIsLootCollected] = useState(false); // NEW
+  const [isLootCollected, setIsLootCollected] = useState(false);
 
-  // When a new loot spawn happens, start a travel timer that represents
-  // the walk-in from offscreen → ribbon center.
+  // New spawn → simulate walk-in time from off-screen to the avatar
   useEffect(() => {
     if (!hasLootSpawned) {
       setHasReachedLoot(false);
-      setIsLootCollected(false); // NEW: reset pickup state when no loot
+      setIsLootCollected(false);
       return;
     }
 
     setHasReachedLoot(false);
-    setIsLootCollected(false); // NEW: reset for each new spawn
+    setIsLootCollected(false);
 
-    // This should roughly match the CSS loot-approach animation duration.
+    // This should roughly match how long it takes the loot to drift in visually.
     const TRAVEL_MS = 5500;
     const id = window.setTimeout(() => {
       setHasReachedLoot(true);
@@ -88,9 +89,10 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   /**
    * If an encounter becomes active while auto-walk is enabled,
    * pause walking and remember that we should resume afterwards.
+   * BUT: if auto-pickup is on, let the Dreamself keep walking.
    */
   useEffect(() => {
-    if (isEncounterActive && isAutoWalking) {
+    if (isEncounterActive && isAutoWalking && !isAutoPickup) {
       setWasAutoWalkingBeforeEncounter(true);
       setIsAutoWalking(false);
     }
@@ -99,7 +101,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
       // When all encounters are cleared we reset the flag.
       setWasAutoWalkingBeforeEncounter(false);
     }
-  }, [isEncounterActive, isAutoWalking]);
+  }, [isEncounterActive, isAutoWalking, isAutoPickup]);
 
   /**
    * Auto-encounter roll while auto-walk is on.
@@ -111,8 +113,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     const delay = 8000 + Math.random() * 8000; // 8–16s
     const id = window.setTimeout(() => {
       setWasAutoWalkingBeforeEncounter(true);
-      // Let the world keep walking while the loot drifts in; we only
-      // flip walking off once the encounter actually becomes active.
       onSpawnDebugItem();
     }, delay);
 
@@ -123,11 +123,11 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     if (!isEncounterActive || !activeEncounterItem) return;
 
     // Mark as collected so WorldLane plays the pickup animation
-    setIsLootCollected(true); // NEW
+    setIsLootCollected(true);
 
     // Snapshot whether we should resume auto-walk after pickup
     const shouldResumeAutoWalk = wasAutoWalkingBeforeEncounter;
-    const PICKUP_MS = 600; // must match CSS @keyframes world-lane-loot-pickup
+    const PICKUP_MS = 750; // match CSS world-lane-loot-pickup duration
 
     window.setTimeout(() => {
       // After the animation finishes, tell parent to resolve:
@@ -146,6 +146,22 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     }, PICKUP_MS);
   };
 
+  /**
+   * Auto-pickup: when an encounter becomes active and auto-pickup is ON,
+   * trigger the same flow as clicking the banner. The Dreamself can keep
+   * walking if auto-walk is still enabled.
+   */
+  useEffect(() => {
+    if (!isAutoPickup) return;
+    if (!isEncounterActive) return;
+    if (isLootCollected) return;
+    if (!activeEncounterItem) return;
+
+    // Same effect as a manual click:
+    handleEncounterBannerClick();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAutoPickup, isEncounterActive, isLootCollected, activeEncounterItem]);
+
   const cardClasses = [
     "world-card",
     lighting.worldClass,
@@ -159,9 +175,8 @@ export const WorldStep: React.FC<WorldStepProps> = ({
       ? `world-encounter-banner--${activeEncounterItem.rarity}`
       : "";
 
-  // Encounter UI (glyph + top banner) is only visible after we've reached loot,
-  // and hides once we've clicked to pick it up while the crystal animates away.
-  const showEncounterUI = isEncounterActive && !isLootCollected; // NEW
+  // Encounter UI (glyph + top banner) hides once we've clicked / auto-picked
+  const showEncounterUI = isEncounterActive && !isLootCollected;
 
   return (
     <section className="app-screen app-screen-world">
@@ -174,7 +189,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
           encounterItemName={encounterItemName}
           isEncounterActive={showEncounterUI}
           isWalking={isWalking}
-          isLootCollected={isLootCollected} // NEW
+          isLootCollected={isLootCollected}
         />
 
         {/* DREAMSELF AVATAR ON THE RIBBON */}
@@ -254,11 +269,28 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                     : "world-autowalk-toggle--off"
                 }`}
                 onClick={() => setIsAutoWalking((prev) => !prev)}
-                disabled={isEncounterActive}
+                disabled={isEncounterActive && !isAutoPickup}
               >
                 <span className="world-autowalk-label">Auto-walk</span>
                 <span className="world-autowalk-state">
                   {isWalking ? "ON" : "OFF"}
+                </span>
+                <span className="world-autowalk-dot" aria-hidden="true" />
+              </button>
+
+              {/* NEW: Auto-pickup toggle */}
+              <button
+                type="button"
+                className={`world-autowalk-toggle ${
+                  isAutoPickup
+                    ? "world-autowalk-toggle--on"
+                    : "world-autowalk-toggle--off"
+                }`}
+                onClick={() => setIsAutoPickup((prev) => !prev)}
+              >
+                <span className="world-autowalk-label">Auto-pickup</span>
+                <span className="world-autowalk-state">
+                  {isAutoPickup ? "ON" : "OFF"}
                 </span>
                 <span className="world-autowalk-dot" aria-hidden="true" />
               </button>

@@ -12,7 +12,6 @@ import { DreamselfPanel } from "../panels/DreamselfPanel";
 import { MapPanel } from "../panels/MapPanel";
 import { InventoryGridModal } from "../InventoryGridModal";
 
-
 type WorldPanelId = "inventory" | "character" | "map" | "journal" | "debug";
 
 interface WorldStepProps {
@@ -41,22 +40,19 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     "inventory"
   );
 
-  const LOOT_TRAVEL_MS = 5500;       // walk-in from offscreen
-  const LOOT_PICKUP_ANIM_MS = 750;   // MUST match CSS pickup duration
-  const AUTO_PICKUP_DELAY_MS = 900;  // how long Relic Found shows before pickup
-  const INVENTORY_TOAST_MS = 1600;   // how long "+1 Relic" stays visible
+  // Timings (must match CSS where noted)
+  const LOOT_TRAVEL_MS = 5500; // walk-in from offscreen
+  const LOOT_PICKUP_ANIM_MS = 750; // MUST match CSS pickup duration
+  const AUTO_PICKUP_DELAY_MS = 900; // how long Relic Found shows before pickup
+  const INVENTORY_TOAST_MS = 1600; // how long "+1 Relic" stays visible
 
   const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
-
-
   const [inventoryToastItem, setInventoryToastItem] =
     useState<InventoryItem | null>(null);
 
-
-
   // Auto-walk & auto-pickup toggles for HUD
   const [isAutoWalking, setIsAutoWalking] = useState(true);
-  const [isAutoPickup, setIsAutoPickup] = useState(true); // NEW
+  const [isAutoPickup, setIsAutoPickup] = useState(true);
 
   // Did we start the encounter while auto-walk was on?
   const [wasAutoWalkingBeforeEncounter, setWasAutoWalkingBeforeEncounter] =
@@ -78,15 +74,12 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     setHasReachedLoot(false);
     setIsLootCollected(false);
 
-    
-  const id = window.setTimeout(() => {
-    setHasReachedLoot(true);
-  }, LOOT_TRAVEL_MS);
+    const id = window.setTimeout(() => {
+      setHasReachedLoot(true);
+    }, LOOT_TRAVEL_MS);
 
-  return () => window.clearTimeout(id);
-}, [hasLootSpawned, encounterItemName]);
-
-
+    return () => window.clearTimeout(id);
+  }, [hasLootSpawned, encounterItemName]);
 
   // Encounter is only "active" once the avatar has reached the loot.
   const isEncounterActive = !!activeEncounterItem && hasReachedLoot;
@@ -170,35 +163,30 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     }, LOOT_PICKUP_ANIM_MS);
   };
 
-
-
   /**
    * Auto-pickup: when an encounter becomes active and auto-pickup is ON,
    * trigger the same flow as clicking the banner. The Dreamself can keep
    * walking if auto-walk is still enabled.
    */
+  useEffect(() => {
+    // Only run if auto-pickup is enabled
+    if (!isAutoPickup) return;
+    // Only when the encounter is actually live (avatar has reached loot)
+    if (!isEncounterActive) return;
+    // Don't retrigger once we've started pickup
+    if (isLootCollected) return;
+    // Need a real item
+    if (!activeEncounterItem) return;
 
-useEffect(() => {
-  // Only run if auto-pickup is enabled
-  if (!isAutoPickup) return;
-  // Only when the encounter is actually live (avatar has reached loot)
-  if (!isEncounterActive) return;
-  // Don't retrigger once we've started pickup
-  if (isLootCollected) return;
-  // Need a real item
-  if (!activeEncounterItem) return;
+    // Wait a moment so the player sees "Relic Found" + !,
+    // then behave exactly like a manual banner click.
+    const id = window.setTimeout(() => {
+      handleEncounterBannerClick();
+    }, AUTO_PICKUP_DELAY_MS);
 
-  // Wait a moment so the player sees "Relic Found" + !,
-  // then behave exactly like a manual banner click.
-  const id = window.setTimeout(() => {
-    handleEncounterBannerClick();
-  }, AUTO_PICKUP_DELAY_MS);
-
-  return () => window.clearTimeout(id);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [isAutoPickup, isEncounterActive, isLootCollected, activeEncounterItem]);
-
-
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAutoPickup, isEncounterActive, isLootCollected, activeEncounterItem]);
 
   const cardClasses = [
     "world-card",
@@ -217,295 +205,297 @@ useEffect(() => {
   const showEncounterUI = isEncounterActive && !isLootCollected;
 
   return (
-    <section className="app-screen app-screen-world">
-      <div className={cardClasses}>
-        {/* WORLD LANE / PARALLAX BACKGROUND */}
-        <WorldLane
-          profile={profile}
-          environmentId="dusk_valley"
-          phase={phase}
-          encounterItemName={encounterItemName}
-          isEncounterActive={showEncounterUI}
-          isWalking={isWalking}
-          isLootCollected={isLootCollected}
-        />
+    <>
+      <section className="app-screen app-screen-world">
+        <div className={cardClasses}>
+          {/* WORLD LANE / PARALLAX BACKGROUND */}
+          <WorldLane
+            profile={profile}
+            environmentId="dusk_valley"
+            phase={phase}
+            encounterItemName={encounterItemName}
+            isEncounterActive={showEncounterUI}
+            isWalking={isWalking}
+            isLootCollected={isLootCollected}
+          />
 
-        {/* DREAMSELF AVATAR ON THE RIBBON */}
-        {profile && (
-          <div
-            className={`world-stage-avatar ${
-              isWalking
-                ? "world-stage-avatar--walking"
-                : "world-stage-avatar--paused"
-            } ${lighting.avatarClass}`}
-          >
-            {/* Alert glyph only when the encounter is actually live */}
-            {showEncounterUI && <div className="world-encounter-glyph">!</div>}
-
-            <AvatarView
-              avatar={profile.avatar}
-              traits={profile.traits}
-              dreamName={profile.dreamName}
-            />
-
-            {/* ground shadow */}
-            <div className="world-stage-shadow" />
-          </div>
-        )}
-
-        {/* GLOBAL TINT OVERLAY */}
-        <div className="world-tint-overlay" />
-
-        {/* TOP-CENTER RELIC BANNER */}
-        {showEncounterUI && activeEncounterItem && (
-          <button
-            type="button"
-            className={`world-encounter-banner ${bannerRarityClass}`}
-            onClick={handleEncounterBannerClick}
-          >
-            <span className="world-encounter-label">Relic Found</span>
-            <span className="world-encounter-name">
-              {activeEncounterItem.name}
-            </span>
-          </button>
-        )}
-
-        {/* OVERLAY: HUD + DOCK + PANELS */}
-        <div className="world-overlay">
-          {/* HUD */}
-          <div className="world-hud">
-            <div className="world-hud-left">
-              <div className="world-hud-field">
-                <span className="hud-kicker">FIELD — SCROLLING WORLD</span>
-              </div>
-              <div className="world-hud-title-row">
-                <span className="world-hud-title">
-                  {profile?.dreamName ?? "Dreamself"}
-                </span>
-                <span className="world-hud-pill">LV 01</span>
-              </div>
-              <div className="world-hud-meta">
-                <span className="hud-label">Dreamself</span>
-                <span className="hud-value">
-                  {profile.traits.primaryArchetype}
-                </span>
-              </div>
-            </div>
-
-            <div className="world-hud-right">
-              <div className="world-hud-phase">
-                <span className="hud-label">Phase</span>
-                <span className="hud-value">{phase}</span>
-              </div>
-
-              {/* Auto-walk toggle */}
-              <button
-                type="button"
-                className={`world-autowalk-toggle ${
-                  isWalking
-                    ? "world-autowalk-toggle--on"
-                    : "world-autowalk-toggle--off"
-                }`}
-                onClick={() => setIsAutoWalking((prev) => !prev)}
-                disabled={isEncounterActive && !isAutoPickup}
-              >
-                <span className="world-autowalk-label">Auto-walk</span>
-                <span className="world-autowalk-state">
-                  {isWalking ? "ON" : "OFF"}
-                </span>
-                <span className="world-autowalk-dot" aria-hidden="true" />
-              </button>
-
-              {/* NEW: Auto-pickup toggle */}
-              <button
-                type="button"
-                className={`world-autowalk-toggle ${
-                  isAutoPickup
-                    ? "world-autowalk-toggle--on"
-                    : "world-autowalk-toggle--off"
-                }`}
-                onClick={() => setIsAutoPickup((prev) => !prev)}
-              >
-                <span className="world-autowalk-label">Auto-pickup</span>
-                <span className="world-autowalk-state">
-                  {isAutoPickup ? "ON" : "OFF"}
-                </span>
-                <span className="world-autowalk-dot" aria-hidden="true" />
-              </button>
-            </div>
-          </div>
-
-          {/* DOCK BUTTONS */}
-          <div className="world-dock">
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "inventory" ? " world-dock-button--active" : "")
-              }
-              onClick={() => togglePanel("inventory")}
+          {/* DREAMSELF AVATAR ON THE RIBBON */}
+          {profile && (
+            <div
+              className={`world-stage-avatar ${
+                isWalking
+                  ? "world-stage-avatar--walking"
+                  : "world-stage-avatar--paused"
+              } ${lighting.avatarClass}`}
             >
-              <span className="world-dock-icon world-dock-icon--inventory" />
-              <span className="world-dock-label">Inventory</span>
-            </button>
+              {/* Alert glyph only when the encounter is actually live */}
+              {showEncounterUI && (
+                <div className="world-encounter-glyph">!</div>
+              )}
 
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "character" ? " world-dock-button--active" : "")
-              }
-              onClick={() => togglePanel("character")}
-            >
-              <span className="world-dock-icon world-dock-icon--dreamself" />
-              <span className="world-dock-label">Dreamself</span>
-            </button>
+              <AvatarView
+                avatar={profile.avatar}
+                traits={profile.traits}
+                dreamName={profile.dreamName}
+              />
 
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "map" ? " world-dock-button--active" : "")
-              }
-              onClick={() => togglePanel("map")}
-            >
-              <span className="world-dock-icon world-dock-icon--map" />
-              <span className="world-dock-label">Map</span>
-            </button>
-
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "journal" ? " world-dock-button--active" : "")
-              }
-              onClick={() => togglePanel("journal")}
-            >
-              <span className="world-dock-icon world-dock-icon--journal" />
-              <span className="world-dock-label">Journal</span>
-            </button>
-
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "debug" ? " world-dock-button--active" : "")
-              }
-              onClick={() => togglePanel("debug")}
-            >
-              <span className="world-dock-icon world-dock-icon--debug" />
-              <span className="world-dock-label">Debug</span>
-            </button>
-          </div>
-
-
-
-        {/* +1 RELIC TOAST NEAR INVENTORY DOCK */}
-          {inventoryToastItem && (
-            <div className="world-inventory-toast">
-              <div className="world-inventory-toast-pill">+1 Relic</div>
-              <div className="world-inventory-toast-name">
-                {inventoryToastItem.name}
-              </div>
+              {/* ground shadow */}
+              <div className="world-stage-shadow" />
             </div>
           )}
 
+          {/* GLOBAL TINT OVERLAY */}
+          <div className="world-tint-overlay" />
 
+          {/* TOP-CENTER RELIC BANNER */}
+          {showEncounterUI && activeEncounterItem && (
+            <button
+              type="button"
+              className={`world-encounter-banner ${bannerRarityClass}`}
+              onClick={handleEncounterBannerClick}
+            >
+              <span className="world-encounter-label">Relic Found</span>
+              <span className="world-encounter-name">
+                {activeEncounterItem.name}
+              </span>
+            </button>
+          )}
 
-
-          {/* PANELS */}
-          <div className="world-panels">
-            {activePanel === "inventory" && (
-              <div className="world-panel world-panel-inventory">
-                <div className="world-panel-header">
-                  <span className="world-panel-kicker">Relics</span>
-                  <span className="world-panel-title">Bound Objects</span>
+          {/* OVERLAY: HUD + DOCK + PANELS */}
+          <div className="world-overlay">
+            {/* HUD */}
+            <div className="world-hud">
+              <div className="world-hud-left">
+                <div className="world-hud-field">
+                  <span className="hud-kicker">FIELD — SCROLLING WORLD</span>
                 </div>
-
-              <button
-                type="button"
-                className="inventory-grid-open-btn"
-                onClick={() => setIsInventoryModalOpen(true)}
-              >
-                Open Grid Inventory
-              </button>
-
-                {inventory.length === 0 ? (
-                  <p className="world-panel-empty">
-                    Walk further. Relics tend to find you once they know your
-                    shape.
-                  </p>
-                ) : (
-                  <ul className="inventory-list">
-                    {inventory.map((item) => (
-                      <li
-                        key={item.id}
-                        className={`inventory-item inventory-item--${item.rarity}`}
-                      >
-                        <div className="inventory-item-icon" />
-                        <div className="inventory-item-content">
-                          <div className="inventory-item-main">
-                            <span className="inventory-item-name">
-                              {item.name}
-                            </span>
-                            <span className="inventory-item-rarity">
-                              {item.rarity}
-                            </span>
-                          </div>
-                          <p className="inventory-item-desc">
-                            {item.description}
-                          </p>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                <div className="world-hud-title-row">
+                  <span className="world-hud-title">
+                    {profile?.dreamName ?? "Dreamself"}
+                  </span>
+                  <span className="world-hud-pill">LV 01</span>
+                </div>
+                <div className="world-hud-meta">
+                  <span className="hud-label">Dreamself</span>
+                  <span className="hud-value">
+                    {profile.traits.primaryArchetype}
+                  </span>
+                </div>
               </div>
-            )}
 
-            {activePanel === "character" && (
-              <DreamselfPanel profile={profile} inventory={inventory} />
-            )}
-
-            {activePanel === "map" && (
-              <MapPanel currentBiomeId="dusk_valley" phase={phase} />
-            )}
-
-            {activePanel === "journal" && (
-              <JournalPanel entries={journalEntries} />
-            )}
-
-            {activePanel === "debug" && (
-              <div className="world-panel world-panel-debug">
-                <div className="world-panel-header">
-                  <span className="world-panel-kicker">Debug</span>
-                  <span className="world-panel-title">Relic Testing</span>
+              <div className="world-hud-right">
+                <div className="world-hud-phase">
+                  <span className="hud-label">Phase</span>
+                  <span className="hud-value">{phase}</span>
                 </div>
-                <p className="world-panel-copy">
-                  Spawn a random relic event for testing drops and journal
-                  entries.
-                </p>
 
+                {/* Auto-walk toggle */}
                 <button
                   type="button"
-                  className="world-debug-pill"
-                  onClick={onSpawnDebugItem}
+                  className={`world-autowalk-toggle ${
+                    isWalking
+                      ? "world-autowalk-toggle--on"
+                      : "world-autowalk-toggle--off"
+                  }`}
+                  onClick={() => setIsAutoWalking((prev) => !prev)}
+                  disabled={isEncounterActive && !isAutoPickup}
                 >
-                  <span className="world-debug-pill__orb" />
-                  <span className="world-debug-pill__label">
-                    Spawn Random Relic
+                  <span className="world-autowalk-label">Auto-walk</span>
+                  <span className="world-autowalk-state">
+                    {isWalking ? "ON" : "OFF"}
                   </span>
+                  <span className="world-autowalk-dot" aria-hidden="true" />
+                </button>
+
+                {/* Auto-pickup toggle */}
+                <button
+                  type="button"
+                  className={`world-autowalk-toggle ${
+                    isAutoPickup
+                      ? "world-autowalk-toggle--on"
+                      : "world-autowalk-toggle--off"
+                  }`}
+                  onClick={() => setIsAutoPickup((prev) => !prev)}
+                >
+                  <span className="world-autowalk-label">Auto-pickup</span>
+                  <span className="world-autowalk-state">
+                    {isAutoPickup ? "ON" : "OFF"}
+                  </span>
+                  <span className="world-autowalk-dot" aria-hidden="true" />
                 </button>
               </div>
+            </div>
+
+            {/* DOCK BUTTONS */}
+            <div className="world-dock">
+              <button
+                className={
+                  "world-dock-button" +
+                  (activePanel === "inventory"
+                    ? " world-dock-button--active"
+                    : "")
+                }
+                onClick={() => togglePanel("inventory")}
+              >
+                <span className="world-dock-icon world-dock-icon--inventory" />
+                <span className="world-dock-label">Inventory</span>
+              </button>
+
+              <button
+                className={
+                  "world-dock-button" +
+                  (activePanel === "character"
+                    ? " world-dock-button--active"
+                    : "")
+                }
+                onClick={() => togglePanel("character")}
+              >
+                <span className="world-dock-icon world-dock-icon--dreamself" />
+                <span className="world-dock-label">Dreamself</span>
+              </button>
+
+              <button
+                className={
+                  "world-dock-button" +
+                  (activePanel === "map" ? " world-dock-button--active" : "")
+                }
+                onClick={() => togglePanel("map")}
+              >
+                <span className="world-dock-icon world-dock-icon--map" />
+                <span className="world-dock-label">Map</span>
+              </button>
+
+              <button
+                className={
+                  "world-dock-button" +
+                  (activePanel === "journal"
+                    ? " world-dock-button--active"
+                    : "")
+                }
+                onClick={() => togglePanel("journal")}
+              >
+                <span className="world-dock-icon world-dock-icon--journal" />
+                <span className="world-dock-label">Journal</span>
+              </button>
+
+              <button
+                className={
+                  "world-dock-button" +
+                  (activePanel === "debug" ? " world-dock-button--active" : "")
+                }
+                onClick={() => togglePanel("debug")}
+              >
+                <span className="world-dock-icon world-dock-icon--debug" />
+                <span className="world-dock-label">Debug</span>
+              </button>
+            </div>
+
+            {/* +1 RELIC TOAST NEAR INVENTORY DOCK */}
+            {inventoryToastItem && (
+              <div className="world-inventory-toast">
+                <div className="world-inventory-toast-pill">+1 Relic</div>
+                <div className="world-inventory-toast-name">
+                  {inventoryToastItem.name}
+                </div>
+              </div>
             )}
+
+            {/* PANELS */}
+            <div className="world-panels">
+              {activePanel === "inventory" && (
+                <div className="world-panel world-panel-inventory">
+                  <div className="world-panel-header">
+                    <span className="world-panel-kicker">Relics</span>
+                    <span className="world-panel-title">Bound Objects</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="inventory-grid-open-btn"
+                    onClick={() => setIsInventoryModalOpen(true)}
+                  >
+                    Open Grid Inventory
+                  </button>
+
+                  {inventory.length === 0 ? (
+                    <p className="world-panel-empty">
+                      Walk further. Relics tend to find you once they know your
+                      shape.
+                    </p>
+                  ) : (
+                    <ul className="inventory-list">
+                      {inventory.map((item) => (
+                        <li
+                          key={item.id}
+                          className={`inventory-item inventory-item--${item.rarity}`}
+                        >
+                          <div className="inventory-item-icon" />
+                          <div className="inventory-item-content">
+                            <div className="inventory-item-main">
+                              <span className="inventory-item-name">
+                                {item.name}
+                              </span>
+                              <span className="inventory-item-rarity">
+                                {item.rarity}
+                              </span>
+                            </div>
+                            <p className="inventory-item-desc">
+                              {item.description}
+                            </p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+
+              {activePanel === "character" && (
+                <DreamselfPanel profile={profile} inventory={inventory} />
+              )}
+
+              {activePanel === "map" && (
+                <MapPanel currentBiomeId="dusk_valley" phase={phase} />
+              )}
+
+              {activePanel === "journal" && (
+                <JournalPanel entries={journalEntries} />
+              )}
+
+              {activePanel === "debug" && (
+                <div className="world-panel world-panel-debug">
+                  <div className="world-panel-header">
+                    <span className="world-panel-kicker">Debug</span>
+                    <span className="world-panel-title">Relic Testing</span>
+                  </div>
+                  <p className="world-panel-copy">
+                    Spawn a random relic event for testing drops and journal
+                    entries.
+                  </p>
+
+                  <button
+                    type="button"
+                    className="world-debug-pill"
+                    onClick={onSpawnDebugItem}
+                  >
+                    <span className="world-debug-pill__orb" />
+                    <span className="world-debug-pill__label">
+                      Spawn Random Relic
+                    </span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    
-    </section>
+      </section>
 
-          {/* INVENTORY GRID MODAL */}
+      {/* INVENTORY GRID MODAL */}
       <InventoryGridModal
         items={inventory}
         isOpen={isInventoryModalOpen}
         onClose={() => setIsInventoryModalOpen(false)}
       />
-
-      
+    </>
   );
 };

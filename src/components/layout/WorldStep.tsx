@@ -39,6 +39,13 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     "inventory"
   );
 
+
+const LOOT_TRAVEL_MS = 5500;      // same as before
+const LOOT_PICKUP_ANIM_MS = 750;  // matches CSS world-lane-loot-pickup
+const AUTO_PICKUP_DELAY_MS = 900; // how long "Relic Found" stays visible before pickup
+
+
+
   // Auto-walk & auto-pickup toggles for HUD
   const [isAutoWalking, setIsAutoWalking] = useState(true);
   const [isAutoPickup, setIsAutoPickup] = useState(true); // NEW
@@ -63,14 +70,15 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     setHasReachedLoot(false);
     setIsLootCollected(false);
 
-    // This should roughly match how long it takes the loot to drift in visually.
-    const TRAVEL_MS = 5500;
-    const id = window.setTimeout(() => {
-      setHasReachedLoot(true);
-    }, TRAVEL_MS);
+    
+  const id = window.setTimeout(() => {
+    setHasReachedLoot(true);
+  }, LOOT_TRAVEL_MS);
 
-    return () => window.clearTimeout(id);
-  }, [hasLootSpawned, encounterItemName]);
+  return () => window.clearTimeout(id);
+}, [hasLootSpawned, encounterItemName]);
+
+
 
   // Encounter is only "active" once the avatar has reached the loot.
   const isEncounterActive = !!activeEncounterItem && hasReachedLoot;
@@ -119,48 +127,56 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     return () => window.clearTimeout(id);
   }, [isAutoWalking, isEncounterActive, hasLootSpawned, onSpawnDebugItem]);
 
-  const handleEncounterBannerClick = () => {
-    if (!isEncounterActive || !activeEncounterItem) return;
+const handleEncounterBannerClick = () => {
+  if (!isEncounterActive || !activeEncounterItem) return;
 
-    // Mark as collected so WorldLane plays the pickup animation
-    setIsLootCollected(true);
+  // Mark as collected so WorldLane plays the pickup animation
+  setIsLootCollected(true);
 
-    // Snapshot whether we should resume auto-walk after pickup
-    const shouldResumeAutoWalk = wasAutoWalkingBeforeEncounter;
-    const PICKUP_MS = 750; // match CSS world-lane-loot-pickup duration
+  // Snapshot whether we should resume auto-walk after pickup
+  const shouldResumeAutoWalk = wasAutoWalkingBeforeEncounter;
 
-    window.setTimeout(() => {
-      // After the animation finishes, tell parent to resolve:
-      // - add to inventory
-      // - clear encounter item
-      onResolveEncounter();
+  window.setTimeout(() => {
+    // After the animation finishes, tell parent to resolve:
+    onResolveEncounter();
 
-      // If we interrupted auto-walk earlier, resume it now
-      if (shouldResumeAutoWalk) {
-        setIsAutoWalking(true);
-      }
+    if (shouldResumeAutoWalk) {
+      setIsAutoWalking(true);
+    }
 
-      // Clear local flags so next encounter can behave normally
-      setHasReachedLoot(false);
-      setIsLootCollected(false);
-    }, PICKUP_MS);
-  };
+    setHasReachedLoot(false);
+    setIsLootCollected(false);
+  }, LOOT_PICKUP_ANIM_MS);
+};
+
 
   /**
    * Auto-pickup: when an encounter becomes active and auto-pickup is ON,
    * trigger the same flow as clicking the banner. The Dreamself can keep
    * walking if auto-walk is still enabled.
    */
-  useEffect(() => {
-    if (!isAutoPickup) return;
-    if (!isEncounterActive) return;
-    if (isLootCollected) return;
-    if (!activeEncounterItem) return;
 
-    // Same effect as a manual click:
+useEffect(() => {
+  // Only run if auto-pickup is enabled
+  if (!isAutoPickup) return;
+  // Only when the encounter is actually live (avatar has reached loot)
+  if (!isEncounterActive) return;
+  // Don't retrigger once we've started pickup
+  if (isLootCollected) return;
+  // Need a real item
+  if (!activeEncounterItem) return;
+
+  // Wait a moment so the player sees "Relic Found" + !,
+  // then behave exactly like a manual banner click.
+  const id = window.setTimeout(() => {
     handleEncounterBannerClick();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAutoPickup, isEncounterActive, isLootCollected, activeEncounterItem]);
+  }, AUTO_PICKUP_DELAY_MS);
+
+  return () => window.clearTimeout(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [isAutoPickup, isEncounterActive, isLootCollected, activeEncounterItem]);
+
+
 
   const cardClasses = [
     "world-card",

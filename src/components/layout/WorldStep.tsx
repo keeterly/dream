@@ -10,6 +10,8 @@ import { AvatarView } from "../AvatarView";
 import { useBiomeLighting } from "../../hooks/useBiomeLighting";
 import { DreamselfPanel } from "../panels/DreamselfPanel";
 import { MapPanel } from "../panels/MapPanel";
+import { InventoryGridModal } from "../InventoryGridModal";
+
 
 type WorldPanelId = "inventory" | "character" | "map" | "journal" | "debug";
 
@@ -43,6 +45,9 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   const LOOT_PICKUP_ANIM_MS = 750;   // MUST match CSS pickup duration
   const AUTO_PICKUP_DELAY_MS = 900;  // how long Relic Found shows before pickup
   const INVENTORY_TOAST_MS = 1600;   // how long "+1 Relic" stays visible
+
+  const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
+
 
   const [inventoryToastItem, setInventoryToastItem] =
     useState<InventoryItem | null>(null);
@@ -412,6 +417,14 @@ useEffect(() => {
                   <span className="world-panel-title">Bound Objects</span>
                 </div>
 
+              <button
+                type="button"
+                className="inventory-grid-open-btn"
+                onClick={() => setIsInventoryModalOpen(true)}
+              >
+                Open Grid Inventory
+              </button>
+
                 {inventory.length === 0 ? (
                   <p className="world-panel-empty">
                     Walk further. Relics tend to find you once they know your
@@ -483,6 +496,16 @@ useEffect(() => {
           </div>
         </div>
       </div>
+    
     </section>
+
+          {/* INVENTORY GRID MODAL */}
+      <InventoryGridModal
+        items={inventory}
+        isOpen={isInventoryModalOpen}
+        onClose={() => setIsInventoryModalOpen(false)}
+      />
+
+      
   );
 };

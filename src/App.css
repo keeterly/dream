@@ -1268,6 +1268,77 @@ body {
   transform: translate(-50%, -50%) rotate(45deg);
 }
 
+/* === "+1 Relic" toast near Inventory dock ======================= */
+
+.world-inventory-toast {
+  position: absolute;
+  right: 5vw;              /* aligns with .world-dock */
+  bottom: 5.4rem;          /* just above dock buttons */
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.9rem;
+  background: radial-gradient(
+      circle at 0% 0%,
+      rgba(148, 197, 253, 0.28),
+      transparent 60%
+    ),
+    rgba(10, 16, 30, 0.94);
+  border: 1px solid rgba(148, 197, 253, 0.7);
+  box-shadow:
+    0 14px 36px rgba(15, 23, 42, 0.95),
+    0 0 0 1px rgba(15, 23, 42, 0.8);
+
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #e5f0ff;
+
+  animation: world-inventory-toast-pop 0.22s ease-out,
+             world-inventory-toast-fade 0.3s ease-out 1.4s forwards;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.world-inventory-toast-pill {
+  opacity: 0.9;
+}
+
+.world-inventory-toast-name {
+  font-size: 0.76rem;
+  text-transform: none;
+  letter-spacing: 0.04em;
+  color: #cbd5ff;
+}
+
+@keyframes world-inventory-toast-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes world-inventory-toast-fade {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+
+
+
 /* slide-up panels */
 
 /* Slide-up panels (inventory, map, etc.) */

@@ -39,10 +39,13 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     "inventory"
   );
 
+  const LOOT_TRAVEL_MS = 5500;       // walk-in from offscreen
+  const LOOT_PICKUP_ANIM_MS = 750;   // MUST match CSS pickup duration
+  const AUTO_PICKUP_DELAY_MS = 900;  // how long Relic Found shows before pickup
+  const INVENTORY_TOAST_MS = 1600;   // how long "+1 Relic" stays visible
 
-const LOOT_TRAVEL_MS = 5500;      // same as before
-const LOOT_PICKUP_ANIM_MS = 750;  // matches CSS world-lane-loot-pickup
-const AUTO_PICKUP_DELAY_MS = 900; // how long "Relic Found" stays visible before pickup
+  const [inventoryToastItem, setInventoryToastItem] =
+    useState<InventoryItem | null>(null);
 
 
 
@@ -127,27 +130,41 @@ const AUTO_PICKUP_DELAY_MS = 900; // how long "Relic Found" stays visible before
     return () => window.clearTimeout(id);
   }, [isAutoWalking, isEncounterActive, hasLootSpawned, onSpawnDebugItem]);
 
-const handleEncounterBannerClick = () => {
-  if (!isEncounterActive || !activeEncounterItem) return;
+  const handleEncounterBannerClick = () => {
+    if (!isEncounterActive || !activeEncounterItem) return;
 
-  // Mark as collected so WorldLane plays the pickup animation
-  setIsLootCollected(true);
+    // Mark as collected so WorldLane plays the pickup animation
+    setIsLootCollected(true);
 
-  // Snapshot whether we should resume auto-walk after pickup
-  const shouldResumeAutoWalk = wasAutoWalkingBeforeEncounter;
+    // Snapshot whether we should resume auto-walk after pickup
+    const shouldResumeAutoWalk = wasAutoWalkingBeforeEncounter;
+    // Capture the item now so we can use it inside the timeout
+    const itemForToast = activeEncounterItem;
 
-  window.setTimeout(() => {
-    // After the animation finishes, tell parent to resolve:
-    onResolveEncounter();
+    window.setTimeout(() => {
+      // After the animation finishes:
+      // 1) add to inventory / clear encounter in parent
+      onResolveEncounter();
 
-    if (shouldResumeAutoWalk) {
-      setIsAutoWalking(true);
-    }
+      // 2) show "+1 Relic" toast
+      if (itemForToast) {
+        setInventoryToastItem(itemForToast);
+        window.setTimeout(() => {
+          setInventoryToastItem(null);
+        }, INVENTORY_TOAST_MS);
+      }
 
-    setHasReachedLoot(false);
-    setIsLootCollected(false);
-  }, LOOT_PICKUP_ANIM_MS);
-};
+      // 3) resume auto-walk if we had paused it
+      if (shouldResumeAutoWalk) {
+        setIsAutoWalking(true);
+      }
+
+      // 4) clear local flags for next encounter
+      setHasReachedLoot(false);
+      setIsLootCollected(false);
+    }, LOOT_PICKUP_ANIM_MS);
+  };
+
 
 
   /**
@@ -370,6 +387,21 @@ useEffect(() => {
               <span className="world-dock-label">Debug</span>
             </button>
           </div>
+
+
+
+        {/* +1 RELIC TOAST NEAR INVENTORY DOCK */}
+          {inventoryToastItem && (
+            <div className="world-inventory-toast">
+              <div className="world-inventory-toast-pill">+1 Relic</div>
+              <div className="world-inventory-toast-name">
+                {inventoryToastItem.name}
+              </div>
+            </div>
+          )}
+
+
+
 
           {/* PANELS */}
           <div className="world-panels">

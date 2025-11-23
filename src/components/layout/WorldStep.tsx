@@ -45,19 +45,22 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   const [wasAutoWalkingBeforeEncounter, setWasAutoWalkingBeforeEncounter] =
     useState(false);
 
-  // --- NEW: "loot is on the ground, walking toward it" state ---
+  // --- Loot lifecycle state ---
   const hasLootSpawned = !!encounterItemName;
   const [hasReachedLoot, setHasReachedLoot] = useState(false);
+  const [isLootCollected, setIsLootCollected] = useState(false); // NEW
 
   // When a new loot spawn happens, start a travel timer that represents
   // the walk-in from offscreen → ribbon center.
   useEffect(() => {
     if (!hasLootSpawned) {
       setHasReachedLoot(false);
+      setIsLootCollected(false); // NEW: reset pickup state when no loot
       return;
     }
 
     setHasReachedLoot(false);
+    setIsLootCollected(false); // NEW: reset for each new spawn
 
     // This should roughly match the CSS loot-approach animation duration.
     const TRAVEL_MS = 5500;
@@ -117,17 +120,30 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   }, [isAutoWalking, isEncounterActive, hasLootSpawned, onSpawnDebugItem]);
 
   const handleEncounterBannerClick = () => {
-    // Tell parent to finalize the encounter (add to inventory, clear active item)
-    onResolveEncounter();
+    if (!isEncounterActive || !activeEncounterItem) return;
 
-    // If we interrupted auto-walk, resume it
-    if (wasAutoWalkingBeforeEncounter) {
-      setIsAutoWalking(true);
-      setWasAutoWalkingBeforeEncounter(false);
-    }
+    // Mark as collected so WorldLane plays the pickup animation
+    setIsLootCollected(true); // NEW
 
-    // Clear local reach flag; parent will also clear encounterItemName.
-    setHasReachedLoot(false);
+    // Snapshot whether we should resume auto-walk after pickup
+    const shouldResumeAutoWalk = wasAutoWalkingBeforeEncounter;
+    const PICKUP_MS = 600; // must match CSS @keyframes world-lane-loot-pickup
+
+    window.setTimeout(() => {
+      // After the animation finishes, tell parent to resolve:
+      // - add to inventory
+      // - clear encounter item
+      onResolveEncounter();
+
+      // If we interrupted auto-walk earlier, resume it now
+      if (shouldResumeAutoWalk) {
+        setIsAutoWalking(true);
+      }
+
+      // Clear local flags so next encounter can behave normally
+      setHasReachedLoot(false);
+      setIsLootCollected(false);
+    }, PICKUP_MS);
   };
 
   const cardClasses = [
@@ -143,8 +159,9 @@ export const WorldStep: React.FC<WorldStepProps> = ({
       ? `world-encounter-banner--${activeEncounterItem.rarity}`
       : "";
 
-  // Encounter UI (glyph + top banner) is only visible after we've reached loot.
-  const showEncounterUI = isEncounterActive;
+  // Encounter UI (glyph + top banner) is only visible after we've reached loot,
+  // and hides once we've clicked to pick it up while the crystal animates away.
+  const showEncounterUI = isEncounterActive && !isLootCollected; // NEW
 
   return (
     <section className="app-screen app-screen-world">
@@ -157,6 +174,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
           encounterItemName={encounterItemName}
           isEncounterActive={showEncounterUI}
           isWalking={isWalking}
+          isLootCollected={isLootCollected} // NEW
         />
 
         {/* DREAMSELF AVATAR ON THE RIBBON */}

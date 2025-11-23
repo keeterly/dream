@@ -3348,3 +3348,91 @@ body {
     opacity: 1;
   }
 }
+
+/* =========================================================
+   DREAM – Loot crystal on the ribbon (pickup animation)
+   ========================================================= */
+
+.world-lane-loot {
+  position: absolute;
+  /* Slightly ahead of the avatar, which is centered at 50% */
+  left: 56%;
+  bottom: 9.5vh; /* lines up with avatar shadow / ribbon */
+  transform: translateX(-50%);
+  z-index: 18; /* under avatar (20), above ground/parallax */
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none; /* encounter logic is handled elsewhere */
+}
+
+/* Soft ground contact under the loot */
+.world-lane-loot-shadow {
+  width: clamp(52px, 4.3vw, 80px);
+  height: clamp(12px, 1vw, 18px);
+  border-radius: 999px;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(0, 0, 0, 0.7),
+    transparent 70%
+  );
+  opacity: 0.9;
+  filter: blur(2px);
+}
+
+/* The SVG crystal / rock */
+.world-lane-loot-image {
+  width: clamp(52px, 4.3vw, 82px);
+  height: auto;
+  display: block;
+
+  transform: translateY(-4px) scale(1) rotate(-3deg);
+  transform-origin: 50% 100%;
+
+  filter:
+    drop-shadow(0 0 6px rgba(248, 250, 252, 0.18))
+    drop-shadow(0 10px 26px rgba(15, 23, 42, 0.95));
+
+  /* Very subtle idle float while it’s on the ground */
+  animation: world-lane-loot-idle 2.2s ease-in-out infinite;
+}
+
+/* Idle micro-float */
+@keyframes world-lane-loot-idle {
+  0%   { transform: translateY(-4px) scale(1) rotate(-3deg); }
+  50%  { transform: translateY(-7px) scale(1.02) rotate(-3deg); }
+  100% { transform: translateY(-4px) scale(1) rotate(-3deg); }
+}
+
+/* When the loot has been picked up:
+   - stop idle float
+   - play a simple “hop up + fade out” on the whole group
+*/
+.world-lane-loot--pickup {
+  animation: world-lane-loot-pickup 0.6s ease-out forwards;
+}
+
+.world-lane-loot--pickup .world-lane-loot-image {
+  animation: none; /* stop idle float while container animates */
+}
+
+@keyframes world-lane-loot-pickup {
+  0% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+  40% {
+    transform: translateX(-50%) translateY(-12px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(-40px);
+    opacity: 0;
+  }
+}
+
+/* If the whole lane is paused, also pause the idle float */
+.world-lane--paused .world-lane-loot-image {
+  animation-play-state: paused;
+}

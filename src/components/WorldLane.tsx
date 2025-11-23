@@ -9,6 +9,8 @@ interface WorldLaneProps {
   isEncounterActive?: boolean;
   /** Whether the Dreamself is currently walking (controls parallax scroll) */
   isWalking?: boolean;
+  /** Whether the current loot has just been collected (triggers pickup anim) */
+  isLootCollected?: boolean;
 }
 
 const PARALLAX_LAYERS = [
@@ -45,6 +47,7 @@ const WorldLane: React.FC<WorldLaneProps> = ({
   encounterItemName,
   isEncounterActive = false,
   isWalking = true,
+  isLootCollected = false,
 }) => {
   // For GitHub Pages this will be "/dream/"
   const baseUrl = import.meta.env.BASE_URL || "/";
@@ -63,6 +66,16 @@ const WorldLane: React.FC<WorldLaneProps> = ({
   const lootPath = lootSprite
     ? `${baseUrl}items/foundItems/${lootSprite}`
     : null;
+
+  const lootClassName = [
+    "world-lane-loot",
+    isEncounterActive
+      ? "world-lane-loot--active"
+      : "world-lane-loot--approach",
+    isLootCollected ? "world-lane-loot--pickup" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className={rootClassName}>
@@ -96,16 +109,10 @@ const WorldLane: React.FC<WorldLaneProps> = ({
 
       {/* Nier-style loot crystal on the ribbon.
           - When it first spawns: class --approach → slides in from off-screen.
-          - Once encounter is active: class --active → locked under the avatar & pulses. */}
+          - Once encounter is active: class --active → locked under the avatar & pulses.
+          - When collected: class --pickup → flies to inventory. */}
       {encounterItemName && lootPath && (
-        <div
-          className={
-            "world-lane-loot " +
-            (isEncounterActive
-              ? "world-lane-loot--active"
-              : "world-lane-loot--approach")
-          }
-        >
+        <div className={lootClassName}>
           <div className="world-lane-loot-shadow" aria-hidden="true" />
           <img
             src={lootPath}

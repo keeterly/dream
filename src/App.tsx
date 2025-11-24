@@ -134,8 +134,9 @@ export const App: React.FC = () => {
     };
 
     // Drive world UI: this becomes the active encounter
+    // Use the *type key* (base id), not the display name.
     setActiveEncounterItem(pending);
-    setEncounterItemName(pending.name);
+    setEncounterItemName(baseItem.id);
   };
 
   // ─────────────────────────────────────────────

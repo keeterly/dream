@@ -218,16 +218,16 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
           <div className="inventory-grid inventory-grid--dotted">
             {gridCells.map((cell, index) => {
               const item = cell.item;
-              const isDragging = dragIndex === index && !!item;
+const isDragging = dragIndex === index && !!item;
 
-              // ✅ The only place we choose the icon:
-              //    use item.name so it matches WorldLane.
-              const iconSrc =
-                item != null
-                  ? `${baseUrl}items/foundItems/${getSpriteForName(
-                      item.name
-                    )}`
-                  : null;
+// Use the *type key* from the instance id prefix.
+// Example: "split_crystal_1719abc" => "split_crystal"
+let iconSrc: string | null = null;
+if (item) {
+  const typeKey = item.id.split("_")[0] || item.id;
+  iconSrc = `${baseUrl}items/foundItems/${getSpriteForName(typeKey)}`;
+}
+
 
               return (
                 <div

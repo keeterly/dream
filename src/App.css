@@ -3831,11 +3831,11 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.25rem;
 }
 
 .inventory-modal-subtitle {
-  margin: 0 0 0.4rem;
+  margin: 0 0 0.3rem;
   font-size: 0.78rem;
   opacity: 0.8;
 }
@@ -4016,9 +4016,9 @@ body {
 
 
 .inventory-modal.inventory-modal--minimal {
-  max-width: 720px;                          /* was ~960 */
-  width: min(92vw, 720px);
-  padding: 0.75rem 1.1rem 0.9rem;            /* less horizontal padding */
+  max-width: 680px;                       /* feels tight but readable */
+  width: min(92vw, 680px);
+  padding: 0.45rem 0.65rem 0.75rem; 
   border-radius: 1.2rem;
   background: linear-gradient(
     135deg,

@@ -41,8 +41,8 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
   // Timings (must match CSS where noted)
   const LOOT_TRAVEL_MS = 5500; // walk-in from offscreen
-  const LOOT_PICKUP_ANIM_MS = 750; // MUST match CSS pickup duration
-  const AUTO_PICKUP_DELAY_MS = 900; // how long Relic Found shows before pickup
+  const LOOT_PICKUP_ANIM_MS = 450; // MUST match CSS pickup duration
+  const AUTO_PICKUP_DELAY_MS = 350; // how long Relic Found shows before pickup
   const INVENTORY_TOAST_MS = 1600; // how long "+1 Relic" stays visible
   const INVENTORY_CAPACITY = 30;
 

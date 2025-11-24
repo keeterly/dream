@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+// src/components/InventoryGridModal.tsx
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { InventoryItem } from "../types";
 
 interface InventoryGridModalProps {
@@ -42,7 +43,7 @@ function sortInventoryItems(
 
   switch (mode) {
     case "newest":
-      return arr; // parent passes newest-first
+      return arr; // assume parent is newest-first
 
     case "oldest":
       return arr.reverse();
@@ -66,7 +67,7 @@ function sortInventoryItems(
       return arr.sort((a, b) => a.name.localeCompare(b.name));
 
     case "size":
-      // all 1x1 for now – keep incoming order
+      // all 1x1 currently
       return arr;
 
     default:
@@ -79,30 +80,67 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const [slots, setSlots] = useState<GridItem[]>(Array(GRID_CAPACITY).fill(null));
+  const [slots, setSlots] = useState<GridItem[]>(() =>
+    Array(GRID_CAPACITY).fill(null)
+  );
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [sortMode, setSortMode] = useState<InventorySortMode>("newest");
 
   const baseUrl = import.meta.env.BASE_URL || "/";
   const isFull = items.length >= GRID_CAPACITY;
 
-  // ✅ Stable sorted list; only recomputes when items or sort mode change
-  const sortedItems = useMemo(
-    () => sortInventoryItems(items, sortMode).slice(0, GRID_CAPACITY),
-    [items, sortMode]
-  );
+  // Keep a snapshot of the last items array to detect new pickups
+  const prevItemsRef = useRef<InventoryItem[]>(items);
 
-  // When modal opens or sort mode changes, seed the slots.
+  // Helper: layout items according to a sort mode (used on open + when user clicks sort)
+  const applySortedLayout = (mode: InventorySortMode, sourceItems: InventoryItem[]) => {
+    const ordered = sortInventoryItems(sourceItems, mode).slice(0, GRID_CAPACITY);
+    const next: GridItem[] = Array(GRID_CAPACITY).fill(null);
+    ordered.forEach((item, idx) => {
+      next[idx] = item;
+    });
+    setSlots(next);
+  };
+
+  // When modal opens, seed slots from current items + sort mode
   useEffect(() => {
     if (!isOpen) return;
+    applySortedLayout(sortMode, items);
+    prevItemsRef.current = items;
+  }, [isOpen, sortMode, items]);
 
-    const nextSlots: GridItem[] = Array(GRID_CAPACITY).fill(null);
-    sortedItems.forEach((item, index) => {
-      nextSlots[index] = item;
+  // While open, whenever the items prop changes, only place *new* items
+  // into the next empty slot; keep existing layout intact.
+  useEffect(() => {
+    if (!isOpen) {
+      prevItemsRef.current = items;
+      return;
+    }
+
+    const prev = prevItemsRef.current;
+    if (items === prev) return;
+
+    const prevIds = new Set(prev.map((i) => i.id));
+    const newItems = items.filter((i) => !prevIds.has(i.id));
+
+    if (newItems.length === 0) {
+      prevItemsRef.current = items;
+      return;
+    }
+
+    setSlots((prevSlots) => {
+      const next = [...prevSlots];
+      newItems.forEach((item) => {
+        const emptyIndex = next.findIndex((slot) => slot === null);
+        if (emptyIndex !== -1) {
+          next[emptyIndex] = item;
+        }
+      });
+      return next;
     });
-    setSlots(nextSlots);
-    setDraggedIndex(null);
-  }, [isOpen, sortedItems]);
+
+    prevItemsRef.current = items;
+  }, [items, isOpen]);
 
   const handleDragStart = (index: number) => {
     if (!slots[index]) return;
@@ -126,6 +164,12 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
 
   const handleDragEnd = () => {
     setDraggedIndex(null);
+  };
+
+  // When user hits a sort pill, we deliberately re-layout everything
+  const handleSortClick = (mode: InventorySortMode) => {
+    setSortMode(mode);
+    applySortedLayout(mode, items);
   };
 
   if (!isOpen) return null;
@@ -174,7 +218,7 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
                 "inventory-sort-pill" +
                 (sortMode === opt.id ? " inventory-sort-pill--active" : "")
               }
-              onClick={() => setSortMode(opt.id as InventorySortMode)}
+              onClick={() => handleSortClick(opt.id as InventorySortMode)}
             >
               {opt.label}
             </button>
@@ -188,7 +232,7 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
               className="inventory-grid-cell"
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
-                e.preventDefault();          // ✅ needed for HTML5 DnD
+                e.preventDefault();
                 handleDropOn(index);
               }}
             >
@@ -211,7 +255,6 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
                     loading="lazy"
                   />
 
-                  {/* Tooltip with full details */}
                   <div className="inventory-tooltip">
                     <div className="inventory-tooltip-name">
                       {item.name}

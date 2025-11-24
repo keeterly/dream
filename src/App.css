@@ -4018,7 +4018,7 @@ body {
 .inventory-modal.inventory-modal--minimal {
   max-width: 680px;                       /* feels tight but readable */
   width: min(92vw, 680px);
-  padding: 0.45rem 0.65rem 0.75rem; 
+    padding: 0.35rem 0.5rem 0.65rem; /* ✅ minimal horizontal padding */
   border-radius: 1.2rem;
   background: linear-gradient(
     135deg,

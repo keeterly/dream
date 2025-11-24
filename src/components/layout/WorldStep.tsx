@@ -42,7 +42,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   // Timings (must match CSS where noted)
   const LOOT_TRAVEL_MS = 5500; // walk-in from offscreen
   const LOOT_PICKUP_ANIM_MS = 450; // MUST match CSS pickup duration
-  const AUTO_PICKUP_DELAY_MS = 350; // how long Relic Found shows before pickup
+  const AUTO_PICKUP_DELAY_MS = 250; // how long Relic Found shows before pickup
   const INVENTORY_TOAST_MS = 1600; // how long "+1 Relic" stays visible
   const INVENTORY_CAPACITY = 30;
 
@@ -138,50 +138,37 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     onSpawnDebugItem,
   ]);
 
-  const handleEncounterBannerClick = () => {
-    if (!isEncounterActive || !activeEncounterItem) return;
+const handleEncounterBannerClick = () => {
+  if (!isEncounterActive || !activeEncounterItem) return;
 
-    // If inventory is full, just leave the relic on the ground & inform the player.
-    if (isInventoryFull) {
-      setInventoryToastItem({
-        ...activeEncounterItem,
-        // no structural changes; we just reuse toast UI to say "Inventory full"
-      });
-      window.setTimeout(() => setInventoryToastItem(null), INVENTORY_TOAST_MS);
-      return;
-    }
+  // Start local pickup state so WorldLane can play its collect animation
+  setIsLootCollected(true);
 
-    // Mark as collected so WorldLane plays the pickup animation
-    setIsLootCollected(true);
+  // Snapshot flags + item for toast
+  const shouldResumeAutoWalk = wasAutoWalkingBeforeEncounter;
+  const itemForToast = activeEncounterItem;
 
-    // Snapshot whether we should resume auto-walk after pickup
-    const shouldResumeAutoWalk = wasAutoWalkingBeforeEncounter;
-    // Capture the item now so we can use it inside the timeout
-    const itemForToast = activeEncounterItem;
+  // ✅ 1) Immediately add to inventory / clear encounter in parent
+  onResolveEncounter();
 
+  // ✅ 2) Show "+1 Relic" toast right away
+  if (itemForToast) {
+    setInventoryToastItem(itemForToast);
     window.setTimeout(() => {
-      // After the animation finishes:
-      // 1) add to inventory / clear encounter in parent
-      onResolveEncounter();
+      setInventoryToastItem(null);
+    }, INVENTORY_TOAST_MS);
+  }
 
-      // 2) show "+1 Relic" toast
-      if (itemForToast) {
-        setInventoryToastItem(itemForToast);
-        window.setTimeout(() => {
-          setInventoryToastItem(null);
-        }, INVENTORY_TOAST_MS);
-      }
+  // ✅ 3) After the sprite animation finishes, clean up local state
+  window.setTimeout(() => {
+    if (shouldResumeAutoWalk) {
+      setIsAutoWalking(true);
+    }
+    setHasReachedLoot(false);
+    setIsLootCollected(false);
+  }, LOOT_PICKUP_ANIM_MS);
+};
 
-      // 3) resume auto-walk if we had paused it
-      if (shouldResumeAutoWalk) {
-        setIsAutoWalking(true);
-      }
-
-      // 4) clear local flags for next encounter
-      setHasReachedLoot(false);
-      setIsLootCollected(false);
-    }, LOOT_PICKUP_ANIM_MS);
-  };
 
   /**
    * Auto-pickup: when an encounter becomes active and auto-pickup is ON,

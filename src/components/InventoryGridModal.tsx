@@ -1,5 +1,5 @@
 // src/components/InventoryGridModal.tsx
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { InventoryItem } from "../types";
 import { getSpriteForItemName } from "../spriteMap";
 
@@ -13,10 +13,6 @@ interface InventoryGridModalProps {
   items: InventoryItem[];
   isOpen: boolean;
   onClose: () => void;
-}
-
-interface GridCell {
-  item: InventoryItem | null;
 }
 
 // Simple rarity weight for sorting
@@ -38,7 +34,14 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
 
-  // Sorted view of items (order only; actual grid placement is mutable via drag-drop)
+  // Local grid order: one cell per slot (null = empty)
+  const [grid, setGrid] = useState<(InventoryItem | null)[]>(
+    () => Array(GRID_CAPACITY).fill(null)
+  );
+
+  const prevSortModeRef = useRef<SortMode>("newest");
+
+  // Sorted list (for filling new items and re-sorting)
   const sortedItems = useMemo(() => {
     const copy = [...items];
 
@@ -55,7 +58,10 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
           const ra = rarityOrder[a.rarity] ?? 0;
           const rb = rarityOrder[b.rarity] ?? 0;
           if (ra !== rb) return rb - ra;
-          return (b.acquiredAt ?? "").localeCompare(a.acquiredAt ?? "");
+          // tie-break by newest
+          const ta = a.acquiredAt ? Date.parse(a.acquiredAt) : 0;
+          const tb = b.acquiredAt ? Date.parse(b.acquiredAt) : 0;
+          return tb - ta;
         });
         break;
       case "name":
@@ -74,42 +80,60 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
     return copy;
   }, [items, sortMode]);
 
-  // 🔁 Lay sorted items into a fixed 6x5 grid in order
-  // Drag/drop will mutate this local ordering only.
-  const [manualGridOrder, setManualGridOrder] = useState<InventoryItem[]>([]);
+  /**
+   * Sync the local grid whenever items or sortMode change.
+   *
+   * - If sortMode changed: fully re-pack items according to the sort.
+   * - If only items changed: keep existing items in their current cells,
+   *   and place *new* items into the next available empty slots
+   *   in the current sort order.
+   */
+  useEffect(() => {
+    setGrid((prevGrid) => {
+      const byId = new Map(items.map((it) => [it.id, it]));
+      const nextGrid: (InventoryItem | null)[] = Array(GRID_CAPACITY).fill(
+        null
+      );
 
-  // Sync manual order when item list changes (e.g., new pickup)
-  React.useEffect(() => {
-    setManualGridOrder((prev) => {
-      // Keep existing items in their current positions
-      const existingIds = new Set(items.map((it) => it.id));
-      const filteredPrev = prev.filter((it) => existingIds.has(it.id));
+      const prevSortMode = prevSortModeRef.current;
+      const sortModeChanged = prevSortMode !== sortMode;
 
-      // Append any new items (sorted) that weren't in the previous local order
-      const existingPrevIds = new Set(filteredPrev.map((it) => it.id));
-      const newOnes = sortedItems.filter((it) => !existingPrevIds.has(it.id));
+      if (sortModeChanged) {
+        // FULL RE-SORT: lay items down from top-left using sorted order
+        sortedItems.forEach((item, idx) => {
+          if (idx < GRID_CAPACITY) {
+            nextGrid[idx] = item;
+          }
+        });
+      } else {
+        // INCREMENTAL UPDATE: preserve placements for items that still exist
+        prevGrid.forEach((cellItem, idx) => {
+          if (!cellItem) return;
+          const updated = byId.get(cellItem.id);
+          if (updated) {
+            nextGrid[idx] = updated; // keep same slot
+            byId.delete(cellItem.id);
+          }
+        });
 
-      const combined = [...filteredPrev, ...newOnes];
-      return combined.slice(0, GRID_CAPACITY);
-    });
-  }, [items, sortedItems]);
-
-  const gridCells: GridCell[] = useMemo(() => {
-    const cells: GridCell[] = Array.from({ length: GRID_CAPACITY }, () => ({
-      item: null,
-    }));
-
-    manualGridOrder.forEach((item, idx) => {
-      if (idx < GRID_CAPACITY) {
-        cells[idx].item = item;
+        // Place *new* items (present in items but not in prev grid)
+        sortedItems.forEach((item) => {
+          if (!byId.has(item.id)) return; // already placed above
+          const emptyIndex = nextGrid.findIndex((cell) => cell === null);
+          if (emptyIndex !== -1) {
+            nextGrid[emptyIndex] = item;
+            byId.delete(item.id);
+          }
+        });
       }
-    });
 
-    return cells;
-  }, [manualGridOrder]);
+      prevSortModeRef.current = sortMode;
+      return nextGrid;
+    });
+  }, [items, sortMode, sortedItems]);
 
   const handleDragStart = (index: number) => {
-    if (!gridCells[index].item) return;
+    if (!grid[index]) return;
     setDragIndex(index);
   };
 
@@ -119,29 +143,13 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
       return;
     }
 
-    const sourceItem = gridCells[dragIndex].item;
-    const targetItem = gridCells[index].item;
-
-    if (!sourceItem && !targetItem) {
-      setDragIndex(null);
-      return;
-    }
-
-    setManualGridOrder(() => {
-      // Build a flat array of items based on the *current* grid cells
-      const nextCells = gridCells.map((cell) => cell.item);
-
-      nextCells[index] = sourceItem ?? null;
-      nextCells[dragIndex] = targetItem ?? null;
-
-      const nextOrder: InventoryItem[] = [];
-      nextCells.forEach((maybeItem) => {
-        if (maybeItem && !nextOrder.find((it) => it.id === maybeItem.id)) {
-          nextOrder.push(maybeItem);
-        }
-      });
-
-      return nextOrder;
+    setGrid((prev) => {
+      const next = [...prev];
+      const source = next[dragIndex];
+      const target = next[index];
+      next[index] = source;
+      next[dragIndex] = target;
+      return next;
     });
 
     setDragIndex(null);
@@ -151,78 +159,51 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
     event.preventDefault();
   };
 
+  const handleSortClick = (mode: SortMode) => {
+    setSortMode(mode);
+  };
+
   if (!isOpen) return null;
+
+  const usedCount = items.length;
 
   return (
     <div className="inventory-modal-backdrop">
       <div className="inventory-modal inventory-modal--minimal">
+        {/* Header */}
         <div className="inventory-modal-header">
           <div className="inventory-modal-title-block">
             <div className="inventory-modal-kicker">Inventory</div>
-            {/* Title kept for styling but can be removed if you prefer just the kicker */}
-            <div className="inventory-modal-title">Bound Relics</div>
           </div>
 
           <div className="inventory-modal-controls">
             <div className="inventory-sort-row">
               <span className="inventory-sort-label">Sort</span>
-              <button
-                type="button"
-                className={
-                  "inventory-sort-pill" +
-                  (sortMode === "newest"
-                    ? " inventory-sort-pill--active"
-                    : "")
-                }
-                onClick={() => setSortMode("newest")}
-              >
-                Newest
-              </button>
-              <button
-                type="button"
-                className={
-                  "inventory-sort-pill" +
-                  (sortMode === "oldest"
-                    ? " inventory-sort-pill--active"
-                    : "")
-                }
-                onClick={() => setSortMode("oldest")}
-              >
-                Oldest
-              </button>
-              <button
-                type="button"
-                className={
-                  "inventory-sort-pill" +
-                  (sortMode === "rarity"
-                    ? " inventory-sort-pill--active"
-                    : "")
-                }
-                onClick={() => setSortMode("rarity")}
-              >
-                Rarity
-              </button>
-              <button
-                type="button"
-                className={
-                  "inventory-sort-pill" +
-                  (sortMode === "name"
-                    ? " inventory-sort-pill--active"
-                    : "")
-                }
-                onClick={() => setSortMode("name")}
-              >
-                Name
-              </button>
+              {(["newest", "oldest", "rarity", "name"] as SortMode[]).map(
+                (mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    className={
+                      "inventory-sort-pill" +
+                      (sortMode === mode ? " inventory-sort-pill--active" : "")
+                    }
+                    onClick={() => handleSortClick(mode)}
+                  >
+                    {mode.toUpperCase()}
+                  </button>
+                )
+              )}
             </div>
 
-            <div className="inventory-capacity inventory-modal-count">
-              {manualGridOrder.length}/{GRID_CAPACITY}
+            {/* Single capacity display (header only) */}
+            <div className="inventory-modal-count">
+              {usedCount}/{GRID_CAPACITY}
             </div>
 
             <button
               type="button"
-              className="inventory-close-btn inventory-modal-close"
+              className="inventory-close-btn"
               onClick={onClose}
             >
               ×
@@ -230,31 +211,22 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
           </div>
         </div>
 
-        {/* 6x5 grid */}
+        {/* Grid */}
         <div className="inventory-grid-shell">
           <div className="inventory-grid inventory-grid--dotted">
-            {gridCells.map((cell, index) => {
-              const item = cell.item;
+            {grid.map((item, index) => {
               const isDragging = dragIndex === index && !!item;
 
-              // ✅ Single source of truth for sprites:
-              // use the same mapping as WorldLane, keyed by item.name
               let iconSrc: string | null = null;
               if (item) {
-                const fileName = getSpriteForItemName(item.name);
-                iconSrc = fileName
-                  ? `${baseUrl}items/foundItems/${fileName}`
-                  : null;
+                const spriteFile = getSpriteForItemName(item.name);
+                iconSrc = `${baseUrl}items/foundItems/${spriteFile}`;
               }
 
               return (
                 <div
                   key={index}
-                  className={
-                    "inventory-grid-cell" +
-                    (item ? " inventory-grid-slot--occupied" : "") +
-                    (isDragging ? " inventory-grid-slot--dragging" : "")
-                  }
+                  className="inventory-grid-cell"
                   onDragOver={handleDragOver}
                   onDrop={() => handleDrop(index)}
                 >
@@ -277,7 +249,6 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
                         className="inventory-grid-icon-img"
                       />
 
-                      {/* Tooltip */}
                       {hoveredItemId === item.id && (
                         <div className="inventory-tooltip">
                           <div className="inventory-tooltip-name">
@@ -304,10 +275,9 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
           </div>
         </div>
 
+        {/* Single footer count (if you prefer just here, remove header count above) */}
         <div className="inventory-modal-footer">
-          <span className="inventory-modal-count">
-            {manualGridOrder.length} / {GRID_CAPACITY} slots used
-          </span>
+          {usedCount} / {GRID_CAPACITY} slots used
         </div>
       </div>
     </div>

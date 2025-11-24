@@ -227,6 +227,7 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
             ×
           </button>
         </div>
+       </div>
       
 
 

@@ -171,44 +171,51 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
     <div className="inventory-modal-backdrop">
       <div className="inventory-modal inventory-modal--minimal">
         {/* Header */}
-        <div className="inventory-modal-header">
-          <div className="inventory-modal-title-block">
-            <div className="inventory-modal-kicker">Inventory</div>
-          </div>
+<div className="inventory-modal-header">
+  <div className="inventory-modal-title-block">
+    <div className="inventory-modal-kicker">Inventory</div>
+  </div>
 
-          <div className="inventory-modal-controls">
-            <div className="inventory-sort-row">
-              <span className="inventory-sort-label">Sort</span>
-              {(["newest", "oldest", "rarity", "name"] as SortMode[]).map(
-                (mode) => (
-                  <button
-                    key={mode}
-                    type="button"
-                    className={
-                      "inventory-sort-pill" +
-                      (sortMode === mode ? " inventory-sort-pill--active" : "")
-                    }
-                    onClick={() => handleSortClick(mode)}
-                  >
-                    {mode.toUpperCase()}
-                  </button>
-                )
-              )}
-            </div>
+  <div className="inventory-sort-row">
+    <span className="inventory-sort-label">Sort</span>
 
-            {/* Single capacity display (header only) */}
-            <div className="inventory-modal-count">
-              {usedCount}/{GRID_CAPACITY}
-            </div>
+    <button
+      className={`inventory-sort-pill ${sortMode === "newest" ? "inventory-sort-pill--active" : ""}`}
+      onClick={() => setSortMode("newest")}
+    >
+      Newest
+    </button>
 
-            <button
-              type="button"
-              className="inventory-close-btn"
-              onClick={onClose}
-            >
-              ×
-            </button>
-          </div>
+    <button
+      className={`inventory-sort-pill ${sortMode === "oldest" ? "inventory-sort-pill--active" : ""}`}
+      onClick={() => setSortMode("oldest")}
+    >
+      Oldest
+    </button>
+
+    <button
+      className={`inventory-sort-pill ${sortMode === "rarity" ? "inventory-sort-pill--active" : ""}`}
+      onClick={() => setSortMode("rarity")}
+    >
+      Rarity
+    </button>
+
+    <button
+      className={`inventory-sort-pill ${sortMode === "name" ? "inventory-sort-pill--active" : ""}`}
+      onClick={() => setSortMode("name")}
+    >
+      Name
+    </button>
+  </div>
+
+  <button
+    type="button"
+    className="inventory-close-btn"
+    onClick={onClose}
+  >
+    ×
+  </button>
+</div>
         </div>
 
         {/* Grid */}

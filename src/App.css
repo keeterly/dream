@@ -4347,3 +4347,7 @@ body {
   border-color: rgba(168, 85, 247, 0.95);
   color: #f5d0fe;
 }
+
+.inventory-modal.inventory-modal--minimal {
+  padding: 10px !important;
+}

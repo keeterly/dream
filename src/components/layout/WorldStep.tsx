@@ -94,6 +94,36 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     element: dominantElement,
   });
 
+
+const DockButton: React.FC<{
+  label: string;
+  icon: string;
+  active?: boolean;
+  notification?: number;
+  onClick: () => void;
+}> = ({ label, icon, active = false, notification = 0, onClick }) => {
+  return (
+    <button
+      className={
+        "world-dock-btn" + (active ? " world-dock-btn--active" : "")
+      }
+      onClick={onClick}
+    >
+      <div className="world-dock-icon-wrap">
+        <span className={`world-dock-icon world-dock-icon--${icon}`} />
+        {notification > 0 && (
+          <span className="world-dock-notification">{notification}</span>
+        )}
+      </div>
+
+      <div className="world-dock-label">{label}</div>
+    </button>
+  );
+};
+
+
+
+
   /**
    * If an encounter becomes active while auto-walk is enabled
    * AND auto-pickup is OFF, pause walking and remember that we
@@ -316,70 +346,44 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
           {/* DOCK BUTTONS */}
           <div className="world-dock">
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "inventory"
-                  ? " world-dock-button--active"
-                  : "")
-              }
-              onClick={() => {
-                togglePanel("inventory");
-                setIsInventoryModalOpen(true);
-              }}
-            >
-              <span className="world-dock-icon world-dock-icon--inventory" />
-              <span className="world-dock-label">Inventory</span>
-            </button>
+  <DockButton
+    label="Inventory"
+    icon="inventory"
+    active={activePanel === "inventory"}
+    notification={inventory.length > 0 && !isInventoryModalOpen ? 1 : 0}
+    onClick={() => togglePanel("inventory")}
+  />
 
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "character"
-                  ? " world-dock-button--active"
-                  : "")
-              }
-              onClick={() => togglePanel("character")}
-            >
-              <span className="world-dock-icon world-dock-icon--dreamself" />
-              <span className="world-dock-label">Dreamself</span>
-            </button>
+  <DockButton
+    label="Dreamself"
+    icon="dreamself"
+    active={activePanel === "character"}
+    onClick={() => togglePanel("character")}
+  />
 
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "map" ? " world-dock-button--active" : "")
-              }
-              onClick={() => togglePanel("map")}
-            >
-              <span className="world-dock-icon world-dock-icon--map" />
-              <span className="world-dock-label">Map</span>
-            </button>
+  <DockButton
+    label="Map"
+    icon="map"
+    active={activePanel === "map"}
+    onClick={() => togglePanel("map")}
+  />
 
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "journal"
-                  ? " world-dock-button--active"
-                  : "")
-              }
-              onClick={() => togglePanel("journal")}
-            >
-              <span className="world-dock-icon world-dock-icon--journal" />
-              <span className="world-dock-label">Journal</span>
-            </button>
+  <DockButton
+    label="Journal"
+    icon="journal"
+    active={activePanel === "journal"}
+    notification={journalEntries.length > 0 ? 1 : 0}
+    onClick={() => togglePanel("journal")}
+  />
 
-            <button
-              className={
-                "world-dock-button" +
-                (activePanel === "debug" ? " world-dock-button--active" : "")
-              }
-              onClick={() => togglePanel("debug")}
-            >
-              <span className="world-dock-icon world-dock-icon--debug" />
-              <span className="world-dock-label">Debug</span>
-            </button>
-          </div>
+  <DockButton
+    label="Debug"
+    icon="debug"
+    active={activePanel === "debug"}
+    onClick={() => togglePanel("debug")}
+  />
+</div>
+
 
           {/* +1 RELIC TOAST NEAR INVENTORY DOCK */}
           {inventoryToastItem && (

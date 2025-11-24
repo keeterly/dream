@@ -4401,3 +4401,82 @@ body {
   opacity: 0.6;
   margin-right: 0.25rem;
 }
+
+
+/* --- Dock Layout --- */
+.world-dock {
+  position: absolute;
+  bottom: 24px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 36px;
+  pointer-events: auto;
+}
+
+.world-dock-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  text-align: center;
+  position: relative;
+  padding: 0;
+  color: #cfd5ea;
+  font-family: inherit;
+  transition: opacity 0.2s;
+}
+
+.world-dock-btn:hover {
+  opacity: 0.85;
+}
+
+.world-dock-btn--active .world-dock-icon {
+  filter: brightness(1.3);
+}
+
+.world-dock-icon-wrap {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 6px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- Notification bubble --- */
+.world-dock-notification {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #e7b3b8;
+  color: #2a2d3a;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+/* --- Dock icon placeholder (swap with your SVG later) --- */
+.world-dock-icon {
+  width: 38px;
+  height: 38px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.9;
+}
+
+/* Example icon mappings (replace with your real SVGs) */
+.world-dock-icon--inventory { background-image: url('/icons/inventory.svg'); }
+.world-dock-icon--dreamself { background-image: url('/icons/dreamself.svg'); }
+.world-dock-icon--map { background-image: url('/icons/map.svg'); }
+.world-dock-icon--journal { background-image: url('/icons/journal.svg'); }
+.world-dock-icon--debug { background-image: url('/icons/debug.svg'); }
+
+.world-dock-label {
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  opacity: 0.9;
+}

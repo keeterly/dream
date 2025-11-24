@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import type { InventoryItem } from "../types";
 
 interface InventoryGridModalProps {
@@ -42,8 +42,7 @@ function sortInventoryItems(
 
   switch (mode) {
     case "newest":
-      // Assume parent already gives newest-first order
-      return arr;
+      return arr; // parent passes newest-first
 
     case "oldest":
       return arr.reverse();
@@ -67,7 +66,7 @@ function sortInventoryItems(
       return arr.sort((a, b) => a.name.localeCompare(b.name));
 
     case "size":
-      // All items are 1×1 for now; keep original order
+      // all 1x1 for now – keep incoming order
       return arr;
 
     default:
@@ -85,10 +84,15 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
   const [sortMode, setSortMode] = useState<InventorySortMode>("newest");
 
   const baseUrl = import.meta.env.BASE_URL || "/";
-  const sortedItems = sortInventoryItems(items, sortMode).slice(0, GRID_CAPACITY);
   const isFull = items.length >= GRID_CAPACITY;
 
-  // Fill slots from sorted items when modal opens or sort changes
+  // ✅ Stable sorted list; only recomputes when items or sort mode change
+  const sortedItems = useMemo(
+    () => sortInventoryItems(items, sortMode).slice(0, GRID_CAPACITY),
+    [items, sortMode]
+  );
+
+  // When modal opens or sort mode changes, seed the slots.
   useEffect(() => {
     if (!isOpen) return;
 
@@ -98,7 +102,7 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
     });
     setSlots(nextSlots);
     setDraggedIndex(null);
-  }, [sortedItems, isOpen]);
+  }, [isOpen, sortedItems]);
 
   const handleDragStart = (index: number) => {
     if (!slots[index]) return;
@@ -183,7 +187,10 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
               key={index}
               className="inventory-grid-cell"
               onDragOver={(e) => e.preventDefault()}
-              onDrop={() => handleDropOn(index)}
+              onDrop={(e) => {
+                e.preventDefault();          // ✅ needed for HTML5 DnD
+                handleDropOn(index);
+              }}
             >
               {item && (
                 <div
@@ -204,7 +211,7 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
                     loading="lazy"
                   />
 
-                  {/* Tooltip: full info lives here */}
+                  {/* Tooltip with full details */}
                   <div className="inventory-tooltip">
                     <div className="inventory-tooltip-name">
                       {item.name}

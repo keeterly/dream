@@ -7,28 +7,31 @@ interface InventoryGridModalProps {
   onClose: () => void;
 }
 
-type GridItem = InventoryItem;
+type GridItem = InventoryItem | null;
 
-const GRID_CAPACITY = 30;
+const GRID_COLUMNS = 6;
+const GRID_ROWS = 5;
+const GRID_CAPACITY = GRID_COLUMNS * GRID_ROWS;
 
-// Same sprite set as the world lane
-const FOUND_ITEM_SVGS = [
-  "split_crystal.svg",
-  "faceted_diamond.svg",
-  "rough_cut_stone.svg",
-  "short_chunky_crystal.svg",
-  "low_gem_prison.svg",
-  "glass_relic.svg",
-];
+// Explicit mapping item → correct SVG
+const ICON_MAP: Record<string, string> = {
+  glass_relic: "glass_relic.svg",
+  split_crystal: "split_crystal.svg",
+  faceted_diamond: "faceted_diamond.svg",
+  rough_cut_stone: "rough_cut_stone.svg",
+  short_chunky_crystal: "short_chunky_crystal.svg",
+  low_gem_prison: "low_gem_prison.svg",
+};
 
-// Deterministically map id/name → one of the sprites
-function getSpriteForName(nameOrId: string): string {
-  let hash = 0;
-  for (let i = 0; i < nameOrId.length; i += 1) {
-    hash = (hash * 31 + nameOrId.charCodeAt(i)) | 0;
+function getSpriteForItem(item: InventoryItem): string {
+  const rawKey = (item.id || item.name).toLowerCase().replace(/\s+/g, "_");
+
+  for (const key of Object.keys(ICON_MAP)) {
+    if (rawKey.includes(key)) return ICON_MAP[key];
   }
-  const index = Math.abs(hash) % FOUND_ITEM_SVGS.length;
-  return FOUND_ITEM_SVGS[index];
+
+  // Fallback: just pick something sane
+  return ICON_MAP.split_crystal ?? Object.values(ICON_MAP)[0];
 }
 
 export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
@@ -36,43 +39,47 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const [gridItems, setGridItems] = useState<GridItem[]>([]);
-  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [slots, setSlots] = useState<GridItem[]>(Array(GRID_CAPACITY).fill(null));
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   const baseUrl = import.meta.env.BASE_URL || "/";
+  const clampedItems = items.slice(0, GRID_CAPACITY);
   const isFull = items.length >= GRID_CAPACITY;
 
-  // Rebuild layout when items change or modal opens
+  // Fill slots sequentially with current items whenever inventory changes / modal opens
   useEffect(() => {
     if (!isOpen) return;
-    setGridItems(items); // all items are 1x1 now
-    setDraggedId(null);
-  }, [items, isOpen]);
 
-  const handleDragStart = (id: string) => {
-    setDraggedId(id);
+    const nextSlots: GridItem[] = Array(GRID_CAPACITY).fill(null);
+    clampedItems.forEach((item, index) => {
+      nextSlots[index] = item;
+    });
+    setSlots(nextSlots);
+    setDraggedIndex(null);
+  }, [clampedItems, isOpen]);
+
+  const handleDragStart = (index: number) => {
+    if (!slots[index]) return;
+    setDraggedIndex(index);
   };
 
-  const handleDropOn = (targetId: string) => {
-    if (!draggedId || draggedId === targetId) return;
+  const handleDropOn = (index: number) => {
+    if (draggedIndex == null || draggedIndex === index) return;
 
-    setGridItems((prev) => {
-      const current = [...prev];
-      const fromIdx = current.findIndex((g) => g.id === draggedId);
-      const toIdx = current.findIndex((g) => g.id === targetId);
-      if (fromIdx === -1 || toIdx === -1) return prev;
-
-      const tmp = current[fromIdx];
-      current[fromIdx] = current[toIdx];
-      current[toIdx] = tmp;
-      return current;
+    setSlots((prev) => {
+      const next = [...prev];
+      const fromItem = next[draggedIndex];
+      const toItem = next[index];
+      next[index] = fromItem;
+      next[draggedIndex] = toItem;
+      return next;
     });
 
-    setDraggedId(null);
+    setDraggedIndex(null);
   };
 
   const handleDragEnd = () => {
-    setDraggedId(null);
+    setDraggedIndex(null);
   };
 
   if (!isOpen) return null;
@@ -80,7 +87,7 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
   return (
     <div className="inventory-modal-backdrop" onClick={onClose}>
       <div
-        className="inventory-modal"
+        className="inventory-modal inventory-modal--minimal"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -101,58 +108,37 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
         </div>
 
         <p className="inventory-modal-subtitle">
-          Drag and drop to rearrange. Each relic occupies one slot. Capacity{" "}
-          {GRID_CAPACITY}.
+          Drag and drop to rearrange. Each relic occupies one slot. Capacity 30.
         </p>
 
-        <div className="inventory-grid">
-          {gridItems.length === 0 && (
-            <div className="inventory-grid-empty">
-              No relics yet. Walk further into the Dream.
-            </div>
-          )}
+        <div className="inventory-grid inventory-grid--dotted">
+          {slots.map((item, index) => (
+            <div
+              key={index}
+              className="inventory-grid-cell"
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={() => handleDropOn(index)}
+            >
+              {item && (
+                <div
+                  className={
+                    "inventory-grid-item-icon-only" +
+                    (draggedIndex === index
+                      ? " inventory-grid-item-icon-only--dragging"
+                      : "")
+                  }
+                  draggable
+                  onDragStart={() => handleDragStart(index)}
+                  onDragEnd={handleDragEnd}
+                >
+                  <img
+                    src={`${baseUrl}items/foundItems/${getSpriteForItem(item)}`}
+                    alt={item.name}
+                    className="inventory-grid-icon-img"
+                    loading="lazy"
+                  />
 
-          {gridItems.map((item) => {
-            const sprite = getSpriteForName(item.id ?? item.name);
-            const iconSrc = `${baseUrl}items/foundItems/${sprite}`;
-
-            return (
-              <div
-                key={item.id}
-                className={
-                  "inventory-grid-item " +
-                  `inventory-grid-item--${item.rarity ?? "common"} ` +
-                  (draggedId === item.id ? "inventory-grid-item--dragging" : "")
-                }
-                style={{
-                  gridColumn: "span 1",
-                  gridRow: "span 1",
-                }}
-                draggable
-                onDragStart={() => handleDragStart(item.id)}
-                onDragEnd={handleDragEnd}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={() => handleDropOn(item.id)}
-              >
-                <div className="inventory-grid-item-inner">
-                  <div className="inventory-grid-item-icon">
-                    <img
-                      src={iconSrc}
-                      alt={item.name}
-                      className="inventory-grid-item-icon-img"
-                    />
-                  </div>
-
-                  <div className="inventory-grid-item-label">
-                    <span className="inventory-grid-item-name">
-                      {item.name}
-                    </span>
-                    <span className="inventory-grid-item-rarity">
-                      {item.rarity}
-                    </span>
-                  </div>
-
-                  {/* Tooltip */}
+                  {/* Tooltip: full info lives here */}
                   <div className="inventory-tooltip">
                     <div className="inventory-tooltip-name">
                       {item.name}
@@ -167,9 +153,9 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              )}
+            </div>
+          ))}
         </div>
 
         <div className="inventory-modal-footer">

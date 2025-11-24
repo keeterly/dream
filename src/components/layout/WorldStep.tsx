@@ -36,15 +36,15 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   activeEncounterItem,
   onResolveEncounter,
 }) => {
-  const [activePanel, setActivePanel] = useState<WorldPanelId | null>(
-    "inventory"
-  );
+  // Panels still exist for character/map/journal/debug, but inventory is handled by modal
+  const [activePanel, setActivePanel] = useState<WorldPanelId | null>(null);
 
   // Timings (must match CSS where noted)
   const LOOT_TRAVEL_MS = 5500; // walk-in from offscreen
   const LOOT_PICKUP_ANIM_MS = 750; // MUST match CSS pickup duration
   const AUTO_PICKUP_DELAY_MS = 900; // how long Relic Found shows before pickup
   const INVENTORY_TOAST_MS = 1600; // how long "+1 Relic" stays visible
+  const INVENTORY_CAPACITY = 30;
 
   const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
   const [inventoryToastItem, setInventoryToastItem] =
@@ -62,6 +62,8 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   const hasLootSpawned = !!encounterItemName;
   const [hasReachedLoot, setHasReachedLoot] = useState(false);
   const [isLootCollected, setIsLootCollected] = useState(false);
+
+  const isInventoryFull = inventory.length >= INVENTORY_CAPACITY;
 
   // New spawn → simulate walk-in time from off-screen to the avatar
   useEffect(() => {
@@ -115,9 +117,11 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   /**
    * Auto-encounter roll while auto-walk is on.
    * We don't spawn a new item if one is already walking in or active.
+   * Also: if inventory is full, no more random relics will spawn.
    */
   useEffect(() => {
     if (!isAutoWalking || isEncounterActive || hasLootSpawned) return;
+    if (isInventoryFull) return;
 
     const delay = 8000 + Math.random() * 8000; // 8–16s
     const id = window.setTimeout(() => {
@@ -126,10 +130,26 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     }, delay);
 
     return () => window.clearTimeout(id);
-  }, [isAutoWalking, isEncounterActive, hasLootSpawned, onSpawnDebugItem]);
+  }, [
+    isAutoWalking,
+    isEncounterActive,
+    hasLootSpawned,
+    isInventoryFull,
+    onSpawnDebugItem,
+  ]);
 
   const handleEncounterBannerClick = () => {
     if (!isEncounterActive || !activeEncounterItem) return;
+
+    // If inventory is full, just leave the relic on the ground & inform the player.
+    if (isInventoryFull) {
+      setInventoryToastItem({
+        ...activeEncounterItem,
+        // no structural changes; we just reuse toast UI to say "Inventory full"
+      });
+      window.setTimeout(() => setInventoryToastItem(null), INVENTORY_TOAST_MS);
+      return;
+    }
 
     // Mark as collected so WorldLane plays the pickup animation
     setIsLootCollected(true);
@@ -177,6 +197,8 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     if (isLootCollected) return;
     // Need a real item
     if (!activeEncounterItem) return;
+    // If inventory is full, skip auto-pick attempts
+    if (isInventoryFull) return;
 
     // Wait a moment so the player sees "Relic Found" + !,
     // then behave exactly like a manual banner click.
@@ -186,7 +208,13 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
     return () => window.clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAutoPickup, isEncounterActive, isLootCollected, activeEncounterItem]);
+  }, [
+    isAutoPickup,
+    isEncounterActive,
+    isLootCollected,
+    activeEncounterItem,
+    isInventoryFull,
+  ]);
 
   const cardClasses = [
     "world-card",
@@ -281,6 +309,11 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                     {profile.traits.primaryArchetype}
                   </span>
                 </div>
+                {isInventoryFull && (
+                  <div className="world-hud-warning">
+                    Inventory full — no new relics will spawn.
+                  </div>
+                )}
               </div>
 
               <div className="world-hud-right">
@@ -328,14 +361,13 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
             {/* DOCK BUTTONS */}
             <div className="world-dock">
+              {/* INVENTORY now only opens the modal */}
               <button
                 className={
                   "world-dock-button" +
-                  (activePanel === "inventory"
-                    ? " world-dock-button--active"
-                    : "")
+                  (isInventoryModalOpen ? " world-dock-button--active" : "")
                 }
-                onClick={() => togglePanel("inventory")}
+                onClick={() => setIsInventoryModalOpen(true)}
               >
                 <span className="world-dock-icon world-dock-icon--inventory" />
                 <span className="world-dock-label">Inventory</span>
@@ -393,63 +425,17 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             {/* +1 RELIC TOAST NEAR INVENTORY DOCK */}
             {inventoryToastItem && (
               <div className="world-inventory-toast">
-                <div className="world-inventory-toast-pill">+1 Relic</div>
+                <div className="world-inventory-toast-pill">
+                  {isInventoryFull ? "Inventory Full" : "+1 Relic"}
+                </div>
                 <div className="world-inventory-toast-name">
                   {inventoryToastItem.name}
                 </div>
               </div>
             )}
 
-            {/* PANELS */}
+            {/* PANELS – inventory panel removed; only other panels remain */}
             <div className="world-panels">
-              {activePanel === "inventory" && (
-                <div className="world-panel world-panel-inventory">
-                  <div className="world-panel-header">
-                    <span className="world-panel-kicker">Relics</span>
-                    <span className="world-panel-title">Bound Objects</span>
-                  </div>
-
-                  <button
-                    type="button"
-                    className="inventory-grid-open-btn"
-                    onClick={() => setIsInventoryModalOpen(true)}
-                  >
-                    Open Grid Inventory
-                  </button>
-
-                  {inventory.length === 0 ? (
-                    <p className="world-panel-empty">
-                      Walk further. Relics tend to find you once they know your
-                      shape.
-                    </p>
-                  ) : (
-                    <ul className="inventory-list">
-                      {inventory.map((item) => (
-                        <li
-                          key={item.id}
-                          className={`inventory-item inventory-item--${item.rarity}`}
-                        >
-                          <div className="inventory-item-icon" />
-                          <div className="inventory-item-content">
-                            <div className="inventory-item-main">
-                              <span className="inventory-item-name">
-                                {item.name}
-                              </span>
-                              <span className="inventory-item-rarity">
-                                {item.rarity}
-                              </span>
-                            </div>
-                            <p className="inventory-item-desc">
-                              {item.description}
-                            </p>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              )}
-
               {activePanel === "character" && (
                 <DreamselfPanel profile={profile} inventory={inventory} />
               )}

@@ -13,7 +13,9 @@ const GRID_COLUMNS = 6;
 const GRID_ROWS = 5;
 const GRID_CAPACITY = GRID_COLUMNS * GRID_ROWS;
 
-// Explicit mapping item → correct SVG
+type InventorySortMode = "newest" | "oldest" | "rarity" | "type" | "size";
+
+// Mapping item → SVG filename
 const ICON_MAP: Record<string, string> = {
   glass_relic: "glass_relic.svg",
   split_crystal: "split_crystal.svg",
@@ -29,9 +31,48 @@ function getSpriteForItem(item: InventoryItem): string {
   for (const key of Object.keys(ICON_MAP)) {
     if (rawKey.includes(key)) return ICON_MAP[key];
   }
-
-  // Fallback: just pick something sane
   return ICON_MAP.split_crystal ?? Object.values(ICON_MAP)[0];
+}
+
+function sortInventoryItems(
+  items: InventoryItem[],
+  mode: InventorySortMode
+): InventoryItem[] {
+  const arr = [...items];
+
+  switch (mode) {
+    case "newest":
+      // Assume parent already gives newest-first order
+      return arr;
+
+    case "oldest":
+      return arr.reverse();
+
+    case "rarity": {
+      const weight: Record<string, number> = {
+        mythic: 0,
+        rare: 1,
+        uncommon: 2,
+        common: 3,
+      };
+      return arr.sort((a, b) => {
+        const wa = weight[a.rarity] ?? 99;
+        const wb = weight[b.rarity] ?? 99;
+        if (wa !== wb) return wa - wb;
+        return a.name.localeCompare(b.name);
+      });
+    }
+
+    case "type":
+      return arr.sort((a, b) => a.name.localeCompare(b.name));
+
+    case "size":
+      // All items are 1×1 for now; keep original order
+      return arr;
+
+    default:
+      return arr;
+  }
 }
 
 export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
@@ -41,22 +82,23 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
 }) => {
   const [slots, setSlots] = useState<GridItem[]>(Array(GRID_CAPACITY).fill(null));
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [sortMode, setSortMode] = useState<InventorySortMode>("newest");
 
   const baseUrl = import.meta.env.BASE_URL || "/";
-  const clampedItems = items.slice(0, GRID_CAPACITY);
+  const sortedItems = sortInventoryItems(items, sortMode).slice(0, GRID_CAPACITY);
   const isFull = items.length >= GRID_CAPACITY;
 
-  // Fill slots sequentially with current items whenever inventory changes / modal opens
+  // Fill slots from sorted items when modal opens or sort changes
   useEffect(() => {
     if (!isOpen) return;
 
     const nextSlots: GridItem[] = Array(GRID_CAPACITY).fill(null);
-    clampedItems.forEach((item, index) => {
+    sortedItems.forEach((item, index) => {
       nextSlots[index] = item;
     });
     setSlots(nextSlots);
     setDraggedIndex(null);
-  }, [clampedItems, isOpen]);
+  }, [sortedItems, isOpen]);
 
   const handleDragStart = (index: number) => {
     if (!slots[index]) return;
@@ -110,6 +152,30 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
         <p className="inventory-modal-subtitle">
           Drag and drop to rearrange. Each relic occupies one slot. Capacity 30.
         </p>
+
+        {/* Sort toggles */}
+        <div className="inventory-sort-row">
+          <span className="inventory-sort-label">Sort</span>
+          {[
+            { id: "newest", label: "Newest" },
+            { id: "oldest", label: "Oldest" },
+            { id: "rarity", label: "Rarity" },
+            { id: "type", label: "Type" },
+            { id: "size", label: "Size" },
+          ].map((opt) => (
+            <button
+              key={opt.id}
+              type="button"
+              className={
+                "inventory-sort-pill" +
+                (sortMode === opt.id ? " inventory-sort-pill--active" : "")
+              }
+              onClick={() => setSortMode(opt.id as InventorySortMode)}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
 
         <div className="inventory-grid inventory-grid--dotted">
           {slots.map((item, index) => (

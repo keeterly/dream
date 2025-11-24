@@ -3807,11 +3807,10 @@ body {
   z-index: 999;
 }
 
-/* Modal – tighter, focused on the grid */
 .inventory-modal.inventory-modal--minimal {
-  max-width: 720px;                          /* was ~960 */
-  width: min(92vw, 720px);
-  padding: 0.75rem 1.1rem 0.9rem;            /* less horizontal padding */
+  max-width: 680px;
+  width: min(92vw, 680px);
+  padding: 0.5rem; /* equal, minimal padding on all sides */
   border-radius: 1.2rem;
   background: linear-gradient(
     135deg,
@@ -3826,12 +3825,14 @@ body {
   z-index: 1000;
 }
 
+
 /* Header spacing a bit tighter */
 .inventory-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.25rem;
+   gap: 1rem;
 }
 
 .inventory-modal-subtitle {
@@ -3845,6 +3846,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
+  flex: 1;
 }
 
 .inventory-modal-kicker {
@@ -3855,8 +3857,8 @@ body {
 }
 
 .inventory-modal-title {
-  font-size: 0.95rem;
-  letter-spacing: 0.18em;
+ font-size: 1.05rem;
+   letter-spacing: 0.18em;
   text-transform: uppercase;
   margin: 0;
 }
@@ -4350,4 +4352,52 @@ body {
 
 .inventory-modal.inventory-modal--minimal {
   padding: 10px !important;
+}
+
+
+
+/* Header layout */
+
+.inventory-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.inventory-modal-title-block {
+  flex: 1;
+}
+
+.inventory-modal-title {
+  font-size: 1.05rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* Right side (sort pills + close button) */
+
+.inventory-modal-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Sort row, right-aligned */
+
+.inventory-sort-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  font-size: 0.74rem;
+  margin: 0; /* no extra vertical spacing */
+}
+
+.inventory-sort-label {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  opacity: 0.6;
+  margin-right: 0.25rem;
 }

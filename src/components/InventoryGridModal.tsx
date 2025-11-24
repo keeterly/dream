@@ -169,23 +169,21 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
     <div className="inventory-modal-backdrop">
       <div className="inventory-modal inventory-modal--minimal">
         {/* Header */}
-        <div className="inventory-modal-header">
-          <div className="inventory-modal-title-block">
-            <div className="inventory-modal-kicker">Inventory</div>
-          </div>
+             <div className="inventory-modal-header">
+        <div className="inventory-modal-title-block">
+          <div className="inventory-modal-title">Inventory</div>
+        </div>
 
+        <div className="inventory-modal-header-right">
           <div className="inventory-sort-row">
             <span className="inventory-sort-label">Sort</span>
 
             <button
               className={
                 "inventory-sort-pill" +
-                (sortMode === "newest"
-                  ? " inventory-sort-pill--active"
-                  : "")
+                (sortMode === "newest" ? " inventory-sort-pill--active" : "")
               }
               onClick={() => handleSortClick("newest")}
-              type="button"
             >
               Newest
             </button>
@@ -193,12 +191,9 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
             <button
               className={
                 "inventory-sort-pill" +
-                (sortMode === "oldest"
-                  ? " inventory-sort-pill--active"
-                  : "")
+                (sortMode === "oldest" ? " inventory-sort-pill--active" : "")
               }
               onClick={() => handleSortClick("oldest")}
-              type="button"
             >
               Oldest
             </button>
@@ -206,12 +201,9 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
             <button
               className={
                 "inventory-sort-pill" +
-                (sortMode === "rarity"
-                  ? " inventory-sort-pill--active"
-                  : "")
+                (sortMode === "rarity" ? " inventory-sort-pill--active" : "")
               }
               onClick={() => handleSortClick("rarity")}
-              type="button"
             >
               Rarity
             </button>
@@ -219,12 +211,9 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
             <button
               className={
                 "inventory-sort-pill" +
-                (sortMode === "name"
-                  ? " inventory-sort-pill--active"
-                  : "")
+                (sortMode === "name" ? " inventory-sort-pill--active" : "")
               }
               onClick={() => handleSortClick("name")}
-              type="button"
             >
               Name
             </button>
@@ -238,6 +227,8 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
             ×
           </button>
         </div>
+      
+
 
         {/* Grid */}
         <div className="inventory-grid-shell">

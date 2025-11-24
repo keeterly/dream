@@ -165,57 +165,78 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
 
   if (!isOpen) return null;
 
-  const usedCount = items.length;
-
   return (
     <div className="inventory-modal-backdrop">
       <div className="inventory-modal inventory-modal--minimal">
         {/* Header */}
-<div className="inventory-modal-header">
-  <div className="inventory-modal-title-block">
-    <div className="inventory-modal-kicker">Inventory</div>
-  </div>
+        <div className="inventory-modal-header">
+          <div className="inventory-modal-title-block">
+            <div className="inventory-modal-kicker">Inventory</div>
+          </div>
 
-  <div className="inventory-sort-row">
-    <span className="inventory-sort-label">Sort</span>
+          <div className="inventory-sort-row">
+            <span className="inventory-sort-label">Sort</span>
 
-    <button
-      className={`inventory-sort-pill ${sortMode === "newest" ? "inventory-sort-pill--active" : ""}`}
-      onClick={() => setSortMode("newest")}
-    >
-      Newest
-    </button>
+            <button
+              className={
+                "inventory-sort-pill" +
+                (sortMode === "newest"
+                  ? " inventory-sort-pill--active"
+                  : "")
+              }
+              onClick={() => handleSortClick("newest")}
+              type="button"
+            >
+              Newest
+            </button>
 
-    <button
-      className={`inventory-sort-pill ${sortMode === "oldest" ? "inventory-sort-pill--active" : ""}`}
-      onClick={() => setSortMode("oldest")}
-    >
-      Oldest
-    </button>
+            <button
+              className={
+                "inventory-sort-pill" +
+                (sortMode === "oldest"
+                  ? " inventory-sort-pill--active"
+                  : "")
+              }
+              onClick={() => handleSortClick("oldest")}
+              type="button"
+            >
+              Oldest
+            </button>
 
-    <button
-      className={`inventory-sort-pill ${sortMode === "rarity" ? "inventory-sort-pill--active" : ""}`}
-      onClick={() => setSortMode("rarity")}
-    >
-      Rarity
-    </button>
+            <button
+              className={
+                "inventory-sort-pill" +
+                (sortMode === "rarity"
+                  ? " inventory-sort-pill--active"
+                  : "")
+              }
+              onClick={() => handleSortClick("rarity")}
+              type="button"
+            >
+              Rarity
+            </button>
 
-    <button
-      className={`inventory-sort-pill ${sortMode === "name" ? "inventory-sort-pill--active" : ""}`}
-      onClick={() => setSortMode("name")}
-    >
-      Name
-    </button>
-  </div>
+            <button
+              className={
+                "inventory-sort-pill" +
+                (sortMode === "name"
+                  ? " inventory-sort-pill--active"
+                  : "")
+              }
+              onClick={() => handleSortClick("name")}
+              type="button"
+            >
+              Name
+            </button>
+          </div>
 
-  <button
-    type="button"
-    className="inventory-close-btn"
-    onClick={onClose}
-  >
-    ×
-  </button>
-</div>
+          <button
+            type="button"
+            className="inventory-close-btn"
+            onClick={onClose}
+          >
+            ×
+          </button>
         </div>
 
         {/* Grid */}
@@ -280,11 +301,6 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
               );
             })}
           </div>
-        </div>
-
-        {/* Single footer count (if you prefer just here, remove header count above) */}
-        <div className="inventory-modal-footer">
-          {usedCount} / {GRID_CAPACITY} slots used
         </div>
       </div>
     </div>

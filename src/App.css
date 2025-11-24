@@ -4084,3 +4084,262 @@ body {
   );
   opacity: 1;
 }
+
+
+
+
+/* === DREAM – INVENTORY GRID RESET (Option A) ===================== */
+
+/* Backdrop – keep world visible behind the modal */
+.inventory-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+      circle at 50% 0%,
+      rgba(15, 23, 42, 0.45),
+      rgba(2, 6, 23, 0.35)
+    );
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* Modal – tighter, focused on grid */
+.inventory-modal.inventory-modal--minimal {
+  max-width: 720px;
+  width: min(92vw, 720px);
+  padding: 0.7rem 1rem 0.85rem;
+  border-radius: 1.2rem;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.82),
+    rgba(15, 23, 42, 0.7)
+  );
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  box-shadow:
+    0 26px 70px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
+}
+
+/* Header */
+.inventory-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.inventory-modal-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.inventory-modal-kicker {
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.inventory-modal-title {
+  font-size: 0.95rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.inventory-modal-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.inventory-sort {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  opacity: 0.8;
+}
+
+.inventory-sort-select {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: rgba(15, 23, 42, 0.95);
+  color: #e5e7eb;
+}
+
+.inventory-capacity {
+  font-size: 0.72rem;
+}
+
+.inventory-close-btn {
+  border: none;
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* Shell around grid, keeps it centered */
+.inventory-grid-shell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.4rem 0.35rem;
+}
+
+/* 6×5 compact grid */
+.inventory-grid.inventory-grid--dotted {
+  width: 100%;
+  max-width: 520px;
+  padding: 0.45rem;
+  border-radius: 0.9rem;
+  background: radial-gradient(
+      circle at 50% 0%,
+      rgba(15, 23, 42, 0.8),
+      rgba(3, 7, 18, 0.95)
+    );
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.95);
+
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-rows: repeat(5, 1fr);
+  gap: 0.22rem;
+
+  overflow: visible;
+}
+
+/* Each slot = square cell with dotted border */
+.inventory-grid-slot {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 0.4rem;
+  border: 1px dashed rgba(148, 163, 184, 0.32);
+  background: radial-gradient(
+      circle at 0% 0%,
+      rgba(148, 163, 184, 0.12),
+      transparent 55%
+    ),
+    rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible; /* lets tooltip escape */
+}
+
+.inventory-grid-slot--dragging {
+  outline: 1px solid rgba(148, 197, 253, 0.8);
+}
+
+/* Icon-only items (borderless, no pill) */
+.inventory-grid-item {
+  position: relative;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+}
+
+.inventory-grid-slot--occupied .inventory-grid-item {
+  cursor: grab;
+}
+
+.inventory-grid-item-icon {
+  width: 82%;
+  max-width: 80px;
+  height: auto;
+  display: block;
+  pointer-events: none;
+  filter:
+    drop-shadow(0 0 12px rgba(15, 23, 42, 0.95))
+    drop-shadow(0 6px 14px rgba(0, 0, 0, 0.85));
+}
+
+/* Tooltip – high z-index and centered above icon */
+.inventory-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: 110%;
+  transform: translateX(-50%) translateY(-4px);
+  min-width: 220px;
+  max-width: 260px;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.6rem;
+  background: radial-gradient(
+      circle at 0% 0%,
+      rgba(15, 23, 42, 0.98),
+      rgba(15, 23, 42, 0.96)
+    );
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.95);
+  font-size: 0.78rem;
+  color: #e5e7eb;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease-out, transform 140ms ease-out;
+  z-index: 1100; /* above modal internals */
+}
+
+.inventory-tooltip::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 10px;
+  height: 10px;
+  background: rgba(15, 23, 42, 0.98);
+  border-left: 1px solid rgba(148, 163, 184, 0.7);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.7);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.inventory-grid-item:hover .inventory-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-1px);
+}
+
+.inventory-tooltip-name {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.inventory-tooltip-rarity {
+  font-size: 0.72rem;
+  text-transform: capitalize;
+  padding: 0.06rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+}
+
+.inventory-tooltip-desc {
+  opacity: 0.85;
+  line-height: 1.4;
+}
+
+/* Optional rarity tints */
+.inventory-tooltip-rarity.rarity-rare {
+  border-color: rgba(56, 189, 248, 0.85);
+  color: #e0f2fe;
+}
+.inventory-tooltip-rarity.rarity-mythic {
+  border-color: rgba(168, 85, 247, 0.95);
+  color: #f5d0fe;
+}

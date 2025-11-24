@@ -1,30 +1,11 @@
 // src/components/InventoryGridModal.tsx
 import React, { useMemo, useState } from "react";
 import type { InventoryItem } from "../types";
+import { getSpriteForItemName } from "../spriteMap";
 
 const GRID_COLUMNS = 6;
 const GRID_ROWS = 5;
 const GRID_CAPACITY = GRID_COLUMNS * GRID_ROWS;
-
-// Same sprite pool as WorldLane
-const FOUND_ITEM_SVGS = [
-  "split_crystal.svg",
-  "faceted_diamond.svg",
-  "rough_cut_stone.svg",
-  "short_chunky_crystal.svg",
-  "low_gem_prison.svg",
-  "glass_relic.svg",
-];
-
-// 🔑 SAME hash as in WorldLane, but we’ll feed it item.name
-function getSpriteForName(name: string): string {
-  let hash = 0;
-  for (let i = 0; i < name.length; i += 1) {
-    hash = (hash * 31 + name.charCodeAt(i)) | 0;
-  }
-  const index = Math.abs(hash) % FOUND_ITEM_SVGS.length;
-  return FOUND_ITEM_SVGS[index];
-}
 
 type SortMode = "newest" | "oldest" | "rarity" | "name";
 
@@ -147,15 +128,14 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
     }
 
     setManualGridOrder((prev) => {
-      const byId: Record<string, InventoryItem> = {};
-      prev.forEach((it) => {
-        byId[it.id] = it;
-      });
-
+      // Start from the current cell layout
       const nextCells = gridCells.map((cell) => cell.item);
+
+      // Swap / move items in the local grid
       nextCells[index] = sourceItem ?? null;
       nextCells[dragIndex] = targetItem ?? null;
 
+      // Rebuild linear order from cells (dedup by id, first occurrence wins)
       const nextOrder: InventoryItem[] = [];
       nextCells.forEach((maybeItem) => {
         if (maybeItem && !nextOrder.find((it) => it.id === maybeItem.id)) {
@@ -177,7 +157,8 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
 
   return (
     <div className="inventory-modal-backdrop">
-      <div className="inventory-modal inventory-modal--minimal">
+      {/* remove --minimal so you get your original large, centered modal */}
+      <div className="inventory-modal">
         <div className="inventory-modal-header">
           <div className="inventory-modal-title-block">
             <div className="inventory-modal-kicker">Inventory</div>
@@ -218,16 +199,20 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
           <div className="inventory-grid inventory-grid--dotted">
             {gridCells.map((cell, index) => {
               const item = cell.item;
-const isDragging = dragIndex === index && !!item;
+              const isDragging = dragIndex === index && !!item;
 
-// Use the *type key* from the instance id prefix.
-// Example: "split_crystal_1719abc" => "split_crystal"
-let iconSrc: string | null = null;
-if (item) {
-  const typeKey = item.id.split("_")[0] || item.id;
-  iconSrc = `${baseUrl}items/foundItems/${getSpriteForName(typeKey)}`;
-}
-
+              let iconSrc: string | null = null;
+              if (item) {
+                // 🔑 Single source of truth: same mapping as WorldLane
+                let spriteFile = getSpriteForItemName(item.name);
+                // optional fallback to id, in case you ever change mapping
+                if (!spriteFile) {
+                  spriteFile = getSpriteForItemName(item.id);
+                }
+                if (spriteFile) {
+                  iconSrc = `${baseUrl}items/foundItems/${spriteFile}`;
+                }
+              }
 
               return (
                 <div
@@ -254,7 +239,7 @@ if (item) {
                         className="inventory-grid-item-icon"
                       />
 
-                      {/* Tooltip */}
+                      {/* Tooltip – z-index handled in CSS */}
                       {hoveredItemId === item.id && (
                         <div className="inventory-tooltip">
                           <div className="inventory-tooltip-name">

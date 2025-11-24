@@ -1,4 +1,6 @@
+// src/components/WorldLane.tsx
 import React from "react";
+import { getSpriteForItemName } from "../spriteMap";
 
 interface WorldLaneProps {
   profile: unknown | null;
@@ -21,26 +23,6 @@ const PARALLAX_LAYERS = [
   { file: "layer_05.png", depth: 5, duration: 14, opacity: 1.0, blur: 0 },
 ];
 
-// Nier-style loot SVGs you added under /public/items/foundItems
-const FOUND_ITEM_SVGS = [
-  "split_crystal.svg",
-  "faceted_diamond.svg",
-  "rough_cut_stone.svg",
-  "short_chunky_crystal.svg",
-  "low_gem_prison.svg",
-  "glass_relic.svg",
-];
-
-// Deterministically map a name → one of the sprites
-function getSpriteForName(name: string): string {
-  let hash = 0;
-  for (let i = 0; i < name.length; i += 1) {
-    hash = (hash * 31 + name.charCodeAt(i)) | 0;
-  }
-  const index = Math.abs(hash) % FOUND_ITEM_SVGS.length;
-  return FOUND_ITEM_SVGS[index];
-}
-
 const WorldLane: React.FC<WorldLaneProps> = ({
   phase,
   environmentId,
@@ -61,17 +43,18 @@ const WorldLane: React.FC<WorldLaneProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  const lootSprite =
-    encounterItemName != null ? getSpriteForName(encounterItemName) : null;
+  // Single source of truth for icons: spriteMap keyed by item name
+  const lootSprite = encounterItemName
+    ? getSpriteForItemName(encounterItemName)
+    : null;
+
   const lootPath = lootSprite
     ? `${baseUrl}items/foundItems/${lootSprite}`
     : null;
 
   const lootClassName = [
     "world-lane-loot",
-    isEncounterActive
-      ? "world-lane-loot--active"
-      : "world-lane-loot--approach",
+    isEncounterActive ? "world-lane-loot--active" : "world-lane-loot--approach",
     isLootCollected ? "world-lane-loot--pickup" : "",
   ]
     .filter(Boolean)
@@ -107,10 +90,7 @@ const WorldLane: React.FC<WorldLaneProps> = ({
         <div className="world-lane-ribbon" />
       </div>
 
-      {/* Nier-style loot crystal on the ribbon.
-          - When it first spawns: class --approach → slides in from off-screen.
-          - Once encounter is active: class --active → locked under the avatar & pulses.
-          - When collected: class --pickup → flies to inventory. */}
+      {/* Nier-style loot crystal on the ribbon. */}
       {encounterItemName && lootPath && (
         <div className={lootClassName}>
           <div className="world-lane-loot-shadow" aria-hidden="true" />

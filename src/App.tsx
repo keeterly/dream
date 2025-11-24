@@ -23,9 +23,6 @@ type ScreenId = "intro" | "questions" | "summary" | "world";
 
 const PHASES = ["Dawn", "Day", "Dusk", "Night"] as const;
 
-// 6x5 inventory grid capacity
-const GRID_CAPACITY = 30;
-
 function getPhaseFromTick(tick: number): string {
   // 48 ticks → full cycle (Dawn, Day, Dusk, Night)
   const segment = Math.floor((tick % 48) / 12);
@@ -43,14 +40,19 @@ export const App: React.FC = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   const [profile, setProfile] = useState<DreamselfProfile | null>(null);
+
+  // Inventory is the *actual* carried relics
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
+
+  // World clock for phase tint
   const [worldTick, setWorldTick] = useState(0);
 
-  // Name used by WorldLane for the on-ribbon crystal
-  const [encounterItemName, setEncounterItemName] =
-    useState<string | null>(null);
+  // Name of the item that’s visually on the ground in the world
+  const [encounterItemName, setEncounterItemName] = useState<string | null>(
+    null
+  );
 
-  // The *actual* relic instance currently on the ground
+  // The specific inventory item currently being encountered
   const [activeEncounterItem, setActiveEncounterItem] =
     useState<InventoryItem | null>(null);
 
@@ -58,26 +60,20 @@ export const App: React.FC = () => {
     entries: journalEntries,
     logDreamselfCreated,
     logItemFound,
+    logBiomeVisited,
   } = useJournal();
 
-  // ─────────────────────────────────────────────
-  // WORLD TICK → time-of-day only
-  // ─────────────────────────────────────────────
+  // Simple world clock just for phase changes (you can tweak interval later)
   useEffect(() => {
-    if (!profile || screen !== "world") return;
+    if (screen !== "world") return;
 
-    const intervalId = window.setInterval(() => {
+    const id = window.setInterval(() => {
       setWorldTick((t) => t + 1);
-      // later: derive biome from worldTick and log if you want
-      // logBiomeVisited("dusk_valley", "twilight");
-    }, 12000);
+    }, 8000);
 
-    return () => window.clearInterval(intervalId);
-  }, [profile, screen]);
+    return () => window.clearInterval(id);
+  }, [screen]);
 
-  // ─────────────────────────────────────────────
-  // INTRO / QUESTIONS FLOW
-  // ─────────────────────────────────────────────
   const handleBegin = () => {
     setScreen("questions");
   };
@@ -97,7 +93,6 @@ export const App: React.FC = () => {
 
     // finished questionnaire → compute dreamself
     const nextProfile = computeTraitsAndAvatar("dream-seed", nextAnswers);
-
     setProfile(nextProfile);
     logDreamselfCreated(nextProfile);
     setScreen("summary");
@@ -107,70 +102,45 @@ export const App: React.FC = () => {
     setScreen("world");
   };
 
-  // ─────────────────────────────────────────────
-  // DEBUG SPAWN — ONLY creates a pending encounter
-  // NO inventory mutation here
-  // ─────────────────────────────────────────────
+  // DEBUG: force-spawn a relic encounter immediately
   const handleSpawnDebugItem = () => {
-    // Don’t spawn if an encounter is already in progress
-    if (activeEncounterItem) return;
-
-    if (inventory.length >= GRID_CAPACITY) {
-      // You can replace this with a nicer toast later
-      alert("Your inventory is full. You can’t carry more relics.");
-      return;
-    }
-
     const baseItem = getRandomWorldItem();
     const acquiredAt = new Date().toISOString();
 
     const pending: InventoryItem = {
       ...baseItem,
-      // Make the inventory instance unique, but keep base identity
+      // keep id unique per instance
       id: `${baseItem.id}_${Date.now()}_${Math.random()
         .toString(36)
         .slice(2, 6)}`,
       acquiredAt,
     };
 
-    // Drive world UI: this becomes the active encounter
-    // Use the *type key* (base id), not the display name.
+    // This is *only* the pending encounter. We do NOT add it
+    // to inventory yet – that happens when WorldStep calls onResolveEncounter.
     setActiveEncounterItem(pending);
-    setEncounterItemName(baseItem.id);
+
+    // IMPORTANT: drive world UI using the *display name*
+    // so world + inventory look up sprites from the same key.
+    setEncounterItemName(baseItem.name);
   };
 
-  // ─────────────────────────────────────────────
-  // PICKUP — the ONLY place items get added to inventory
-  // Called by WorldStep after banner click or auto-pickup
-  // ─────────────────────────────────────────────
+  // Called by WorldStep once the pickup animation finishes (or auto-pickup fires)
   const handleResolveEncounter = () => {
-    setActiveEncounterItem((pending) => {
-      if (!pending) return null;
+    if (activeEncounterItem) {
+      // Add to inventory *here* so timing & identity match the pickup
+      setInventory((prev) => [activeEncounterItem, ...prev]);
+      logItemFound(activeEncounterItem);
+    }
 
-      setInventory((prev) => {
-        if (prev.length >= GRID_CAPACITY) {
-          alert("Your inventory is full. Free a slot before picking up relics.");
-          return prev;
-        }
-
-        const updated = [...prev, pending];
-        logItemFound(pending); // journal logs the *same* relic you saw
-
-        return updated;
-      });
-
-      // Clear encounter visuals
-      setEncounterItemName(null);
-      return null;
-    });
+    // Clear encounter visual state
+    setActiveEncounterItem(null);
+    setEncounterItemName(null);
   };
-
-  // ─────────────────────────────────────────────
-  // RENDER SCREEN
-  // ─────────────────────────────────────────────
-  const phase = getPhaseFromTick(worldTick);
 
   const renderScreen = () => {
+    const phase = getPhaseFromTick(worldTick);
+
     if (screen === "intro") {
       return <IntroStep onBegin={handleBegin} />;
     }
@@ -187,9 +157,7 @@ export const App: React.FC = () => {
     }
 
     if (screen === "summary" && profile) {
-      return (
-        <SummaryStep profile={profile} onEnterWorld={handleEnterWorld} />
-      );
+      return <SummaryStep profile={profile} onEnterWorld={handleEnterWorld} />;
     }
 
     if (screen === "world" && profile) {
@@ -207,6 +175,7 @@ export const App: React.FC = () => {
       );
     }
 
+    // fallback
     return <IntroStep onBegin={handleBegin} />;
   };
 
@@ -215,8 +184,7 @@ export const App: React.FC = () => {
       {screen !== "world" && <AppHeader screen={screen} />}
       <main
         className={
-          "App-main app-main" +
-          (screen === "world" ? " app-main--world" : "")
+          "App-main app-main" + (screen === "world" ? " app-main--world" : "")
         }
       >
         {renderScreen()}

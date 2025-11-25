@@ -4829,3 +4829,10 @@ body {
     width: 110px;
   }
 }
+
+
+
+/* FIX: Ensure dock buttons can hold absolutely-positioned badges */
+.world-dock-btn {
+  position: relative !important;
+}

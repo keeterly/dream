@@ -581,43 +581,7 @@ body {
   transform: translate3d(0, 0, 0);
 }
 
-.world-lane-backdrop--far {
-  bottom: 32%;
-  background-image: linear-gradient(
-      to top,
-      rgba(15, 23, 42, 1) 0%,
-      rgba(15, 23, 42, 0.1) 55%,
-      transparent 90%
-    ),
-    repeating-linear-gradient(
-      -8deg,
-      rgba(15, 23, 42, 0.9) 0,
-      rgba(15, 23, 42, 0.9) 80px,
-      rgba(15, 23, 42, 0.3) 80px,
-      rgba(15, 23, 42, 0.3) 150px
-    );
-  opacity: 0.4;
-  animation: world-lane-scroll-slow 80s linear infinite;
-}
 
-.world-lane-backdrop--near {
-  bottom: 26%;
-  background-image: linear-gradient(
-      to top,
-      rgba(15, 23, 42, 1) 0%,
-      rgba(15, 23, 42, 0.2) 50%,
-      transparent 90%
-    ),
-    repeating-linear-gradient(
-      -10deg,
-      rgba(15, 23, 42, 0.95) 0,
-      rgba(15, 23, 42, 0.95) 90px,
-      rgba(15, 23, 42, 0.4) 90px,
-      rgba(15, 23, 42, 0.4) 160px
-    );
-  opacity: 0.65;
-  animation: world-lane-scroll 55s linear infinite;
-}
 
 /* ground / walking path */
 
@@ -631,45 +595,7 @@ body {
   transform: translate3d(0, 0, 0);
 }
 
-.world-lane-ground--back {
-  bottom: 15%;
-  background-image: linear-gradient(
-      to top,
-      #020617 0%,
-      #020617 30%,
-      rgba(15, 23, 42, 0.9) 60%,
-      rgba(15, 23, 42, 0.5) 100%
-    ),
-    repeating-linear-gradient(
-      0deg,
-      #1d3557 0,
-      #1d3557 40px,
-      #020617 40px,
-      #020617 80px
-    );
-  opacity: 0.95;
-  animation: world-lane-scroll-fast 28s linear infinite;
-}
 
-.world-lane-ground--front {
-  bottom: 9%;
-  background-image: linear-gradient(
-      to top,
-      #020617 0%,
-      #020617 45%,
-      rgba(15, 23, 42, 0.9) 80%,
-      rgba(15, 23, 42, 0.4) 100%
-    ),
-    repeating-linear-gradient(
-      0deg,
-      #223a70 0,
-      #223a70 36px,
-      #020617 36px,
-      #020617 80px
-    );
-  opacity: 1.1;
-  animation: world-lane-scroll-fast 20s linear infinite;
-}
 
 /* character silhouette */
 
@@ -893,16 +819,15 @@ body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 5; /* above parallax, below figure / crystal / HUD */
-  background: linear-gradient(
-    to bottom,
-    rgba(15, 23, 42, 0.95) 0%,
-    rgba(15, 23, 42, 0.85) 28%,
-    rgba(15, 23, 42, 0.6) 55%,
-    rgba(15, 23, 42, 0.25) 78%,
-    transparent 100%
+  z-index: 5;
+  background: radial-gradient(
+    ellipse at top,
+    rgba(15, 23, 42, 0.65),
+    rgba(15, 23, 42, 0.35),
+    transparent 70%
   );
 }
+
 
 
 
@@ -4372,4 +4297,105 @@ body {
   .world-hud-bar-track {
     width: 110px;
   }
+}
+
+
+
+/* === CLEAN FINAL DOCK ICONS === */
+
+.world-dock {
+  position: absolute;
+  right: 4vw;
+  bottom: 2.2rem;
+  display: flex;
+  gap: 2rem;
+  z-index: 30;
+}
+
+.world-dock-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.world-dock-icon {
+  width: 48px;   /* 2× size */
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  /* no circle ring */
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.world-dock-icon::before,
+.world-dock-icon::after {
+  border: none !important;   /* Remove rings */
+}
+
+/* Label */
+.world-dock-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+}
+
+/* Notification bubble */
+.world-dock-notification {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #f9a8d4;
+  color: #111827;
+  font-size: 0.65rem;
+  text-align: center;
+  line-height: 18px;
+  box-shadow: 0 0 10px rgba(248,113,171,0.9);
+}
+
+
+/* === STATUS BARS (bottom, aligned with dock) === */
+
+.world-hud-bars {
+  position: absolute;
+  right: calc(4vw + 200px);  /* shifts left to align with dock */
+  bottom: 2.4rem;
+  display: flex;
+  gap: 1.5rem;
+  z-index: 30;
+}
+
+.world-hud-bar-track {
+  width: 140px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+
+.world-hud-bar-fill {
+  height: 100%;
+}
+
+.world-hud-bar--hp .world-hud-bar-fill {
+  background: linear-gradient(90deg, #fca5a5, #f87171);
+}
+
+.world-hud-bar--mp .world-hud-bar-fill {
+  background: linear-gradient(90deg, #93c5fd, #3b82f6);
+}
+
+.world-hud-bar--stamina .world-hud-bar-fill {
+  background: linear-gradient(90deg, #fde68a, #facc15);
 }

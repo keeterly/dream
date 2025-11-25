@@ -4260,3 +4260,41 @@ html, body {
   margin: 0 !important;
   padding: 0 !important;
 }
+
+
+
+/* === DREAM – HARD FULLSCREEN WORLD LAYOUT ===================== */
+/* Kill all outer padding when we're in world mode */
+.app-root--world {
+  padding: 0 !important;
+}
+
+/* Make the main area just be a fullscreen canvas */
+.app-main--world {
+  padding: 0 !important;
+  margin: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  min-height: 100vh;
+}
+
+/* The world screen itself should fill the viewport */
+.app-main--world .app-screen-world {
+  margin: 0;
+  width: 100%;
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden; /* no scroll below the game */
+}
+
+/* The world card is the actual “game surface” → full bleed */
+.app-main--world .app-screen-world .world-card {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+  border-radius: 0;     /* no rounding on the game surface */
+  border: none;
+}

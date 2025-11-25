@@ -881,10 +881,7 @@ body {
 }
 
 
-/* When the Dreamself is not walking, freeze the parallax */
-.world-lane--paused .world-lane-layer {
-  animation-play-state: paused;
-}
+
 
 
 
@@ -2801,11 +2798,7 @@ body {
 }
 
 
-/* When an encounter is active, freeze the parallax + ribbon */
-.world-lane--paused .world-lane-layer,
-.world-lane--paused .world-lane-ribbon {
-  animation-play-state: paused;
-}
+
 
 
 
@@ -4723,20 +4716,19 @@ body {
 }
 
 
-/* === FINAL PATCH: World dock icons (bigger, no outer circle) === */
+/* === DREAM – World dock (clean canonical version) =============== */
 
-/* Position of the dock row */
 .world-dock {
   position: absolute;
   right: 5vw;
   bottom: 2.2rem;
   display: flex;
-  gap: 1.4rem;
+  gap: 1.2rem;
   align-items: flex-end;
   z-index: 25;
 }
 
-/* The button wrapper your JSX uses (Inventory / Dreamself / Map / Journal / Debug) */
+/* Button wrapper your JSX uses: Inventory / Dreamself / Map / Journal / Debug */
 .world-dock-btn {
   background: transparent;
   border: none;
@@ -4755,40 +4747,27 @@ body {
   text-transform: uppercase;
 }
 
-/* Label under icon – bold for legibility */
 .world-dock-label {
   font-weight: 600;
   opacity: 0.9;
 }
 
-/* Bigger hit area – no circular chip or border */
+/* Hit area for the icon */
 .world-dock-icon-wrap {
   position: relative;
-  width: 48px;   /* ~2x what you had */
-  height: 48px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
-  background: transparent;
 }
 
-/* The glyph container itself – no border, no circle */
+/* Glyph container */
 .world-dock-icon {
   position: relative;
-  width: 28px;   /* doubled-ish */
-  height: 28px;
-  border: none;
-  border-radius: 0;  /* we’ll draw shapes by hand below */
+  width: 22px;
+  height: 22px;
 }
-
-/* Make sure any old “base circle” doesn’t show up */
-.world-dock-icon::before,
-.world-dock-icon::after {
-  content: none !important;
-}
-
-/* === Minimal geometric glyphs for each icon ===================== */
 
 /* INVENTORY: double box */
 .world-dock-icon--inventory::before,
@@ -4800,14 +4779,14 @@ body {
 }
 
 .world-dock-icon--inventory::before {
-  inset: 12% 16% auto 16%;   /* lid */
+  inset: 10% 15% auto 15%;  /* lid */
 }
 
 .world-dock-icon--inventory::after {
-  inset: 32% 18% 16% 18%;    /* body */
+  inset: 32% 18% 16% 18%;   /* body */
 }
 
-/* DREAMSELF: simple circle head + robe */
+/* DREAMSELF: circle head + robe */
 .world-dock-icon--dreamself::before,
 .world-dock-icon--dreamself::after {
   content: "";
@@ -4861,7 +4840,7 @@ body {
   top: 60%;
 }
 
-/* DEBUG: small rotated square (diamond) */
+/* DEBUG: small rotated square */
 .world-dock-icon--debug::before {
   content: "";
   position: absolute;
@@ -4871,7 +4850,7 @@ body {
   transform: rotate(45deg);
 }
 
-/* Tiny pink notification badge (for “1” etc.) – kept as-is, just aligned to new size */
+/* Tiny notification badge */
 .world-dock-notification {
   position: absolute;
   top: -6px;
@@ -4887,33 +4866,21 @@ body {
   box-shadow: 0 0 10px rgba(248, 113, 171, 0.9);
 }
 
-/* Subtle hover polish */
+/* Hover + active polish */
 .world-dock-btn:hover .world-dock-icon {
-  filter: drop-shadow(0 0 6px rgba(248, 250, 252, 0.4));
+  filter: drop-shadow(0 0 6px rgba(248, 250, 252, 0.35));
 }
 
 .world-dock-btn:hover .world-dock-label {
   opacity: 1;
 }
 
-/* Active / selected glow */
 .world-dock-btn.world-dock-btn--active .world-dock-icon {
   filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.9));
 }
+
 .world-dock-btn.world-dock-btn--active .world-dock-label {
   color: #e0f2fe;
-}
-
-
-/* FINAL OVERRIDE — remove world ribbon / stray horizontal bars */
-.world-lane-ribbon,
-.world-lane-line,
-.world-ground-line,
-.world-lane-inner::before,
-.world-lane-inner::after {
-  display: none !important;
-  background: transparent !important;
-  border: none !important;
 }
 
 

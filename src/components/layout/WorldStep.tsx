@@ -37,9 +37,8 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   activeEncounterItem,
   onResolveEncounter,
 }) => {
-  const [activePanel, setActivePanel] = useState<WorldPanelId | null>(
-    "inventory"
-  );
+  // slide-up panels (dreamself / map / journal / debug)
+  const [activePanel, setActivePanel] = useState<WorldPanelId | null>(null);
 
   // Timing constants (ms)
   const LOOT_TRAVEL_MS = 5500; // walk-in from offscreen
@@ -47,6 +46,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   const AUTO_PICKUP_DELAY_MS = 250; // delay before auto pickup (Relic Found visible)
   const INVENTORY_TOAST_MS = 1600; // "+1 Relic" toast lifetime
 
+  // Inventory grid modal
   const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
   const [inventoryToastItem, setInventoryToastItem] =
     useState<InventoryItem | null>(null);
@@ -86,17 +86,13 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   const isEncounterActive = !!activeEncounterItem && hasReachedLoot;
   const isWalking = isAutoWalking && !(!isAutoPickup && isEncounterActive);
 
-  const togglePanel = (panel: WorldPanelId) => {
-    setActivePanel((current) => (current === panel ? null : panel));
-  };
-
   const dominantElement = profile?.traits?.dominantElement ?? null;
   const lighting = useBiomeLighting({
     phase,
     element: dominantElement,
   });
 
-  // Dock button component (icon + label + optional badge)
+  // Dock button component (icon + label + optional notification)
   const DockButton: React.FC<{
     label: string;
     icon: string;
@@ -109,8 +105,8 @@ export const WorldStep: React.FC<WorldStepProps> = ({
         className={
           "world-dock-btn" + (active ? " world-dock-btn--active" : "")
         }
-        onClick={onClick}
         type="button"
+        onClick={onClick}
       >
         <div className="world-dock-icon-wrap">
           <span className={`world-dock-icon world-dock-icon--${icon}`} />
@@ -121,6 +117,27 @@ export const WorldStep: React.FC<WorldStepProps> = ({
         <div className="world-dock-label">{label}</div>
       </button>
     );
+  };
+
+  /**
+   * Open/close slide-up panels (NOT the inventory modal).
+   * Any time a panel is opened, close the inventory modal so they never overlap.
+   */
+  const togglePanel = (panel: WorldPanelId) => {
+    if (panel === "inventory") {
+      // inventory is handled by its own modal toggler
+      return;
+    }
+
+    setIsInventoryModalOpen(false);
+    setActivePanel((current) => (current === panel ? null : panel));
+  };
+
+  // Separate handler for the Inventory dock → toggles the modal
+  const handleInventoryDockClick = () => {
+    setIsInventoryModalOpen((prev) => !prev);
+    // ensure slide-up panels are closed while the modal is open
+    setActivePanel(null);
   };
 
   /**
@@ -223,11 +240,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
   // Encounter UI (glyph + top banner) hides once we've clicked / auto-picked
   const showEncounterUI = isEncounterActive && !isLootCollected;
-
-  // Simple placeholder ratios for HP / MP / Stamina bars
-  const HP_RATIO = 0.86;
-  const MP_RATIO = 0.64;
-  const STAMINA_RATIO = 0.72;
 
   return (
     <section className="app-screen app-screen-world">
@@ -348,16 +360,18 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             </div>
           </div>
 
-          {/* DOCK BUTTONS (bottom-right) */}
+          {/* HP / MP / STAMINA strip – already in your CSS */}
+
+          {/* DOCK BUTTONS */}
           <div className="world-dock">
             <DockButton
               label="Inventory"
               icon="inventory"
-              active={activePanel === "inventory"}
+              active={isInventoryModalOpen}
               notification={
                 inventory.length > 0 && !isInventoryModalOpen ? 1 : 0
               }
-              onClick={() => togglePanel("inventory")}
+              onClick={handleInventoryDockClick}
             />
 
             <DockButton
@@ -388,39 +402,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
               active={activePanel === "debug"}
               onClick={() => togglePanel("debug")}
             />
-          </div>
-
-          {/* HP / MP / STAMINA BARS (bottom-left, Nier-style minimal) */}
-          <div className="world-hud-bars">
-            <div className="world-hud-bar world-hud-bar--hp">
-              <span className="world-hud-bar-label">HP</span>
-              <div className="world-hud-bar-track">
-                <div
-                  className="world-hud-bar-fill"
-                  style={{ width: `${HP_RATIO * 100}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="world-hud-bar world-hud-bar--mp">
-              <span className="world-hud-bar-label">MP</span>
-              <div className="world-hud-bar-track">
-                <div
-                  className="world-hud-bar-fill"
-                  style={{ width: `${MP_RATIO * 100}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="world-hud-bar world-hud-bar--stamina">
-              <span className="world-hud-bar-label">STAMINA</span>
-              <div className="world-hud-bar-track">
-                <div
-                  className="world-hud-bar-fill"
-                  style={{ width: `${STAMINA_RATIO * 100}%` }}
-                />
-              </div>
-            </div>
           </div>
 
           {/* +1 RELIC TOAST NEAR INVENTORY DOCK */}

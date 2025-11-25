@@ -4711,3 +4711,195 @@ body {
 .world-lane-debug {
   display: none !important;
 }
+
+
+/* === FINAL PATCH: kill legacy horizontal line in world view === */
+.world-lane-ribbon,
+.world-lane-line,
+.world-ground-line,
+.world-lane-debug {
+  display: none !important;
+  background: transparent !important;
+}
+
+
+/* === FINAL PATCH: World dock icons (bigger, no outer circle) === */
+
+/* Position of the dock row */
+.world-dock {
+  position: absolute;
+  right: 5vw;
+  bottom: 2.2rem;
+  display: flex;
+  gap: 1.4rem;
+  align-items: flex-end;
+  z-index: 25;
+}
+
+/* The button wrapper your JSX uses (Inventory / Dreamself / Map / Journal / Debug) */
+.world-dock-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+
+  color: #e5e7eb;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* Label under icon – bold for legibility */
+.world-dock-label {
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+/* Bigger hit area – no circular chip or border */
+.world-dock-icon-wrap {
+  position: relative;
+  width: 48px;   /* ~2x what you had */
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+}
+
+/* The glyph container itself – no border, no circle */
+.world-dock-icon {
+  position: relative;
+  width: 28px;   /* doubled-ish */
+  height: 28px;
+  border: none;
+  border-radius: 0;  /* we’ll draw shapes by hand below */
+}
+
+/* Make sure any old “base circle” doesn’t show up */
+.world-dock-icon::before,
+.world-dock-icon::after {
+  content: none !important;
+}
+
+/* === Minimal geometric glyphs for each icon ===================== */
+
+/* INVENTORY: double box */
+.world-dock-icon--inventory::before,
+.world-dock-icon--inventory::after {
+  content: "";
+  position: absolute;
+  border-radius: 3px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.world-dock-icon--inventory::before {
+  inset: 12% 16% auto 16%;   /* lid */
+}
+
+.world-dock-icon--inventory::after {
+  inset: 32% 18% 16% 18%;    /* body */
+}
+
+/* DREAMSELF: simple circle head + robe */
+.world-dock-icon--dreamself::before,
+.world-dock-icon--dreamself::after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+/* head */
+.world-dock-icon--dreamself::before {
+  width: 32%;
+  height: 32%;
+  border-radius: 999px;
+  left: 50%;
+  top: 6%;
+  transform: translateX(-50%);
+}
+
+/* robe */
+.world-dock-icon--dreamself::after {
+  left: 22%;
+  right: 22%;
+  bottom: 10%;
+  top: 40%;
+  border-radius: 5px 5px 10px 10px;
+}
+
+/* MAP: folded map rectangle */
+.world-dock-icon--map::before {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border-radius: 4px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+/* JOURNAL: two horizontal lines */
+.world-dock-icon--journal::before,
+.world-dock-icon--journal::after {
+  content: "";
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  border-top: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.world-dock-icon--journal::before {
+  top: 32%;
+}
+
+.world-dock-icon--journal::after {
+  top: 60%;
+}
+
+/* DEBUG: small rotated square (diamond) */
+.world-dock-icon--debug::before {
+  content: "";
+  position: absolute;
+  inset: 22%;
+  border-radius: 3px;
+  border: 1px solid rgba(248, 250, 252, 0.9);
+  transform: rotate(45deg);
+}
+
+/* Tiny pink notification badge (for “1” etc.) – kept as-is, just aligned to new size */
+.world-dock-notification {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  padding: 0 4px;
+  border-radius: 10px;
+  background: #f9a8d4;
+  color: #111827;
+  font-size: 0.65rem;
+  text-align: center;
+  line-height: 1.2;
+  box-shadow: 0 0 10px rgba(248, 113, 171, 0.9);
+}
+
+/* Subtle hover polish */
+.world-dock-btn:hover .world-dock-icon {
+  filter: drop-shadow(0 0 6px rgba(248, 250, 252, 0.4));
+}
+
+.world-dock-btn:hover .world-dock-label {
+  opacity: 1;
+}
+
+/* Active / selected glow */
+.world-dock-btn.world-dock-btn--active .world-dock-icon {
+  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.9));
+}
+.world-dock-btn.world-dock-btn--active .world-dock-label {
+  color: #e0f2fe;
+}

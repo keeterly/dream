@@ -93,6 +93,8 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     setActivePanel((current) => (current === panel ? null : panel));
   };
 
+  const closeActivePanel = () => setActivePanel(null);
+
   const dominantElement = profile?.traits?.dominantElement ?? null;
   const lighting = useBiomeLighting({
     phase,
@@ -147,9 +149,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   /**
    * Auto-encounter roll while actually walking.
    * We don't spawn a new item if one is already walking in or active.
-   *
-   * NOTE: Previously this used `isAutoWalking` and an 8–16s delay,
-   * which made drops feel extremely rare in short sessions.
    */
   useEffect(() => {
     if (!isWalking || isEncounterActive || hasLootSpawned) return;
@@ -177,7 +176,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     const shouldResumeAutoWalk = wasAutoWalkingBeforeEncounter;
     const itemForToast = activeEncounterItem;
 
-    // ✅ Parent actually adds the relic to inventory here
+    // Parent actually adds the relic to inventory here
     onResolveEncounter();
 
     // Increment unread counter for the inventory badge
@@ -241,14 +240,8 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     setInventoryUnreadCount(0);
   };
 
-  // When closing the modal, just flip the flag (counter already cleared)
   const handleCloseInventoryModal = () => {
     setIsInventoryModalOpen(false);
-  };
-
-  // Close any of the non-inventory modal panels
-  const handleCloseActivePanel = () => {
-    setActivePanel(null);
   };
 
   return (
@@ -307,7 +300,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
         {/* OVERLAY: HUD + DOCK + PANELS */}
         <div className="world-overlay">
-          {/* HUD */}
+          {/* HUD (top) */}
           <div className="world-hud">
             <div className="world-hud-left">
               <div className="world-hud-field">
@@ -453,20 +446,20 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             </div>
           )}
 
-          {/* === MODAL PANELS (Dreamself / Map / Journal / Debug) ======= */}
+          {/* MODAL PANELS (Dreamself / Map / Journal / Debug) */}
           {activePanel && (
             <div
-              className="inventory-modal-backdrop world-panel-modal-backdrop"
-              onClick={handleCloseActivePanel}
+              className="world-panel-modal-backdrop"
+              onClick={closeActivePanel}
             >
               <div
-                className="inventory-modal inventory-modal--minimal world-panel-modal"
+                className="world-panel-modal"
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
                   type="button"
                   className="world-panel-modal-close"
-                  onClick={handleCloseActivePanel}
+                  onClick={closeActivePanel}
                   aria-label="Close panel"
                 >
                   ×

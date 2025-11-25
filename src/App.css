@@ -1,7 +1,3 @@
-/* =========================================================
-   BASE
-   ========================================================= */
-
 :root {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
     "Segoe UI", sans-serif;
@@ -15,19 +11,1586 @@
   box-sizing: border-box;
 }
 
-html,
 body {
   margin: 0;
-  padding: 0;
-  height: 100%;
-  background: #020617;
+  background: radial-gradient(circle at top, #020617 0, #000 60%);
   color: inherit;
 }
 
-/* =========================================================
-   ROOT LAYOUT (WORLD ONLY)
-   ========================================================= */
+.app-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 2rem 2rem;
+}
 
+.app-root--world {
+  padding-inline: 0;
+  padding-bottom: 0;
+}
+
+/* header */
+
+.app-header {
+  flex-shrink: 0;
+  margin-bottom: 1rem;
+}
+
+.app-header-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0.35rem 0;
+}
+
+.app-header-line {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(148, 163, 184, 0.4),
+    rgba(15, 23, 42, 0.2),
+    rgba(148, 163, 184, 0.4)
+  );
+}
+
+.app-header-line--faint {
+  opacity: 0.4;
+}
+
+.app-logo {
+  font-size: 0.9rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #e5e7eb;
+}
+
+.app-header-meta {
+  display: flex;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.app-header-dot {
+  opacity: 0.6;
+}
+
+.app-subtitle--soft {
+  color: #94a3b8;
+}
+
+/* main layout */
+
+.app-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  overflow: visible; /* important: don't clip world lane or dock */
+}
+
+.app-main--world {
+  padding: 0;
+}
+
+.app-panel {
+  width: 100%;
+  max-width: 1120px;
+  border-radius: 1.5rem;
+  padding: 1.6rem 1.8rem 2rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: radial-gradient(circle at top left, #020617 0, #020617 65%, #000);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.95);
+}
+
+.app-panel--full {
+  width: 100%;
+}
+
+.app-main--world .app-panel--full {
+  max-width: none;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+}
+
+/* chips & buttons */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.14rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #cbd5f5;
+  background: rgba(15, 23, 42, 0.95);
+}
+
+.chip--ghost {
+  opacity: 0.85;
+  border-style: dashed;
+}
+
+.chip--small {
+  padding: 0.08rem 0.5rem;
+  font-size: 0.7rem;
+}
+
+/* primary button */
+
+.btn {
+  background: linear-gradient(90deg, #38bdf8, #a855f7);
+  border: none;
+  border-radius: 999px;
+  padding: 0.55rem 1.4rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #020617;
+  cursor: pointer;
+  font-weight: 500;
+  box-shadow: 0 18px 40px rgba(56, 189, 248, 0.55);
+  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
+}
+
+.btn--ghost {
+  background: transparent;
+  color: #e5e7eb;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  box-shadow: none;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 22px 50px rgba(56, 189, 248, 0.7);
+}
+
+.btn:active {
+  transform: translateY(0);
+  opacity: 0.9;
+}
+
+/* ---------- INTRO ---------- */
+
+.intro-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 2rem;
+  align-items: center;
+  min-height: calc(100vh - 140px);
+}
+
+.intro-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.intro-card--glass {
+  padding: 1.75rem 1.9rem;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: radial-gradient(
+      circle at top left,
+      rgba(148, 163, 184, 0.22),
+      transparent 55%
+    ),
+    rgba(15, 23, 42, 0.92);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.95);
+}
+
+.intro-card--centered {
+  justify-content: center;
+}
+
+.intro-tagline {
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.intro-title {
+  font-size: 1.9rem;
+  margin: 0;
+  color: #f9fafb;
+}
+
+.intro-copy {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #cbd5f5;
+}
+
+.intro-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.intro-actions {
+  margin-top: 1.2rem;
+}
+
+/* cave art */
+
+.intro-hero-art {
+  position: relative;
+  min-height: 340px;
+  border-radius: 1.7rem;
+  overflow: hidden;
+  background: radial-gradient(circle at top, #020617 0, #020617 60%, #000);
+  border: 1px solid rgba(30, 64, 175, 0.7);
+  box-shadow: 0 28px 80px rgba(15, 23, 42, 0.9);
+}
+
+.intro-hero-moon {
+  position: absolute;
+  top: 10%;
+  left: 65%;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #f9fafb 0, #e5e7eb 40%, transparent 70%);
+  box-shadow: 0 0 40px rgba(248, 250, 252, 0.55);
+}
+
+.intro-hero-ridge {
+  position: absolute;
+  inset: 40% -5% 0;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.6;
+}
+
+.intro-hero-ridge--back {
+  background-image: linear-gradient(
+    to top,
+    rgba(15, 23, 42, 1) 0,
+    rgba(15, 23, 42, 0.1) 50%,
+    transparent 80%
+  );
+}
+
+.intro-hero-ridge--front {
+  inset: 48% -10% 0;
+  opacity: 0.9;
+  background-image: linear-gradient(
+    to top,
+    rgba(15, 23, 42, 1) 0,
+    rgba(15, 23, 42, 0.7) 24%,
+    transparent 60%
+  );
+}
+
+.intro-hero-figure {
+  position: absolute;
+  bottom: 18%;
+  left: 22%;
+  width: 120px;
+  height: 160px;
+  background:
+    radial-gradient(circle at 45% 30%, #f9fafb 0, #020617 32%, transparent 33%),
+    linear-gradient(135deg, #020617 0, #020617 40%, #111827 100%);
+  border-radius: 40% 40% 10% 10%;
+  filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.9));
+}
+
+.intro-hero-scanlines {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(15, 23, 42, 0.15) 1px,
+    transparent 1px
+  );
+  background-size: 100% 3px;
+  mix-blend-mode: soft-light;
+  opacity: 0.4;
+}
+
+/* ---------- QUESTION FLOW ---------- */
+
+.question-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+  padding: 1.6rem 1.9rem 2rem;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: radial-gradient(
+      circle at top left,
+      rgba(148, 163, 184, 0.22),
+      transparent 55%
+    ),
+    rgba(15, 23, 42, 0.95);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.95);
+}
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.question-step {
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.question-step-divider {
+  margin: 0 0.1rem;
+}
+
+.phase-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.18rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #e5e7eb;
+}
+
+.phase-pill span:first-child {
+  opacity: 0.7;
+}
+
+.phase-pill strong {
+  letter-spacing: 0.12em;
+}
+
+.question-progress {
+  width: 32%;
+  max-width: 220px;
+}
+
+.question-progress-bar {
+  height: 4px;
+  border-radius: 999px;
+  background: #020617;
+  overflow: hidden;
+}
+
+.question-progress-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #38bdf8, #a855f7);
+  transition: width 180ms ease-out;
+}
+
+.question-prompt {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #f9fafb;
+}
+
+.question-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.option-card {
+  text-align: left;
+  background: rgba(15, 23, 42, 0.96);
+  border-radius: 0.9rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease,
+    transform 120ms ease;
+}
+
+.option-card:hover {
+  border-color: #38bdf8;
+  background: radial-gradient(circle at top left, #0f172a, #020617);
+  transform: translateY(-1px);
+}
+
+.option-card--selected {
+  border-color: #a855f7;
+  box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.6);
+}
+
+.option-label {
+  font-size: 0.98rem;
+  margin-bottom: 0.18rem;
+  color: #e5e7eb;
+}
+
+.option-description {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.question-hint {
+  margin: 0.3rem 0 0;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* ---------- SUMMARY / BIRTH ---------- */
+
+.summary-hero {
+  min-height: calc(100vh - 160px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.4rem;
+  text-align: center;
+}
+
+.summary-chapter-label {
+  font-size: 0.76rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.summary-hero-avatar {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle at top, #020617, #020617 65%, #000);
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.summary-title {
+  margin: 0;
+  font-size: 1.6rem;
+  color: #f9fafb;
+}
+
+.summary-subtitle {
+  margin: 0;
+  font-size: 0.98rem;
+  color: #cbd5f5;
+}
+
+.summary-dream-name {
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
+.summary-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.summary-label {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 0.7rem;
+}
+
+.summary-temperament-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  justify-content: center;
+}
+
+.summary-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+
+/* ---------- WORLD LANE FULLSCREEN ---------- */
+
+.world-card {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 80px); /* desktop fallback */
+  height: 100svh;                 /* mobile-safe viewport height */
+  overflow: hidden;
+  background: #020617;
+}
+
+/* WORLD LANE is pure background */
+.world-card .world-lane {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0; /* background only */
+}
+
+
+
+
+
+/* ---------- WORLD LANE VISUALS (cloak walk ref) ---------- */
+
+.world-lane {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* sky */
+
+.world-lane-sky {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 10% -10%, #e5e7eb33, transparent 65%),
+    linear-gradient(to bottom, #020617 0%, #020725 45%, #020617 100%);
+  z-index: 0;
+}
+
+.world-lane-stars {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, #e5e7ebaa 1px, transparent 1px);
+  background-size: 160px 160px;
+  opacity: 0.35;
+  mix-blend-mode: screen;
+  z-index: 1;
+}
+
+/* distant hills + ruins */
+
+.world-lane-backdrop {
+  position: absolute;
+  left: -140%;
+  right: -140%;
+  height: 38%;
+  bottom: 26%;
+  background-repeat: repeat-x;
+  background-size: 260px 100%;
+  transform: translate3d(0, 0, 0);
+}
+
+.world-lane-backdrop--far {
+  bottom: 32%;
+  background-image: linear-gradient(
+      to top,
+      rgba(15, 23, 42, 1) 0%,
+      rgba(15, 23, 42, 0.1) 55%,
+      transparent 90%
+    ),
+    repeating-linear-gradient(
+      -8deg,
+      rgba(15, 23, 42, 0.9) 0,
+      rgba(15, 23, 42, 0.9) 80px,
+      rgba(15, 23, 42, 0.3) 80px,
+      rgba(15, 23, 42, 0.3) 150px
+    );
+  opacity: 0.4;
+  animation: world-lane-scroll-slow 80s linear infinite;
+}
+
+.world-lane-backdrop--near {
+  bottom: 26%;
+  background-image: linear-gradient(
+      to top,
+      rgba(15, 23, 42, 1) 0%,
+      rgba(15, 23, 42, 0.2) 50%,
+      transparent 90%
+    ),
+    repeating-linear-gradient(
+      -10deg,
+      rgba(15, 23, 42, 0.95) 0,
+      rgba(15, 23, 42, 0.95) 90px,
+      rgba(15, 23, 42, 0.4) 90px,
+      rgba(15, 23, 42, 0.4) 160px
+    );
+  opacity: 0.65;
+  animation: world-lane-scroll 55s linear infinite;
+}
+
+/* ground / walking path */
+
+.world-lane-ground {
+  position: absolute;
+  left: -160%;
+  right: -160%;
+  height: 22%;
+  background-repeat: repeat-x;
+  background-size: 240px 100%;
+  transform: translate3d(0, 0, 0);
+}
+
+.world-lane-ground--back {
+  bottom: 15%;
+  background-image: linear-gradient(
+      to top,
+      #020617 0%,
+      #020617 30%,
+      rgba(15, 23, 42, 0.9) 60%,
+      rgba(15, 23, 42, 0.5) 100%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      #1d3557 0,
+      #1d3557 40px,
+      #020617 40px,
+      #020617 80px
+    );
+  opacity: 0.95;
+  animation: world-lane-scroll-fast 28s linear infinite;
+}
+
+.world-lane-ground--front {
+  bottom: 9%;
+  background-image: linear-gradient(
+      to top,
+      #020617 0%,
+      #020617 45%,
+      rgba(15, 23, 42, 0.9) 80%,
+      rgba(15, 23, 42, 0.4) 100%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      #223a70 0,
+      #223a70 36px,
+      #020617 36px,
+      #020617 80px
+    );
+  opacity: 1.1;
+  animation: world-lane-scroll-fast 20s linear infinite;
+}
+
+/* character silhouette */
+
+.world-lane-figure {
+  position: absolute;
+  bottom: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92px;
+  height: 140px;
+  border-radius: 42% 42% 16% 16%;
+  background: linear-gradient(135deg, #020617 0, #020617 45%, #111827 100%);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.9);
+  animation: world-lane-walk-bob 1.4s ease-in-out infinite;
+  z-index: 10; /* above overlay + parallax */
+}
+
+.world-lane-figure-shadow {
+  position: absolute;
+  bottom: 3%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 110px;
+  height: 26px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(15, 23, 42, 0.95), transparent 70%);
+  opacity: 0.9;
+  filter: blur(2px);
+}
+
+.world-lane-figure-body {
+  position: absolute;
+  inset: 0;
+  border-radius: 45% 45% 14% 14%;
+  background: linear-gradient(135deg, #020617 0, #020617 45%, #111827 100%);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.95);
+  animation: world-lane-walk-bob 1.35s ease-in-out infinite;
+}
+
+.world-lane-figure-hood {
+  position: absolute;
+  left: 50%;
+  top: 8%;
+  width: 66px;
+  height: 66px;
+  transform: translateX(-50%);
+  border-radius: 60% 60% 48% 48%;
+  background: linear-gradient(135deg, #020617 0, #020617 40%, #0b1220 100%);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.85);
+}
+
+.world-lane-figure-face {
+  position: absolute;
+  inset: 18%;
+  border-radius: 999px;
+  background: radial-gradient(circle, #f9fafb 0, #e5e7eb 40%, #020617 70%);
+  box-shadow: 0 0 12px rgba(248, 250, 252, 0.75);
+}
+
+/* moon */
+
+.world-lane-moon {
+  position: absolute;
+  top: 12%;
+  left: 22%;
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  background: radial-gradient(circle, #f9fafb 0, #e5e7eb 40%, transparent 72%);
+  box-shadow: 0 0 40px rgba(248, 250, 252, 0.45);
+  z-index: 2;
+}
+
+/* ground glow under loot */
+
+.world-lane-encounter-pulse {
+  position: absolute;
+  bottom: 16.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 170px;
+  height: 46px;
+  border-radius: 999px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(148, 197, 253, 0.55) 0%,
+    rgba(56, 189, 248, 0.35) 35%,
+    transparent 70%
+  );
+  filter: blur(2px);
+  opacity: 0;
+  animation: world-lane-pulse 1.6s ease-out infinite;
+  z-index: 9; /* under crystal, above ground */
+}
+
+/* animations */
+
+@keyframes world-lane-scroll-slow {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(40%, 0, 0);
+  }
+}
+
+@keyframes world-lane-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(60%, 0, 0);
+  }
+}
+
+@keyframes world-lane-scroll-fast {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(90%, 0, 0);
+  }
+}
+
+@keyframes world-lane-walk-bob {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-4px);
+  }
+}
+
+
+@keyframes world-lane-pulse {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.85);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) scale(1.1);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+/* ---------- WORLD LANE PARALLAX ART LAYERS ---------- */
+
+/* base layer styling – parallax art only */
+.world-lane-layer {
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat-x;
+  background-position: 0 bottom;
+  background-size: 130% auto; /* slight zoom to hide tiling seams */
+  transform: translate3d(0, 0, 0);
+  will-change: background-position;
+  animation-name: world-lane-art-scroll;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  z-index: 0;
+}
+
+
+
+
+/* depth-based layering: 1 = far back, 5 = foreground */
+.world-lane-layer--depth-1 {
+  z-index: 0;
+}
+
+.world-lane-layer--depth-2 {
+  z-index: 1;
+}
+
+.world-lane-layer--depth-3 {
+  z-index: 2;
+}
+
+.world-lane-layer--depth-4 {
+  z-index: 3;
+}
+
+.world-lane-layer--depth-5 {
+  z-index: 4;
+}
+
+/* Smooth horizontal drift for PNG parallax layers */
+@keyframes world-lane-art-scroll {
+  from {
+    background-position: 0% bottom;
+  }
+  to {
+    background-position: 120% bottom; /* enough to feel like a slow walk */
+  }
+}
+
+
+/* When the Dreamself is not walking, freeze the parallax */
+.world-lane--paused .world-lane-layer {
+  animation-play-state: paused;
+}
+
+
+
+/* dusk overlay so valley matches D.R.E.A.M palette */
+.world-lane::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5; /* above parallax, below figure / crystal / HUD */
+  background: linear-gradient(
+    to bottom,
+    rgba(15, 23, 42, 0.95) 0%,
+    rgba(15, 23, 42, 0.85) 28%,
+    rgba(15, 23, 42, 0.6) 55%,
+    rgba(15, 23, 42, 0.25) 78%,
+    transparent 100%
+  );
+}
+
+
+
+
+
+
+/* overlay on top of the sky */
+
+/* Main overlay content (title, description, toast, etc.) */
+.world-overlay-main {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  padding: 3.2rem 5vw 2.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #f9fafb;
+}
+
+.world-title {
+  margin: 1rem 0 0.35rem;
+  font-size: clamp(1.7rem, 2.4vw, 2.1rem);
+  letter-spacing: 0.02em;
+}
+
+.world-copy {
+  margin: 0;
+  max-width: 48rem;
+  font-size: 0.96rem;
+  line-height: 1.7;
+  color: #e5e7eb;
+}
+
+/* HUD */
+
+.world-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.world-hud-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.world-hud-title {
+  font-size: 0.76rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.world-hud-name {
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.world-hud-level {
+  padding: 0.08rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  font-size: 0.72rem;
+}
+
+.world-hud-right {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+
+.world-hud-phase-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.world-hud-phase-value {
+  font-size: 0.9rem;
+}
+
+
+/* subtle top vignette behind HUD */
+.world-card::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+      circle at 50% -10%,
+      rgba(255, 255, 255, 0.06),
+      transparent 55%
+    ),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.65), transparent 35%);
+  mix-blend-mode: soft-light;
+}
+
+/* glass strip behind HUD */
+.world-hud {
+  position: relative;
+}
+
+.world-hud::before {
+  content: "";
+  position: absolute;
+  inset: -0.4rem -2.2rem 0.4rem -2.2rem;
+  background: radial-gradient(
+      circle at 0% 0%,
+      rgba(255, 255, 255, 0.13),
+      transparent 55%
+    ),
+    linear-gradient(
+      to right,
+      rgba(4, 6, 15, 0.9),
+      rgba(6, 12, 24, 0.85),
+      rgba(4, 6, 15, 0.9)
+    );
+  opacity: 0.7;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+  z-index: -1;
+}
+
+
+
+/* bottom gauges */
+
+.world-overlay-bottom {
+  margin-top: 1.5rem;
+}
+
+.world-status {
+  display: flex;
+  gap: 1.2rem;
+  max-width: 32rem;
+}
+
+.world-status-column {
+  flex: 1;
+}
+
+.world-status-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 0.25rem;
+}
+
+.world-status-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.9);
+  overflow: hidden;
+}
+
+.world-status-fill {
+  height: 100%;
+  width: 70%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #38bdf8, #a855f7);
+}
+
+.world-status-fill--vit {
+  background: linear-gradient(90deg, #fb7185, #f97316);
+}
+
+.world-status-fill--aether {
+  background: linear-gradient(90deg, #38bdf8, #22c55e);
+}
+
+.world-status-fill--memory {
+  background: linear-gradient(90deg, #a855f7, #6366f1);
+}
+
+.world-bottom-row {
+  margin-top: 1.2rem;
+}
+
+/* event toast */
+
+.world-event-toast {
+  margin-top: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: 0.9rem;
+  background: radial-gradient(
+    circle at 0% 0%,
+    rgba(56, 189, 248, 0.42),
+    rgba(15, 23, 42, 0.96)
+  );
+  border: 1px solid rgba(56, 189, 248, 0.9);
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.95);
+  font-size: 0.82rem;
+}
+
+.world-event-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 20%, #f9fafb, #38bdf8);
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.95);
+  flex-shrink: 0;
+}
+
+.world-event-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.world-event-title {
+  font-weight: 600;
+}
+
+.world-event-title span {
+  font-weight: 400;
+  color: #bae6fd;
+  margin-left: 0.25rem;
+}
+
+.world-event-desc {
+  color: #e5e7eb;
+}
+
+.world-event-meta {
+  font-size: 0.78rem;
+  color: #9ca3af;
+}
+
+.world-event-rarity {
+  padding: 0.06rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  margin-left: 0.25rem;
+  text-transform: capitalize;
+}
+
+.world-event-rarity--rare {
+  border-color: rgba(56, 189, 248, 0.9);
+  color: #e0f2fe;
+}
+
+.world-event-rarity--mythic {
+  border-color: rgba(168, 85, 247, 0.95);
+  color: #f5d0fe;
+}
+
+.world-event-gain {
+  margin-left: 0.5rem;
+  color: #a5b4fc;
+}
+
+
+/* Dock icons row (INVENTORY / DREAMSELF / MAP / DEBUG) */
+.world-dock {
+  position: absolute;
+  right: 5vw;
+  bottom: 2.4rem;
+  display: flex;
+  gap: 0.7rem;
+  z-index: 25;
+}
+
+.world-dock-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #e5e7eb;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.world-dock-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: radial-gradient(circle at 30% 20%, #020617, #111827);
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.9);
+  position: relative;
+}
+
+.world-dock-btn--active .world-dock-icon {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.8),
+    0 12px 26px rgba(15, 23, 42, 0.95);
+}
+
+.world-dock-label {
+  opacity: 0.8;
+}
+
+/* simple glyphs */
+
+.world-dock-icon::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: inherit;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+}
+
+.world-dock-icon--inventory::after {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border-radius: 3px;
+  border: 1px solid rgba(248, 250, 252, 0.9);
+}
+
+.world-dock-icon--character::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 12px;
+  border-radius: 999px 999px 4px 4px;
+  border: 1px solid rgba(248, 250, 252, 0.9);
+  transform: translate(-50%, -60%);
+}
+
+.world-dock-icon--map::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(248, 250, 252, 0.9);
+  transform: translate(-50%, -50%);
+}
+
+.world-dock-icon--debug::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  border: 1px solid rgba(248, 250, 252, 0.9);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+/* === "+1 Relic" toast near Inventory dock ======================= */
+
+.world-inventory-toast {
+  position: absolute;
+  right: 5vw;              /* aligns with .world-dock */
+  bottom: 5.4rem;          /* just above dock buttons */
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.9rem;
+  background: radial-gradient(
+      circle at 0% 0%,
+      rgba(148, 197, 253, 0.28),
+      transparent 60%
+    ),
+    rgba(10, 16, 30, 0.94);
+  border: 1px solid rgba(148, 197, 253, 0.7);
+  box-shadow:
+    0 14px 36px rgba(15, 23, 42, 0.95),
+    0 0 0 1px rgba(15, 23, 42, 0.8);
+
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #e5f0ff;
+
+  animation: world-inventory-toast-pop 0.22s ease-out,
+             world-inventory-toast-fade 0.3s ease-out 1.4s forwards;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.world-inventory-toast-pill {
+  opacity: 0.9;
+}
+
+.world-inventory-toast-name {
+  font-size: 0.76rem;
+  text-transform: none;
+  letter-spacing: 0.04em;
+  color: #cbd5ff;
+}
+
+@keyframes world-inventory-toast-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes world-inventory-toast-fade {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+
+
+
+/* slide-up panels */
+
+/* Slide-up panels (inventory, map, etc.) */
+.world-panel-shell {
+  position: absolute;
+  right: 5vw;      /* aligns with dock */
+  bottom: 5.3rem;  /* sits above the icon row instead of covering it */
+  padding-bottom: 0;
+  pointer-events: none;
+  z-index: 30;     /* above dock */
+}
+
+.world-panel-shell--visible {
+  pointer-events: auto;
+}
+
+
+
+.world-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 0.7rem;
+}
+
+.world-panel-close {
+  border: none;
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* inventory list */
+
+.world-inventory-empty {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.world-inventory-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.world-inventory-item {
+  padding: 0.4rem 0.7rem;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: radial-gradient(
+    circle at 0% 0%,
+    rgba(15, 23, 42, 0.98),
+    rgba(15, 23, 42, 0.9)
+  );
+  font-size: 0.78rem;
+}
+
+.world-inventory-item--rare {
+  border-color: rgba(56, 189, 248, 0.9);
+}
+
+.world-inventory-item--mythic {
+  border-color: rgba(168, 85, 247, 0.95);
+}
+
+.world-inventory-item-name {
+  font-weight: 500;
+}
+
+.world-inventory-item-desc {
+  color: #9ca3af;
+}
+
+/* character panel */
+
+.world-panel-character {
+  display: flex;
+  gap: 1rem;
+}
+
+.world-panel-character-avatar {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  overflow: hidden;
+  background: radial-gradient(circle at top, #020617, #000);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.world-panel-character-meta h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+/* map panel */
+
+.world-map-track {
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.world-map-node {
+  flex: 0 0 auto;
+  padding: 0.3rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  font-size: 0.72rem;
+}
+
+.world-map-node--visited {
+  border-style: dashed;
+}
+
+.world-map-node--current {
+  border-color: #38bdf8;
+}
+
+.world-map-connector {
+  flex: 1 1 auto;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(148, 163, 184, 0.6),
+    rgba(30, 64, 175, 0.2)
+  );
+}
+
+/* debug copy */
+
+.world-debug-copy {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+/* back button in world */
+
+.world-back-btn {
+  padding-inline: 1.4rem;
+}
+
+/* responsive tweaks */
+
+@media (max-width: 960px) {
+  .app-root {
+    padding: 1rem;
+  }
+
+  .intro-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .intro-hero-art {
+    order: -1;
+  }
+
+  .world-overlay-main {
+    padding-inline: 1.4rem;
+  }
+
+  .world-dock {
+    right: 1.4rem;
+  }
+
+  .world-panel-shell {
+    padding-inline: 1.4rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .world-hud {
+    flex-direction: column;
+  }
+
+  .world-status {
+    max-width: none;
+  }
+
+  .world-dock {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .world-panel {
+    margin: 0 auto;
+    max-width: 100%;
+  }
+}
+@media (max-width: 640px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  .app-root {
+    padding: 0.6rem;
+  }
+
+  .app-panel {
+    padding: 1rem;
+    max-width: 100%;
+  }
+
+  .world-card {
+    height: 100svh;
+  }
+
+  .world-overlay-main {
+    padding: 1.2rem 1rem 1.6rem;
+  }
+
+  .world-title {
+    font-size: 1.4rem;
+  }
+
+  .world-copy {
+    font-size: 0.88rem;
+  }
+
+  .world-dock {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    bottom: 1.4rem;
+  }
+
+  .world-panel-shell {
+    padding-inline: 1rem;
+  }
+
+  .world-panel {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+}
+
+/* ==== DREAM v0.2 layout glue for new components ==== */
+
+/* Root & screens */
 .app-root {
   min-height: 100vh;
   display: flex;
@@ -47,383 +1610,18 @@ body {
   align-items: stretch;
 }
 
-/* WORLD view fills the viewport, no scroll wrapper */
-.app-main--world {
-  padding: 0;
-}
-
-.app-main--world .app-screen-world {
-  min-height: 100vh;
-  height: 100vh;
-  overflow: hidden;
-}
-
-/* =========================================================
-   WORLD CARD + VIGNETTE
-   ========================================================= */
-
-.world-card {
-  position: relative;
+/* Intro / Summary cards */
+.app-screen-intro .intro-card,
+.app-screen-summary .summary-card {
+  max-width: 960px;
   width: 100%;
-  height: 100%;
-  background: #020617;
-  overflow: hidden;
+  margin-inline: auto;
 }
 
-/* Brighter vignette, more “lit” horizon */
-.world-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(
-      circle at 50% -10%,
-      rgba(255, 255, 255, 0.14),
-      transparent 55%
-    ),
-    radial-gradient(
-      circle at 50% 100%,
-      rgba(15, 23, 42, 0.85),
-      transparent 65%
-    ),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent 40%);
-  mix-blend-mode: soft-light;
-  z-index: 1;
+/* World overlay & panels */
+.app-screen-world .world-card {
+  margin-inline: auto;
 }
-
-/* =========================================================
-   WORLD LANE: BACKGROUND + PARALLAX
-   ========================================================= */
-
-.world-lane {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 0;
-}
-
-/* Base sky */
-.world-lane-sky {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 10% -10%, #e5e7eb33, transparent 70%),
-    linear-gradient(to bottom, #020617 0%, #02081f 55%, #020617 100%);
-}
-
-/* Optional starfield */
-.world-lane-stars {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle, #e5e7ebaa 1px, transparent 1px);
-  background-size: 160px 160px;
-  opacity: 0.35;
-  mix-blend-mode: screen;
-}
-
-/* Parallax PNG art layers */
-.world-lane-layer {
-  position: absolute;
-  inset: 0;
-  background-repeat: repeat-x;
-  background-position: 0 bottom;
-  background-size: 130% auto;
-  transform: translate3d(0, 0, 0);
-  will-change: background-position;
-  animation-name: world-lane-art-scroll;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
-
-/* depth stack */
-.world-lane-layer--depth-1 { z-index: 0; }
-.world-lane-layer--depth-2 { z-index: 1; }
-.world-lane-layer--depth-3 { z-index: 2; }
-.world-lane-layer--depth-4 { z-index: 3; }
-.world-lane-layer--depth-5 { z-index: 4; }
-
-/* Smooth drift */
-@keyframes world-lane-art-scroll {
-  from { background-position: 0% bottom; }
-  to   { background-position: 120% bottom; }
-}
-
-/* Phase tint */
-.world-lane--phase-dawn::after,
-.world-lane--phase-day::after,
-.world-lane--phase-dusk::after,
-.world-lane--phase-night::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  mix-blend-mode: soft-light;
-  opacity: 0.7;
-}
-
-.world-lane--phase-dawn::after {
-  background: radial-gradient(
-    circle at 50% 0%,
-    rgba(255, 204, 170, 0.6),
-    transparent 55%
-  );
-}
-
-.world-lane--phase-day::after {
-  background: radial-gradient(
-    circle at 50% -10%,
-    rgba(180, 220, 255, 0.45),
-    transparent 60%
-  );
-}
-
-.world-lane--phase-dusk::after {
-  background: radial-gradient(
-    circle at 50% 0%,
-    rgba(180, 140, 255, 0.5),
-    transparent 55%
-  );
-}
-
-.world-lane--phase-night::after {
-  background:
-    radial-gradient(
-      circle at 50% -10%,
-      rgba(120, 160, 255, 0.3),
-      transparent 55%
-    ),
-    radial-gradient(
-      circle at 10% 90%,
-      rgba(80, 130, 255, 0.35),
-      transparent 70%
-    );
-}
-
-/* Pause all scrolling when lane is paused */
-.world-lane--paused .world-lane-layer {
-  animation-play-state: paused;
-}
-
-/* Kill any legacy lines / debug bands */
-.world-lane-ribbon,
-.world-lane-line,
-.world-ground-line,
-.world-lane-debug {
-  display: none !important;
-  background: transparent !important;
-}
-
-/* =========================================================
-   STAGE + AVATAR
-   ========================================================= */
-
-.world-stage {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.world-stage-avatar {
-  position: absolute;
-  left: 50%;
-  bottom: 9vh;
-  transform: translateX(-50%);
-  transform-origin: 50% 100%;
-  z-index: 20;
-  pointer-events: none;
-}
-
-.world-stage-avatar .avatar-view-svg {
-  width: clamp(96px, 18vh, 140px);
-  height: auto;
-}
-
-/* Walking bob */
-.world-stage-avatar--walking .avatar-root {
-  animation: dreamself-walk 1.8s ease-in-out infinite;
-}
-
-@keyframes dreamself-walk {
-  0%   { transform: translateY(0); }
-  25%  { transform: translateY(-4px); }
-  50%  { transform: translateY(0); }
-  75%  { transform: translateY(3px); }
-  100% { transform: translateY(0); }
-}
-
-/* Phase-based tint on avatar */
-.world-phase-dawn svg {
-  filter: brightness(1.05) saturate(1.1)
-    drop-shadow(0 0 6px rgba(255, 220, 170, 0.25));
-}
-.world-phase-night svg {
-  filter: brightness(0.85) saturate(0.9)
-    drop-shadow(0 0 6px rgba(90, 130, 255, 0.2));
-}
-.world-phase-dusk svg {
-  filter: brightness(0.9) saturate(0.85)
-    drop-shadow(0 0 4px rgba(60, 60, 120, 0.3));
-}
-
-/* Pause avatar when encounter active */
-.world-stage-avatar--paused .avatar-view-svg {
-  animation-play-state: paused;
-}
-
-/* =========================================================
-   LOOT ON THE RIBBON
-   ========================================================= */
-
-.world-lane-loot {
-  position: absolute;
-  left: 56%;
-  bottom: 9.5vh;
-  transform: translateX(-50%);
-  z-index: 18;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  pointer-events: none;
-}
-
-.world-lane-loot-shadow {
-  width: clamp(52px, 4.3vw, 80px);
-  height: clamp(12px, 1vw, 18px);
-  border-radius: 999px;
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgba(0, 0, 0, 0.7),
-    transparent 70%
-  );
-  opacity: 0.9;
-  filter: blur(2px);
-}
-
-.world-lane-loot-image {
-  width: clamp(52px, 4.3vw, 82px);
-  height: auto;
-  transform: translateY(-4px) scale(1) rotate(-3deg);
-  transform-origin: 50% 100%;
-  filter:
-    drop-shadow(0 0 6px rgba(248, 250, 252, 0.18))
-    drop-shadow(0 10px 26px rgba(15, 23, 42, 0.95));
-  animation: world-lane-loot-idle 2.2s ease-in-out infinite;
-}
-
-@keyframes world-lane-loot-idle {
-  0%   { transform: translateY(-4px) scale(1) rotate(-3deg); }
-  50%  { transform: translateY(-8px) scale(1.03) rotate(-3deg); }
-  100% { transform: translateY(-4px) scale(1) rotate(-3deg); }
-}
-
-/* Pickup animation */
-.world-lane-loot--pickup {
-  animation: world-lane-loot-pickup 0.75s cubic-bezier(0.22, 0.61, 0.36, 1)
-    forwards;
-}
-.world-lane-loot--pickup .world-lane-loot-image {
-  animation: none;
-  filter:
-    drop-shadow(0 0 16px rgba(248, 250, 252, 0.9))
-    drop-shadow(0 18px 40px rgba(15, 23, 42, 0.98));
-}
-
-@keyframes world-lane-loot-pickup {
-  0% {
-    transform: translateX(-50%) translateY(0) scale(1);
-    opacity: 1;
-  }
-  15% {
-    transform: translateX(-50%) translateY(4px) scale(0.94, 1.06);
-  }
-  40% {
-    transform: translateX(-50%) translateY(-20px) scale(1.08);
-  }
-  70% {
-    transform: translateX(-50%) translateY(-34px) scale(0.95);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(-50%) translateY(-48px) scale(0.75);
-    opacity: 0;
-  }
-}
-
-/* Pause idle float when lane paused */
-.world-lane--paused .world-lane-loot-image {
-  animation-play-state: paused;
-}
-
-/* =========================================================
-   ENCOUNTER GLYPH + BANNER
-   ========================================================= */
-
-.world-encounter-glyph {
-  position: absolute;
-  left: 50%;
-  bottom: 180px;
-  transform: translateX(-50%);
-  font-size: 42px;
-  font-weight: 900;
-  color: #facc15;
-  text-shadow:
-    0 0 8px rgba(250, 204, 21, 0.75),
-    0 0 18px rgba(250, 204, 21, 0.9);
-  animation: mgs-alert-pulse 1.2s ease-in-out infinite;
-}
-
-@keyframes mgs-alert-pulse {
-  0%   { transform: translateX(-50%) scale(0.9); opacity: 0.7; }
-  50%  { transform: translateX(-50%) scale(1.05); opacity: 1; }
-  100% { transform: translateX(-50%) scale(0.92); opacity: 0.85; }
-}
-
-.world-encounter-banner {
-  position: absolute;
-  top: 48px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 0.7rem 1.6rem;
-  border-radius: 999px;
-  background: rgba(10, 14, 25, 0.78);
-  border: 1px solid rgba(148, 163, 184, 0.7);
-  backdrop-filter: blur(14px);
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  font-size: 0.7rem;
-  color: #e5e7eb;
-  box-shadow:
-    0 10px 30px rgba(15, 23, 42, 0.95),
-    0 0 0 1px rgba(15, 23, 42, 0.85);
-  z-index: 40;
-}
-.world-encounter-label {
-  opacity: 0.7;
-  margin-right: 0.6rem;
-}
-.world-encounter-name {
-  font-weight: 600;
-}
-
-/* rarity tints (optional) */
-.world-encounter-banner--rare {
-  border-color: rgba(56, 189, 248, 0.9);
-  box-shadow:
-    0 10px 30px rgba(15, 23, 42, 0.9),
-    0 0 12px rgba(56, 189, 248, 0.6);
-}
-.world-encounter-banner--mythic {
-  border-color: rgba(168, 85, 247, 0.9);
-  box-shadow:
-    0 10px 30px rgba(15, 23, 42, 0.9),
-    0 0 14px rgba(168, 85, 247, 0.7);
-}
-
-/* =========================================================
-   WORLD OVERLAY + HUD
-   ========================================================= */
 
 .world-overlay {
   position: absolute;
@@ -432,350 +1630,90 @@ body {
   flex-direction: column;
   justify-content: space-between;
   pointer-events: none;
-  z-index: 2;
 }
 
-/* Allow UI to be clickable */
 .world-hud,
 .world-dock,
-.world-panel-shell,
 .world-panels {
   pointer-events: auto;
 }
 
 /* HUD bar */
 .world-hud {
-  padding: 1rem 5vw 0.75rem;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: rgba(229, 231, 235, 0.9);
-}
-
-.world-hud-left {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
-.world-hud-title {
+  align-items: center;
+  padding: 0.75rem 1.5rem;
   font-size: 0.8rem;
-  letter-spacing: 0.22em;
-}
-
-.world-hud-meta {
-  display: flex;
-  gap: 0.75rem;
-  font-size: 0.68rem;
-  opacity: 0.8;
-}
-
-.world-hud-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.35rem;
-  text-align: right;
-}
-
-/* PHASE label + value */
-.world-hud-phase-label {
-  font-size: 0.68rem;
-  letter-spacing: 0.18em;
-  opacity: 0.7;
-}
-.world-hud-phase-value {
-  font-size: 0.82rem;
-}
-
-/* Autowalk chip */
-.world-autowalk-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.16rem 0.7rem 0.16rem 0.6rem;
-  border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.8);
-  background: radial-gradient(
-    circle at top left,
-    rgba(15, 23, 42, 0.96),
-    #020617
-  );
-  font-size: 0.68rem;
-  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #e5e7eb;
-  cursor: pointer;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.85);
-}
-
-.world-autowalk-toggle--off {
-  opacity: 0.75;
-  border-style: dashed;
-}
-
-.world-autowalk-label {
-  opacity: 0.7;
-}
-.world-autowalk-state {
-  font-weight: 500;
-}
-.world-autowalk-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: #22c55e;
-  box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
-}
-.world-autowalk-toggle--off .world-autowalk-dot {
-  background: #64748b;
-  box-shadow: none;
-}
-
-/* =========================================================
-   HP / MP / STAMINA – RIGHT HUD METERS
-   ========================================================= */
-
-.world-hud-meters {
-  margin-top: 0.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  align-items: flex-end;
-}
-
-.world-hud-meter {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-}
-
-.world-hud-meter-label {
-  font-size: 0.68rem;
   letter-spacing: 0.16em;
-  opacity: 0.8;
+  color: rgba(255, 255, 255, 0.8);
 }
 
-.world-hud-meter-track {
-  width: 150px;
-  height: 8px; /* thicker JRPG-style */
+/* Dock buttons */
+.world-dock {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding-bottom: 1.25rem;
+}
+
+.world-dock-button {
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.9);
-  overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.16), rgba(0, 0, 0, 0.6));
+  padding: 0.35rem 0.9rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.82);
+  cursor: pointer;
+  white-space: nowrap;
+  backdrop-filter: blur(20px);
 }
 
-.world-hud-meter-fill {
-  height: 100%;
-  width: 100%;
-  border-radius: inherit;
-  transform-origin: left center;
-  transition: transform 220ms ease-out;
+/* focus ring & active glow */
+.world-dock-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(180, 210, 255, 0.6),
+    0 0 0 3px rgba(33, 150, 255, 0.3),
+    0 16px 45px rgba(0, 0, 0, 0.85);
 }
 
-/* colors */
-.world-hud-meter--hp .world-hud-meter-fill {
-  background: linear-gradient(90deg, #fecaca, #f97373);
-}
-.world-hud-meter--mp .world-hud-meter-fill {
-  background: linear-gradient(90deg, #bfdbfe, #60a5fa);
-}
-.world-hud-meter--stamina .world-hud-meter-fill {
-  background: linear-gradient(90deg, #fef3c7, #facc15);
+.world-dock-button--active .world-dock-icon {
+  box-shadow: 0 0 8px rgba(180, 210, 255, 0.9);
 }
 
-/* On mobile, meter width shrinks */
-@media (max-width: 768px) {
-  .world-hud-meter-track {
-    width: 120px;
+.world-dock-button--active {
+  border-color: rgba(255, 255, 255, 0.7);
+  background: radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.35), rgba(0, 0, 0, 0.75));
+ animation: dock-active-pulse 1.8s ease-out infinite;
+}
+
+@keyframes dock-active-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(180, 210, 255, 0.35);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(180, 210, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(180, 210, 255, 0);
   }
 }
 
-/* =========================================================
-   DOCK – Nier-smooth hover (bottom-right)
-   ========================================================= */
 
-.world-dock {
-  position: absolute;
-  right: 5vw;
-  bottom: 2.2rem;
-  display: flex;
-  gap: 1.2rem;
-  align-items: flex-end;
-  z-index: 25;
-}
-
-.world-dock-btn {
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.3rem;
-
-  color: #e5e7eb;
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-
-  /* Nier-smooth hover feel */
-  transition:
-    transform 180ms cubic-bezier(0.16, 0.67, 0.35, 1),
-    filter 180ms ease-out,
-    opacity 180ms ease-out;
-}
-
-.world-dock-label {
-  font-weight: 600;
-  opacity: 0.9;
-}
-
-.world-dock-icon-wrap {
-  position: relative;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.world-dock-icon {
-  width: 24px;
-  height: 24px;
-  position: relative;
-}
-
-/* GLYPHS */
-
-.world-dock-icon--inventory::before,
-.world-dock-icon--inventory::after {
-  content: "";
-  position: absolute;
-  border-radius: 3px;
-  border: 1px solid rgba(226, 232, 240, 0.9);
-}
-.world-dock-icon--inventory::before {
-  inset: 12% 16% auto 16%;
-}
-.world-dock-icon--inventory::after {
-  inset: 32% 18% 16% 18%;
-}
-
-.world-dock-icon--dreamself::before,
-.world-dock-icon--dreamself::after {
-  content: "";
-  position: absolute;
-  border: 1px solid rgba(226, 232, 240, 0.9);
-}
-.world-dock-icon--dreamself::before {
-  width: 32%;
-  height: 32%;
-  border-radius: 50%;
-  left: 50%;
-  top: 6%;
-  transform: translateX(-50%);
-}
-.world-dock-icon--dreamself::after {
-  left: 20%;
-  right: 20%;
-  top: 38%;
-  bottom: 10%;
-  border-radius: 4px;
-}
-
-.world-dock-icon--map::before {
-  content: "";
-  position: absolute;
-  inset: 18%;
-  border-radius: 4px;
-  border: 1px solid rgba(226, 232, 240, 0.9);
-}
-
-.world-dock-icon--journal::before,
-.world-dock-icon--journal::after {
-  content: "";
-  position: absolute;
-  left: 20%;
-  right: 20%;
-  border-top: 1px solid rgba(226, 232, 240, 0.9);
-}
-.world-dock-icon--journal::before { top: 32%; }
-.world-dock-icon--journal::after { top: 60%; }
-
-.world-dock-icon--debug::before {
-  content: "";
-  position: absolute;
-  inset: 22%;
-  border-radius: 3px;
-  border: 1px solid rgba(248, 250, 252, 0.9);
-  transform: rotate(45deg);
-}
-
-/* Badge */
-.world-dock-notification {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  min-width: 18px;
-  padding: 0 4px;
-  border-radius: 10px;
-  background: #f9a8d4;
-  color: #111827;
-  font-size: 0.65rem;
-  text-align: center;
-  line-height: 1.2;
-  box-shadow: 0 0 10px rgba(248, 113, 171, 0.9);
-}
-
-/* Hover/active (Nier-smooth) */
-.world-dock-btn:hover {
-  transform: translateY(-2px) scale(1.03);
-  filter: drop-shadow(0 0 8px rgba(248, 250, 252, 0.24));
-}
-.world-dock-btn:active {
-  transform: translateY(1px) scale(0.97);
-  filter: drop-shadow(0 4px 10px rgba(15, 23, 42, 0.9));
-}
-.world-dock-btn.world-dock-btn--active .world-dock-icon {
-  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.9));
-}
-.world-dock-btn.world-dock-btn--active .world-dock-label {
-  color: #e0f2fe;
-}
-
-/* =========================================================
-   SLIDE-UP PANELS (inventory / dreamself / map / journal / debug)
-   ========================================================= */
-
-.world-panel-shell {
-  position: absolute;
-  right: 5vw;
-  bottom: 5.2rem;
-  pointer-events: none;
-  z-index: 30;
-}
-
-.world-panel-shell--visible {
-  pointer-events: auto;
-}
-
+/* Panel shell */
 .world-panels {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  margin-bottom: 4.5rem; /* float above dock */
 }
 
 .world-panel {
   max-width: 520px;
   width: 100%;
-  padding: 1.1rem 1.3rem;
+  padding: 1.2rem 1.4rem;
   border-radius: 1.2rem 1.2rem 0 1.2rem;
   background: linear-gradient(
     135deg,
@@ -788,14 +1726,279 @@ body {
   color: rgba(255, 255, 255, 0.9);
   font-size: 0.82rem;
 
+  /* NEW: JRPG slide-in animation */
   transform: translateY(10px);
   opacity: 0;
   animation: panel-enter 240ms ease-out forwards;
 }
 
 @keyframes panel-enter {
-  from { transform: translateY(10px); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.world-panel-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 0.75rem;
+  opacity: 0.9;
+}
+
+.world-panel-empty {
+  opacity: 0.7;
+}
+
+/* Journal entries */
+.journal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 260px;
+  overflow: auto;
+}
+
+.journal-entry {
+  padding: 0.5rem 0.6rem;
+  border-radius: 0.75rem;
+  background: radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.08), transparent);
+}
+
+.journal-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  opacity: 0.8;
+}
+
+.journal-entry-title {
+  margin-top: 0.15rem;
+  font-size: 0.8rem;
+}
+
+.journal-entry-body {
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.journal-entry-type {
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Slight mobile tweaks */
+@media (max-width: 768px) {
+  .world-panel {
+    width: calc(100% - 1.5rem);
+    padding: 1rem 1.1rem;
+  }
+
+  .world-hud {
+    padding-inline: 1rem;
+  }
+}
+
+
+/* === DREAM: World HUD / Dock / Panels (JRPG-style) === */
+
+/* Root & screens */
+.app-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-screen {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+/* World overlay hooks into your existing world-card, which is already positioned/animated */
+.app-screen-world .world-card {
+  margin-inline: auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.world-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+/* Let children be interactable */
+.world-hud,
+.world-dock,
+.world-panels {
+  pointer-events: auto;
+}
+
+/* ===== HUD (top overlay) ===== */
+
+.world-hud {
+  padding: 1rem 2.5rem 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.world-hud-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.hud-kicker {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  opacity: 0.6;
+}
+
+.world-hud-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.world-hud-title {
+  font-size: 1rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.world-hud-badge {
+  font-size: 0.7rem;
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.18em;
+}
+
+.world-hud-meta {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.1rem;
+  font-size: 0.7rem;
+}
+
+.hud-label {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  opacity: 0.6;
+  margin-right: 0.3rem;
+}
+
+.hud-value {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+.world-hud-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  font-size: 0.7rem;
+  text-align: right;
+}
+
+/* ===== Dock (bottom buttons) ===== */
+
+.world-dock {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  padding-bottom: 1.5rem;
+}
+
+.world-dock-button {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(
+    135deg,
+    rgba(18, 24, 40, 0.9),
+    rgba(4, 8, 20, 0.95)
+  );
+  padding: 0.4rem 1rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.82);
+  cursor: pointer;
+  white-space: nowrap;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.8),
+    0 12px 35px rgba(0, 0, 0, 0.75);
+  transition: transform 120ms ease-out, border-color 120ms ease-out,
+    box-shadow 120ms ease-out, background 120ms ease-out;
+}
+
+.world-dock-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 16px 45px rgba(0, 0, 0, 0.85);
+}
+
+.world-dock-button--active {
+  border-color: rgba(255, 255, 255, 0.7);
+  background: linear-gradient(
+    135deg,
+    rgba(250, 250, 255, 0.18),
+    rgba(3, 5, 15, 0.96)
+  );
+}
+
+/* ===== Panels (Inventory / Journal / Debug) ===== */
+
+.world-panels {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 2.5rem 4.8rem;
+}
+
+.world-panel {
+  max-width: 520px;
+  width: 100%;
+  padding: 1.2rem 1.4rem;
+  border-radius: 1.2rem 1.2rem 0 1.2rem;
+  background: linear-gradient(
+    135deg,
+    rgba(9, 15, 26, 0.96),
+    rgba(14, 27, 54, 0.94)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(24px);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.82rem;
 }
 
 .world-panel-title {
@@ -806,21 +2009,416 @@ body {
   opacity: 0.8;
 }
 
-.world-panel-empty {
+.world-panel-empty,
+.world-panel-body {
   opacity: 0.75;
 }
 
-/* =========================================================
-   INVENTORY LIST (inside slide-up panel)
-   ========================================================= */
+/* Inventory list within panel */
+.inventory-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.inventory-item {
+  padding: 0.45rem 0.5rem;
+  border-radius: 0.8rem;
+  background: radial-gradient(
+    circle at 0% 0%,
+    rgba(255, 255, 255, 0.09),
+    transparent
+  );
+}
+
+.inventory-item-main {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+/* subtle rarity tints */
+.inventory-item.rarity-common {
+  border-left: 2px solid rgba(255, 255, 255, 0.25);
+}
+
+.inventory-item.rarity-rare {
+  border-left: 2px solid rgba(156, 206, 255, 0.7);
+}
+
+.inventory-item.rarity-mythic {
+  border-left: 2px solid rgba(255, 215, 160, 0.95);
+}
+
+/* Journal entries */
+.journal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-height: 260px;
+  overflow: auto;
+}
+
+.journal-entry {
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.8rem;
+  background: radial-gradient(
+    circle at 0% 0%,
+    rgba(255, 255, 255, 0.08),
+    transparent
+  );
+}
+
+.journal-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  opacity: 0.82;
+}
+
+.journal-entry-title {
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+}
+
+.journal-entry-body {
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  opacity: 0.88;
+}
+
+.journal-entry-type {
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+/* Mobile tweaks */
+@media (max-width: 768px) {
+  .world-hud {
+    padding-inline: 1rem;
+  }
+
+  .world-panels {
+    margin: 0 1rem 4.5rem;
+    justify-content: center;
+  }
+
+  .world-panel {
+    max-width: none;
+    width: 100%;
+    border-radius: 1rem;
+  }
+}
+
+
+
+/* === Dock icons (simple geometric glyphs) === */
+
+.world-dock-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.world-dock-icon {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Inventory: stacked circles */
+.world-dock-icon--inventory::before,
+.world-dock-icon--inventory::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.world-dock-icon--inventory::before {
+  width: 60%;
+  height: 60%;
+  left: 10%;
+  top: 10%;
+}
+
+.world-dock-icon--inventory::after {
+  width: 40%;
+  height: 40%;
+  right: 4%;
+  bottom: 4%;
+}
+
+/* Dreamself: mask-shaped diamond */
+.world-dock-icon--dreamself {
+  border-radius: 0.4rem;
+  transform: rotate(45deg);
+}
+
+.world-dock-icon--dreamself::before {
+  content: "";
+  position: absolute;
+  inset: 20%;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Map: small grid */
+.world-dock-icon--map::before,
+.world-dock-icon--map::after {
+  content: "";
+  position: absolute;
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  border-left: 1px solid rgba(255, 255, 255, 0.5);
+  width: 65%;
+  height: 65%;
+  left: 15%;
+  top: 15%;
+}
+
+/* Journal: lines */
+.world-dock-icon--journal::before,
+.world-dock-icon--journal::after {
+  content: "";
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  border-top: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.world-dock-icon--journal::before {
+  top: 30%;
+}
+
+.world-dock-icon--journal::after {
+  top: 60%;
+}
+
+/* Debug: triangle warning */
+.world-dock-icon--debug {
+  border-radius: 0;
+  border: none;
+}
+
+.world-dock-icon--debug::before {
+  content: "";
+  position: absolute;
+  inset: 10%;
+  border-left: 1px solid rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+  transform: rotate(45deg);
+}
+
+/* Label text */
+.world-dock-label {
+  font-size: 0.7rem;
+}
+
+/* === Journal NEW badge + divider === */
+
+.journal-entry-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.journal-entry-badge {
+  font-size: 0.6rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  opacity: 0.9;
+}
+
+.journal-entry-divider {
+  margin: 0.3rem 0 0.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  position: relative;
+}
+
+.journal-entry-divider::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 32%;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+
+/* Phase-based tint overlay on the scrolling world */
+.world-lane--phase-dawn::after,
+.world-lane--phase-day::after,
+.world-lane--phase-dusk::after,
+.world-lane--phase-night::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  opacity: 0.65;
+}
+
+.world-lane--phase-dawn::after {
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(255, 204, 170, 0.55),
+    transparent 55%
+  );
+}
+
+.world-lane--phase-day::after {
+  background: radial-gradient(
+    circle at 50% -10%,
+    rgba(180, 220, 255, 0.4),
+    transparent 60%
+  );
+}
+
+.world-lane--phase-dusk::after {
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(180, 140, 255, 0.45),
+    transparent 55%
+  );
+}
+
+.world-lane--phase-night::after {
+  background: radial-gradient(
+      circle at 50% -10%,
+      rgba(120, 160, 255, 0.2),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 10% 90%,
+      rgba(80, 130, 255, 0.25),
+      transparent 70%
+    );
+}
+
+
+
+.world-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+
+
+
+
+.world-lane-player {
+  display: none;
+}
+
+.world-lane-figure {
+  display: none;
+}
+
+
+
+
+/* Walking / bobbing animation for world mode */
+.world-stage-avatar--walking .avatar-view-svg {
+  transform-origin: 50% 100%;
+}
+
+
+
+
+/* Stage container – keep avatar centered and grounded */
+.world-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+
+
+
+
+/* WALK ANIMATION
+   Body bobs & sways slightly; robe lags for a cape-y feel.
+*/
+.world-stage-avatar--walking .avatar-figure {
+  animation: dreamself-walk-body 1.25s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
+.world-stage-avatar--walking .avatar-robe {
+  animation: dreamself-walk-robe 1.25s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
+/* Body bob + tiny lateral sway */
+@keyframes dreamself-walk-body {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(-3px) translateX(-0.6px);
+  }
+  75% {
+    transform: translateY(-3px) translateX(0.6px);
+  }
+}
+
+/* Robe sway – tiny skew left/right */
+@keyframes dreamself-walk-robe {
+  0%, 100% {
+    transform: skewX(0deg);
+  }
+  25% {
+    transform: skewX(-1.6deg);
+  }
+  75% {
+    transform: skewX(1.6deg);
+  }
+}
+
+
+
+/* Global tint applied to the avatar (SVG gets softly color-multiplied) */
+.world-stage-avatar svg {
+  transition: filter 0.4s ease, opacity 0.4s ease;
+}
+
+/* Dawn — warm, soft light */
+.world-phase-dawn svg {
+  filter: brightness(1.05) saturate(1.1) drop-shadow(0 0 6px rgba(255,220,170,0.25));
+}
+
+/* Night — cooler, moody light */
+.world-phase-night svg {
+  filter: brightness(0.85) saturate(0.9) drop-shadow(0 0 6px rgba(90,130,255,0.2));
+}
+
+/* Dusk — desaturated and shadow-biased */
+.world-phase-dusk svg {
+  filter: brightness(0.9) saturate(0.85) drop-shadow(0 0 4px rgba(60,60,120,0.3));
+}
+
+
 
 .inventory-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
 }
 
 .inventory-item {
@@ -830,6 +2428,10 @@ body {
   border-radius: 0.75rem;
   background: rgba(7, 10, 20, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.inventory-item + .inventory-item {
+  margin-top: 0.5rem;
 }
 
 .inventory-item-icon-wrapper {
@@ -846,16 +2448,19 @@ body {
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.7);
 }
 
-/* Rarity tints */
+/* Rarity tint examples — tweak to taste */
 .inventory-item-icon.rarity-common {
   background: radial-gradient(circle, #cfd2dd 0%, #868899 70%, #272938 100%);
 }
+
 .inventory-item-icon.rarity-uncommon {
   background: radial-gradient(circle, #c6f2d4 0%, #52b085 60%, #133a2b 100%);
 }
+
 .inventory-item-icon.rarity-rare {
   background: radial-gradient(circle, #d9ccff 0%, #8d71ff 55%, #261d5a 100%);
 }
+
 .inventory-item-icon.rarity-legendary {
   background: radial-gradient(circle, #ffe9b3 0%, #ffb347 55%, #5b3512 100%);
 }
@@ -888,10 +2493,1305 @@ body {
   opacity: 0.8;
 }
 
+
+
+.world-panel-dreamself .world-panel-title {
+  margin-bottom: 1rem;
+}
+
+.dreamself-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr);
+  gap: 2rem;
+}
+
+.dreamself-avatar-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dreamself-avatar-card {
+  width: 220px;
+  max-width: 100%;
+  padding: 1.2rem 1rem 1.6rem;
+  border-radius: 1.25rem;
+  background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.06), rgba(4, 6, 15, 0.96));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dreamself-avatar-card .avatar-view-svg {
+  width: 100%;
+  height: auto;
+}
+
+.dreamself-tags {
+  margin-top: 0.75rem;
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.dreamself-tag {
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(10, 12, 20, 0.8);
+}
+
+.dreamself-temperament {
+  margin-top: 0.7rem;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.dreamself-equip-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.dreamself-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.dreamself-slot-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 0.25rem;
+}
+
+.dreamself-slot-body {
+  border-radius: 0.9rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(6, 9, 18, 0.9);
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  min-height: 2.2rem;
+  display: flex;
+  align-items: center;
+}
+
+.dreamself-slot-body--empty {
+  opacity: 0.5;
+}
+
+.dreamself-inventory-preview {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 0.9rem;
+}
+
+.dreamself-inventory-title {
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 0.4rem;
+}
+
+.dreamself-inventory-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dreamself-inventory-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  padding: 0.25rem 0;
+}
+
+
+.world-panel-map .world-panel-title {
+  margin-bottom: 0.5rem;
+}
+
+.world-panel-map .world-panel-subtitle {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  margin-bottom: 1rem;
+}
+
+.map-track {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.75rem 0.5rem 0.25rem;
+}
+
+.map-track::before {
+  content: "";
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  top: 1.05rem;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.18),
+    rgba(255, 255, 255, 0.05)
+  );
+}
+
+.map-node {
+  position: relative;
+  flex: 1 1 0;
+  text-align: center;
+}
+
+.map-node-pin {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 999px;
+  margin: 0 auto 0.25rem;
+  background: rgba(200, 205, 220, 0.55);
+  box-shadow: 0 0 8px rgba(200, 205, 220, 0.8);
+}
+
+.map-node-label {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.map-node--active .map-node-pin {
+  background: #f9e6a9;
+  box-shadow: 0 0 14px rgba(255, 232, 166, 0.9);
+}
+
+.map-node--active .map-node-label {
+  opacity: 1;
+}
+
+
+/* Avatar bob / sway is controlled via .avatar-view-svg animation.
+   When an encounter is active, we pause it. */
+.world-stage-avatar--paused .avatar-view-svg {
+  animation-play-state: paused;
+}
+
+
+
+
+
+
+.world-encounter-label {
+  opacity: 0.7;
+}
+
+.world-encounter-name {
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+}
+
+/* tiny highlight dot */
+.world-encounter-bubble::before {
+  content: "";
+  position: absolute;
+  bottom: -0.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, #f9e6b9 0%, #f4c46d 50%, #4b3413 100%);
+  box-shadow: 0 0 10px rgba(249, 230, 185, 0.9);
+}
+
+/* little "pop" when the bubble appears */
+@keyframes world-encounter-pop {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+/* gentle fade out at the end of the encounter window */
+@keyframes world-encounter-fade {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+
+.world-debug-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.08) 0%, rgba(7, 10, 20, 0.98) 55%, rgba(3, 6, 12, 1) 100%);
+  box-shadow:
+    0 14px 38px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(255, 255, 255, 0.03);
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(245, 247, 255, 0.9);
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  transition:
+    transform 120ms ease-out,
+    box-shadow 120ms ease-out,
+    border-color 120ms ease-out,
+    background 160ms ease-out;
+}
+
+.world-debug-pill__orb {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 30% 20%, #f9f4ff 0%, #e2d4ff 30%, #b299ff 55%, #4f3aa7 100%);
+  box-shadow:
+    0 0 12px rgba(188, 157, 255, 0.9),
+    0 0 0 1px rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
+}
+
+.world-debug-pill__label {
+  position: relative;
+  top: 0.02rem;
+}
+
+/* hover / press states */
+.world-debug-pill:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.32);
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.world-debug-pill:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+
+/* When an encounter is active, freeze the parallax + ribbon */
+.world-lane--paused .world-lane-layer,
+.world-lane--paused .world-lane-ribbon {
+  animation-play-state: paused;
+}
+
+
+
+.worldstep-container {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background: url("/world/layers/layer_00.png") center / cover no-repeat;
+}
+
+.world-ribbon {
+  position: absolute;
+  width: 300%;   /* long scrolling stripe */
+  height: 30vh;
+  bottom: 0;
+  background: url("/world/layers/layer_05.png") repeat-x;
+  opacity: 0.65;
+}
+
+.world-character {
+  position: absolute;
+  bottom: 10vh;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Floating popup */
+.found-popup {
+  position: absolute;
+  bottom: 140px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10,10,15,0.9);
+  padding: 6px 12px;
+  border-radius: 8px;
+  color: white;
+  text-align: center;
+  font-size: 12px;
+  animation: popupFade 1.8s ease-out forwards;
+}
+
+@keyframes popupFade {
+  0% { opacity: 0; transform: translate(-50%, 10px); }
+  15% { opacity: 1; transform: translate(-50%, 0px); }
+  100% { opacity: 0; transform: translate(-50%, -12px); }
+}
+
+/* UI Buttons */
+.world-ui {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.ui-btn {
+  padding: 8px 14px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.06);
+  color: #ccc;
+  font-size: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+
+
+
+/* When auto-walk is paused (or an encounter is active) stop all background motion */
+.world-lane--paused .world-lane-layer,
+.world-lane--paused .world-lane-backdrop,
+.world-lane--paused .world-lane-ground,
+.world-lane--paused .world-lane-figure,
+.world-lane--paused .world-lane-figure-body,
+.world-lane--paused .world-lane-crystal,
+.world-lane--paused .world-lane-encounter-pulse {
+  animation-play-state: paused;
+}
+
+
+.world-autowalk-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.16rem 0.7rem 0.16rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.8);
+  background: radial-gradient(
+    circle at top left,
+    rgba(15, 23, 42, 0.96),
+    #020617
+  );
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #e5e7eb;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.85);
+}
+
+.world-autowalk-toggle--off {
+  opacity: 0.75;
+  border-style: dashed;
+}
+
+.world-autowalk-toggle:active {
+  transform: translateY(0.5px);
+}
+
+.world-autowalk-label {
+  opacity: 0.7;
+}
+
+.world-autowalk-state {
+  font-weight: 500;
+}
+
+.world-autowalk-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+}
+
+.world-autowalk-toggle--off .world-autowalk-dot {
+  background: #64748b;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+
+/* Matches world drift for a grounded walking feel */
+.world-stage-avatar--walking .avatar-root {
+  animation: dreamself-walk 1.8s ease-in-out infinite;
+}
+
+@keyframes dreamself-walk {
+  0%   { transform: translateY(0px); }
+  25%  { transform: translateY(-4px); }
+  50%  { transform: translateY(0px); }
+  75%  { transform: translateY(3px); }
+  100% { transform: translateY(0); }
+}
+
+
+
+
+
+
+
+
+
+
+
+/* When an encounter is active, darken and vignette the scene a bit */
+.world-card--encounter .world-tint-overlay {
+  opacity: 0.7;
+  background: radial-gradient(
+      circle at center,
+      rgba(15, 23, 42, 0.15),
+      rgba(15, 23, 42, 0.9)
+    ),
+    radial-gradient(
+      circle at top center,
+      rgba(56, 189, 248, 0.12),
+      transparent 55%
+    );
+}
+
+
+
+
+
+
+
+/* Default main layout (keep whatever you already have) */
+/* .app-main { ... } */
+
+/* WORLD view: no extra top padding, fill viewport, no scrolling wrapper */
+.app-main--world {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.app-main--world .app-screen-world {
+  min-height: 100vh;
+}
+
+.app-main--world .world-card {
+  margin-top: 0;
+}
+
+
 /* =========================================================
-   INVENTORY MODAL + GRID
+   WORLD VIEW FULLSCREEN LAYOUT
+   ========================================================= */
+.app-main--world {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.app-main--world .app-screen-world {
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden; /* prevent scroll */
+}
+
+.app-main--world .world-card {
+  margin-top: 0;
+  height: 100%;
+}
+
+
+
+
+
+
+
+
+/* Clean, floating large exclamation (!) above avatar */
+.world-encounter-glyph {
+  position: absolute;
+  top: -2.6rem;            /* perfect offset for mobile */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2.2rem;       /* large and readable */
+  font-weight: 900;
+  color: #facc15;          /* gold alert */
+  line-height: 1;
+  background: none;
+  border: none;
+  padding: 0;
+
+  text-shadow:
+    0 0 8px rgba(250, 204, 21, 0.75),
+    0 0 18px rgba(250, 204, 21, 0.9);
+
+  animation: mgs-alert-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes mgs-alert-pulse {
+  0%   { transform: translateX(-50%) scale(0.9); opacity: 0.7; }
+  50%  { transform: translateX(-50%) scale(1.05); opacity: 1; }
+  100% { transform: translateX(-50%) scale(0.92); opacity: 0.85; }
+}
+
+
+
+
+
+
+
+
+
+
+
+/* Top-center glass HUD chip for RELIC FOUND */
+.world-encounter-banner {
+  position: absolute;
+  top: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.7rem 1.6rem;
+  border-radius: 999px;
+  background: rgba(10, 14, 25, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  backdrop-filter: blur(14px);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.7rem;
+  color: #e5e7eb;
+  box-shadow:
+    0 10px 30px rgba(15, 23, 42, 0.9),
+    0 0 0 1px rgba(15, 23, 42, 0.8);
+  z-index: 40;
+}
+
+.world-encounter-label {
+  opacity: 0.7;
+  margin-right: 0.6rem;
+}
+
+.world-encounter-name {
+  font-weight: 600;
+}
+
+/* optional rarity tints */
+.world-encounter-banner--common {
+  border-color: rgba(148, 163, 184, 0.6);
+}
+.world-encounter-banner--rare {
+  border-color: rgba(56, 189, 248, 0.9);
+  box-shadow:
+    0 10px 30px rgba(15, 23, 42, 0.9),
+    0 0 12px rgba(56, 189, 248, 0.6);
+}
+.world-encounter-banner--mythic {
+  border-color: rgba(168, 85, 247, 0.9);
+  box-shadow:
+    0 10px 30px rgba(15, 23, 42, 0.9),
+    0 0 14px rgba(168, 85, 247, 0.7);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* DREAM – world avatar placement (single source of truth) */
+.world-stage-avatar {
+  position: absolute;
+  left: 50%;
+  bottom: 9vh;          /* adjust up/down to taste */
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.world-stage-avatar .avatar-view-svg {
+  width: clamp(96px, 18vh, 140px);
+  height: auto;
+  margin: 0;
+}
+
+.world-stage-avatar .avatar-root {
+  margin: 0;
+}
+
+
+/* Disable legacy relic popup in favor of top-center banner */
+.found-popup {
+  display: none !important;
+}
+
+
+/* === DREAM – final encounter + avatar layout fixes ================== */
+
+/* 1. Hard-lock the avatar to the center of the ribbon */
+.world-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+
+/* 2. Kill the old “mini relic card” that hugs the avatar */
+.found-popup,
+.world-stage-avatar .found-popup,
+.world-stage-avatar .world-encounter-bubble,
+.world-stage-avatar .world-encounter-card,
+.world-stage-avatar .world-encounter-panel {
+  display: none !important;
+}
+
+/* Clean, floating exclamation above avatar */
+.world-encounter-glyph {
+  position: absolute;
+  left: 50%;
+  bottom: 180px; /* sits above the avatar head */
+  transform: translateX(-50%);
+  font-size: 42px;
+  font-weight: 700;
+  color: #fce87a;
+  text-shadow: 0 0 12px rgba(255, 230, 120, 0.9);
+  animation: glyphPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes glyphPulse {
+  0% { opacity: 0.4; transform: translateX(-50%) translateY(0); }
+  50% { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+  100% { opacity: 0.4; transform: translateX(-50%) translateY(0); }
+}
+
+/* 4. Minimal glass HUD chip for “RELIC FOUND” at the top center */
+.world-encounter-banner {
+  position: absolute;
+  top: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 14px 24px;
+  background: rgba(15,15,25,0.55);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 28px;
+  backdrop-filter: blur(10px);
+  color: white;
+  font-size: 14px;
+  text-align: center;
+  letter-spacing: 0.08em;
+  z-index: 999;
+}
+
+
+
+
+
+
+
+/* hide any old “meta” row if it exists */
+.world-encounter-banner-meta {
+  display: none !important;
+}
+  
+
+
+
+
+
+.encounter-top-banner {
+  position: absolute;
+  top: 10vh;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  background: rgba(12, 16, 28, 0.6);
+  backdrop-filter: blur(12px);
+  padding: 12px 28px;
+  border-radius: 24px;
+  color: var(--hud-text);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+  pointer-events: none;
+}
+
+.encounter-top-banner--visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.encounter-alert {
+  position: absolute;
+  bottom: calc(25vh + 60px);
+  font-size: 48px;
+  color: #ffd85a;
+  text-shadow: 0 0 12px rgba(255, 216, 90, 0.9);
+  animation: alert-pop 0.65s ease-out forwards;
+}
+
+@keyframes alert-pop {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+
+
+/* Nier-style encounter item sprite */
+.world-encounter-sprite {
+  position: absolute;
+  bottom: 18%;          /* sits nicely on the ridge */
+  left: 56%;            /* slightly ahead of the avatar */
+  transform: translateX(-50%);
+  width: 52px;          /* feel free to tweak size */
+  height: auto;
+  pointer-events: none;
+
+  filter:
+    drop-shadow(0 0 10px rgba(15, 23, 42, 0.9))
+    drop-shadow(0 10px 20px rgba(0, 0, 0, 0.8));
+  opacity: 0.96;
+}
+
+/* optional subtle hover bob when encounter is active */
+.world-card--encounter .world-encounter-sprite {
+  animation: encounter-crystal-float 1.8s ease-in-out infinite;
+}
+
+@keyframes encounter-crystal-float {
+  0%   { transform: translateX(-50%) translateY(0); }
+  50%  { transform: translateX(-50%) translateY(-4px); }
+  100% { transform: translateX(-50%) translateY(0); }
+}
+
+
+
+/* Container for SVG loot on the ribbon */
+.world-lane-encounter-item {
+  position: absolute;
+  /* line the item up with the ribbon; tweak bottom % to taste */
+  bottom: 14%;
+  /* slightly ahead of the avatar (which is centered) */
+  left: 53%;
+  transform: translateX(-50%);
+  z-index: 19; /* under avatar (20), above ground/parallax */
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.world-lane-encounter-item img {
+  display: block;
+  width: 64px;
+  height: auto;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.85))
+    drop-shadow(0 0 10px rgba(250, 250, 255, 0.35));
+}
+
+
+/* === Grounded loot on the ribbon ===================================== */
+
+.world-lane-loot {
+  position: absolute;
+  /* Center-ish but slightly ahead of the avatar (which is at 50%) */
+  left: 56%;
+  bottom: 9.5vh; /* matches the avatar shadow line */
+  transform: translateX(-50%);
+  z-index: 18; /* under HUD, above ribbon + grass */
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none; /* purely decorative; encounter is handled in logic */
+}
+
+/* Soft ground contact */
+.world-lane-loot-shadow {
+  width: clamp(52px, 4.3vw, 80px);
+  height: clamp(12px, 1vw, 18px);
+  border-radius: 999px;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(0, 0, 0, 0.65),
+    transparent 70%
+  );
+  opacity: 0.85;
+  filter: blur(2px);
+  transform-origin: 50% 50%;
+}
+
+/* The Nier-style SVG crystal/rock */
+.world-lane-loot-image {
+  width: clamp(52px, 4.3vw, 82px);  /* responsive size */
+  height: auto;
+  display: block;
+
+  /* Tilt slightly so it feels “sitting” in perspective */
+  transform: translateY(-4px) scale(1) rotate(-3deg);
+  transform-origin: 50% 100%;
+
+  /* Subtle glow + hover float */
+  filter:
+    drop-shadow(0 0 6px rgba(248, 250, 252, 0.14))
+    drop-shadow(0 10px 26px rgba(15, 23, 42, 0.9));
+  animation: loot-idle-float 2.2s ease-in-out infinite;
+}
+
+/* When the encounter actually triggers, make it flare a bit */
+.world-lane-loot--active .world-lane-loot-image {
+  animation: loot-pulse 0.6s ease-out, loot-idle-float 2.2s ease-in-out 0.6s infinite;
+}
+
+/* Idle micro-float while the Dreamself walks toward it */
+@keyframes loot-idle-float {
+  0%   { transform: translateY(-4px) scale(1) rotate(-3deg); }
+  50%  { transform: translateY(-7px) scale(1.02) rotate(-3deg); }
+  100% { transform: translateY(-4px) scale(1) rotate(-3deg); }
+}
+
+/* Pick-up flash when encounter fires */
+@keyframes loot-pulse {
+  0% {
+    filter:
+      drop-shadow(0 0 0 rgba(248, 250, 252, 0))
+      drop-shadow(0 10px 26px rgba(15, 23, 42, 0.9));
+    transform: translateY(-6px) scale(1);
+  }
+  45% {
+    filter:
+      drop-shadow(0 0 26px rgba(248, 250, 252, 0.85))
+      drop-shadow(0 18px 34px rgba(15, 23, 42, 0.95));
+    transform: translateY(-10px) scale(1.06);
+  }
+  100% {
+    filter:
+      drop-shadow(0 0 10px rgba(248, 250, 252, 0.2))
+      drop-shadow(0 10px 26px rgba(15, 23, 42, 0.9));
+    transform: translateY(-4px) scale(1);
+  }
+}
+
+/* Keep loot still if the whole lane is paused */
+.world-lane--paused .world-lane-loot-image {
+  animation-play-state: paused;
+}
+
+
+/* Loot states: walking in vs reached */
+.world-lane-loot--approach {
+  /* Slides from off-screen right → ribbon position */
+  animation: loot-approach 5.5s ease-out forwards;
+}
+
+.world-lane-loot--active {
+  /* Stop horizontal motion; keep it locked under the avatar */
+  animation: none;
+  transform: translateX(-50%);
+}
+
+/* Match the travel time in WorldStep (TRAVEL_MS) */
+@keyframes loot-approach {
+  0% {
+    transform: translateX(220%) translateY(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+
+/* =========================================================
+   DREAM – Loot crystal on the ribbon (idle + pickup)
    ========================================================= */
 
+.world-lane-loot {
+  position: absolute;
+  /* Slightly ahead of the avatar, which is centered at 50% */
+  left: 56%;
+  bottom: 9.5vh; /* lines up with avatar shadow / ribbon */
+  transform: translateX(-50%);
+  z-index: 18; /* under avatar (20), above ground/parallax */
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none; /* encounter logic is handled elsewhere */
+}
+
+/* Soft ground contact under the loot */
+.world-lane-loot-shadow {
+  width: clamp(52px, 4.3vw, 80px);
+  height: clamp(12px, 1vw, 18px);
+  border-radius: 999px;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(0, 0, 0, 0.7),
+    transparent 70%
+  );
+  opacity: 0.9;
+  filter: blur(2px);
+  transform-origin: 50% 50%;
+}
+
+/* The SVG crystal / rock */
+.world-lane-loot-image {
+  width: clamp(52px, 4.3vw, 82px);
+  height: auto;
+  display: block;
+
+  transform: translateY(-4px) scale(1) rotate(-3deg);
+  transform-origin: 50% 100%;
+
+  filter:
+    drop-shadow(0 0 6px rgba(248, 250, 252, 0.18))
+    drop-shadow(0 10px 26px rgba(15, 23, 42, 0.95));
+
+  /* Very subtle idle float while it’s on the ground */
+  animation: world-lane-loot-idle 2.2s ease-in-out infinite;
+}
+
+/* Idle micro-float */
+@keyframes world-lane-loot-idle {
+  0%   { transform: translateY(-4px) scale(1) rotate(-3deg); }
+  50%  { transform: translateY(-8px) scale(1.03) rotate(-3deg); }
+  100% { transform: translateY(-4px) scale(1) rotate(-3deg); }
+}
+
+/* When the loot has been picked up:
+   - container does a squash + launch + fade
+   - idle float stops so the motion feels clean
+*/
+.world-lane-loot--pickup {
+  animation: world-lane-loot-pickup 0.75s
+    cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+.world-lane-loot--pickup .world-lane-loot-image {
+  animation: none;
+  filter:
+    drop-shadow(0 0 16px rgba(248, 250, 252, 0.9))
+    drop-shadow(0 18px 40px rgba(15, 23, 42, 0.98));
+}
+
+@keyframes world-lane-loot-pickup {
+  0% {
+    transform: translateX(-50%) translateY(0) scale(1);
+    opacity: 1;
+  }
+  15% {
+    /* tiny squash before launch */
+    transform: translateX(-50%) translateY(4px) scale(0.94, 1.06);
+  }
+  40% {
+    /* big pop upwards */
+    transform: translateX(-50%) translateY(-20px) scale(1.08);
+  }
+  70% {
+    transform: translateX(-50%) translateY(-34px) scale(0.95);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(-48px) scale(0.75);
+    opacity: 0;
+  }
+}
+
+/* If the whole lane is paused, also pause the idle float */
+.world-lane--paused .world-lane-loot-image {
+  animation-play-state: paused;
+}
+
+
+
+/* ===== INVENTORY GRID MODAL =================================== */
+
+.inventory-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+      circle at top,
+      rgba(15, 23, 42, 0.82),
+      rgba(2, 6, 23, 0.9)
+  );
+ backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999; /* above world + panels */
+}
+
+.inventory-modal {
+  width: min(920px, 94vw);
+  max-height: 88vh;
+  padding: 1.4rem 1.6rem 1.2rem;
+  border-radius: 1.3rem;
+  background: radial-gradient(
+      circle at 0% 0%,
+      rgba(148, 197, 253, 0.15),
+      transparent 55%
+    ),
+    rgba(10, 16, 30, 0.98);
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.92),
+    0 0 0 1px rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  color: #e5e7eb;
+}
+
+
+.inventory-modal-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.inventory-modal-kicker {
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.inventory-modal-title {
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.inventory-modal-close {
+  border: none;
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.inventory-modal-subtitle {
+  margin: 0.6rem 0 1rem;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.inventory-modal-footer {
+  margin-top: 0.6rem;
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+/* call-to-action from the slide-up panel */
+.inventory-grid-open-btn {
+  margin: 0.5rem 0 0.8rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 197, 253, 0.8);
+  background: rgba(15, 23, 42, 0.9);
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #e0f2fe;
+  cursor: pointer;
+}
+
+
+
+
+
+.inventory-grid-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  padding: 1.4rem 0;
+}
+
+/* Single item block (top-left of its span) */
+.inventory-grid-item {
+  position: relative;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: radial-gradient(
+      circle at 0% 0%,
+      rgba(148, 197, 253, 0.16),
+      transparent 70%
+    ),
+    rgba(15, 23, 42, 0.96);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.8);
+  cursor: grab;
+}
+
+.inventory-grid-item--dragging {
+  opacity: 0.7;
+  box-shadow:
+    0 0 0 1px rgba(148, 197, 253, 0.8),
+    0 16px 34px rgba(15, 23, 42, 0.98);
+}
+
+/* rarity tints */
+.inventory-grid-item--rare {
+  border-color: rgba(56, 189, 248, 0.85);
+}
+.inventory-grid-item--mythic {
+  border-color: rgba(168, 85, 247, 0.9);
+}
+
+.inventory-grid-item-inner {
+  position: relative;
+  height: 100%;
+  padding: 0.35rem 0.45rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.inventory-grid-item-icon {
+  flex: 0 0 1.9rem;
+  height: 1.9rem;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle at 30% 20%,
+    #020617,
+    #111827 60%,
+    #020617 100%
+  );
+  box-shadow:
+    0 0 10px rgba(15, 23, 42, 0.95),
+    0 0 0 1px rgba(148, 163, 184, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.inventory-grid-item-icon-img {
+  width: 110%;
+  height: auto;
+  transform: translateY(1px);
+}
+
+
+.inventory-grid-item-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.inventory-grid-item-name {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inventory-grid-item-rarity {
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+/* ===== TOOLTIP ================================================ */
+
+.inventory-tooltip {
+  position: absolute;
+  left: 0.2rem;
+  bottom: 105%;
+  transform: translateY(-4px);
+  min-width: 180px;
+  max-width: 260px;
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.6rem;
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.95);
+  font-size: 0.76rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 140ms ease-out, transform 140ms ease-out;
+  z-index: 10;
+}
+
+.inventory-tooltip::after {
+  content: "";
+  position: absolute;
+  left: 1.4rem;
+  bottom: -6px;
+  width: 10px;
+  height: 10px;
+  background: rgba(15, 23, 42, 0.98);
+  border-left: 1px solid rgba(148, 163, 184, 0.7);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.7);
+  transform: rotate(45deg);
+}
+
+.inventory-grid-item:hover .inventory-tooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.inventory-tooltip-name {
+  font-weight: 600;
+  margin-bottom: 0.18rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.inventory-tooltip-rarity {
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  opacity: 0.8;
+}
+
+.inventory-tooltip-body {
+  font-size: 0.78rem;
+  color: #cbd5f5;
+}
+
+/* rarity colors inside tooltip */
+.inventory-tooltip-rarity.rarity-rare {
+  color: #7dd3fc;
+}
+.inventory-tooltip-rarity.rarity-mythic {
+  color: #f0abfc;
+}
+
+
+.world-hud-warning {
+  margin-top: 0.25rem;
+  font-size: 0.72rem;
+  color: #fed7aa;
+  opacity: 0.9;
+}
+
+
+
+/* Backdrop: world remains clearly visible */
 .inventory-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -907,38 +3807,46 @@ body {
   z-index: 999;
 }
 
-.inventory-modal {
-  max-width: 720px;
-  width: min(92vw, 720px);
-  max-height: 88vh;
-  padding: 0.7rem 1rem 0.9rem;
+.inventory-modal.inventory-modal--minimal {
+  max-width: 680px;
+  width: min(92vw, 680px);
+  padding: 0.5rem; /* equal, minimal padding on all sides */
   border-radius: 1.2rem;
   background: linear-gradient(
     135deg,
-    rgba(15, 23, 42, 0.82),
-    rgba(15, 23, 42, 0.7)
+    rgba(15, 23, 42, 0.72),
+    rgba(15, 23, 42, 0.6)
   );
-  border: 1px solid rgba(148, 163, 184, 0.45);
+  border: 1px solid rgba(148, 163, 184, 0.4);
   box-shadow:
     0 26px 70px rgba(0, 0, 0, 0.9),
     0 0 0 1px rgba(15, 23, 42, 0.9);
   color: #e5e7eb;
-  display: flex;
-  flex-direction: column;
+  z-index: 1000;
 }
 
+
+/* Header spacing a bit tighter */
 .inventory-modal-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 1rem;
   margin-bottom: 0.25rem;
+   gap: 1rem;
 }
 
+.inventory-modal-subtitle {
+  margin: 0 0 0.3rem;
+  font-size: 0.78rem;
+  opacity: 0.8;
+}
+
+
 .inventory-modal-title-block {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
+  flex: 1;
 }
 
 .inventory-modal-kicker {
@@ -949,24 +3857,19 @@ body {
 }
 
 .inventory-modal-title {
-  font-size: 0.95rem;
-  letter-spacing: 0.18em;
+ font-size: 1.05rem;
+   letter-spacing: 0.18em;
   text-transform: uppercase;
   margin: 0;
 }
+
 
 .inventory-modal-close {
   border: none;
   background: transparent;
   color: #e5e7eb;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   cursor: pointer;
-}
-
-.inventory-modal-subtitle {
-  margin: 0.2rem 0 0.6rem;
-  font-size: 0.78rem;
-  opacity: 0.8;
 }
 
 .inventory-modal-footer {
@@ -975,14 +3878,187 @@ body {
   opacity: 0.75;
 }
 
-/* Sort row (optional, right-aligned) */
+.inventory-modal-count {
+  white-space: nowrap;
+}
+
+
+/* Compact 6x5 grid, centered inside modal */
+ {
+  margin-top: 0.4rem;
+  padding: 0.5rem;
+  border-radius: 0.9rem;
+  background: radial-gradient(
+      circle at 50% 0%,
+      rgba(15, 23, 42, 0.75),
+      rgba(3, 7, 18, 0.9)
+    );
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.95);
+
+  width: 100%;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-rows: repeat(5, 1fr);
+  gap: 0.22rem;
+
+  overflow: visible;
+}
+
+
+
+/* Each slot: small square with dotted border */
+.inventory-grid-cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 0.4rem;
+  border: 1px dashed rgba(148, 163, 184, 0.32);
+  background: radial-gradient(
+      circle at 0% 0%,
+      rgba(148, 163, 184, 0.12),
+      transparent 55%
+    ),
+    rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+
+
+
+
+/* Icon-only item: NO background, NO border */
+.inventory-grid-item-icon-only {
+  position: relative;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+}
+
+.inventory-grid-item-icon-only--dragging {
+  opacity: 0.7;
+  cursor: grabbing;
+}
+
+
+/* Tooltip – must sit above grid and modal internals */
+.inventory-grid-item-icon-only .inventory-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: 110%;
+  transform: translateX(-50%);
+  min-width: 220px;
+  max-width: 260px;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.6rem;
+  background: radial-gradient(
+      circle at 0% 0%,
+      rgba(15, 23, 42, 0.98),
+      rgba(15, 23, 42, 0.96)
+    );
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.95);
+  font-size: 0.78rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease-out, transform 140ms ease-out;
+  color: #e5e7eb;
+  z-index: 1100; /* higher than modal content */
+}
+
+.inventory-grid-item-icon-only:hover .inventory-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.inventory-tooltip-name {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.inventory-tooltip-rarity {
+  font-size: 0.72rem;
+  text-transform: capitalize;
+  padding: 0.06rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+}
+
+.inventory-tooltip-body {
+  opacity: 0.85;
+  line-height: 1.4;
+}
+
+
+
+
+
+
+/* Optional rarity tints */
+.inventory-tooltip-rarity.rarity-rare {
+  border-color: rgba(56, 189, 248, 0.85);
+  color: #e0f2fe;
+}
+.inventory-tooltip-rarity.rarity-mythic {
+  border-color: rgba(168, 85, 247, 0.95);
+  color: #f5d0fe;
+}
+
+
+
+.inventory-modal.inventory-modal--minimal {
+  max-width: 680px;                       /* feels tight but readable */
+  width: min(92vw, 680px);
+    padding: 0.35rem 0.5rem 0.65rem; /* ✅ minimal horizontal padding */
+  border-radius: 1.2rem;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.72),
+    rgba(15, 23, 42, 0.6)
+  );
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  box-shadow:
+    0 26px 70px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
+  z-index: 1000;
+}
+
+
+/* Bigger item art (≈2×) with just a soft drop shadow */
+.inventory-grid-icon-img {
+  width: 120%;
+  max-width: 110px;
+  height: auto;
+  display: block;
+  filter:
+    drop-shadow(0 0 12px rgba(15, 23, 42, 0.95))
+    drop-shadow(0 6px 14px rgba(0, 0, 0, 0.85));
+  pointer-events: none;
+}
+
+
+
+/* Sort pills (restore pill UI) */
 .inventory-sort-row {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   gap: 0.35rem;
+  margin-bottom: 0.45rem;
   font-size: 0.74rem;
-  margin: 0 0 0.35rem;
 }
 
 .inventory-sort-label {
@@ -1004,6 +4080,7 @@ body {
   cursor: pointer;
   opacity: 0.7;
 }
+
 .inventory-sort-pill--active {
   border-color: rgba(56, 189, 248, 0.9);
   background: radial-gradient(
@@ -1014,7 +4091,111 @@ body {
   opacity: 1;
 }
 
-/* Grid shell */
+
+
+
+/* === DREAM – INVENTORY GRID RESET (Option A) ===================== */
+
+/* Backdrop – keep world visible behind the modal */
+.inventory-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+      circle at 50% 0%,
+      rgba(15, 23, 42, 0.45),
+      rgba(2, 6, 23, 0.35)
+    );
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* Modal – tighter, focused on grid */
+.inventory-modal.inventory-modal--minimal {
+  max-width: 720px;
+  width: min(92vw, 720px);
+  padding: 0.7rem 1rem 0.85rem;
+  border-radius: 1.2rem;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.82),
+    rgba(15, 23, 42, 0.7)
+  );
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  box-shadow:
+    0 26px 70px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
+}
+
+/* Header */
+.inventory-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.inventory-modal-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.inventory-modal-kicker {
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.inventory-modal-title {
+  font-size: 0.95rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.inventory-modal-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.inventory-sort {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  opacity: 0.8;
+}
+
+.inventory-sort-select {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: rgba(15, 23, 42, 0.95);
+  color: #e5e7eb;
+}
+
+.inventory-capacity {
+  font-size: 0.72rem;
+}
+
+.inventory-close-btn {
+  border: none;
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* Shell around grid, keeps it centered */
 .inventory-grid-shell {
   flex: 1;
   display: flex;
@@ -1023,8 +4204,8 @@ body {
   padding: 0.4rem 0.4rem 0.35rem;
 }
 
-/* 6 × 5 grid */
-.inventory-grid {
+/* 6×5 compact grid */
+.inventory-grid.inventory-grid--dotted {
   width: 100%;
   max-width: 520px;
   padding: 0.45rem;
@@ -1040,9 +4221,11 @@ body {
   grid-template-columns: repeat(6, minmax(0, 1fr));
   grid-template-rows: repeat(5, 1fr);
   gap: 0.22rem;
+
+  overflow: visible;
 }
 
-/* Each slot */
+/* Each slot = square cell with dotted border */
 .inventory-grid-slot {
   position: relative;
   aspect-ratio: 1 / 1;
@@ -1057,14 +4240,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: visible;
+  overflow: visible; /* lets tooltip escape */
 }
 
 .inventory-grid-slot--dragging {
   outline: 1px solid rgba(148, 197, 253, 0.8);
 }
 
-/* Icon-only item */
+/* Icon-only items (borderless, no pill) */
 .inventory-grid-item {
   position: relative;
   padding: 0;
@@ -1075,6 +4258,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: grab;
+}
+
+.inventory-grid-slot--occupied .inventory-grid-item {
   cursor: grab;
 }
 
@@ -1089,7 +4276,7 @@ body {
     drop-shadow(0 6px 14px rgba(0, 0, 0, 0.85));
 }
 
-/* Tooltip */
+/* Tooltip – high z-index and centered above icon */
 .inventory-tooltip {
   position: absolute;
   left: 50%;
@@ -1111,7 +4298,7 @@ body {
   opacity: 0;
   pointer-events: none;
   transition: opacity 140ms ease-out, transform 140ms ease-out;
-  z-index: 1100;
+  z-index: 1100; /* above modal internals */
 }
 
 .inventory-tooltip::after {
@@ -1147,11 +4334,13 @@ body {
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 184, 0.7);
 }
+
 .inventory-tooltip-desc {
   opacity: 0.85;
   line-height: 1.4;
 }
 
+/* Optional rarity tints */
 .inventory-tooltip-rarity.rarity-rare {
   border-color: rgba(56, 189, 248, 0.85);
   color: #e0f2fe;
@@ -1161,53 +4350,327 @@ body {
   color: #f5d0fe;
 }
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
-
-@media (max-width: 960px) {
-  .world-hud {
-    padding-inline: 1.5rem;
-  }
-
-  .world-panel-shell {
-    right: 1.5rem;
-  }
-
-  .world-dock {
-    right: 1.5rem;
-  }
+.inventory-modal.inventory-modal--minimal {
+  padding: 10px !important;
 }
 
-@media (max-width: 720px) {
-  .world-hud {
+
+
+/* Header layout */
+
+.inventory-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.inventory-modal-title-block {
+  flex: 1;
+}
+
+.inventory-modal-title {
+  font-size: 1.05rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* Right side (sort pills + close button) */
+
+.inventory-modal-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Sort row, right-aligned */
+
+.inventory-sort-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  font-size: 0.74rem;
+  margin: 0; /* no extra vertical spacing */
+}
+
+.inventory-sort-label {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  opacity: 0.6;
+  margin-right: 0.25rem;
+}
+
+/* === Dock: bottom-right, icon on top, label below =================== */
+
+.world-dock {
+  position: absolute;
+  right: 3rem;
+  bottom: 2.4rem;
+  display: flex;
+  gap: 1.4rem;
+  align-items: flex-end;
+  z-index: 25;
+}
+
+/* Each dock entry is a vertical button */
+.world-dock-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0; /* minimal padding */
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #e5e7eb;
+  font-family: inherit;
+}
+
+/* circular icon wrapper with tiny padding for the badge */
+.world-dock-icon-wrapper {
+  position: relative;
+  padding: 0.1rem;
+}
+
+/* base icon – reduced ~25% from the “big” version */
+.world-dock-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  position: relative;
+}
+
+/* keep your existing glyphs – just reuse the same classes */
+.world-dock-icon--inventory::before,
+.world-dock-icon--dreamself::before,
+.world-dock-icon--map::before,
+.world-dock-icon--journal::before,
+.world-dock-icon--debug::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: inherit;
+  border: 1px solid rgba(248, 250, 252, 0.8);
+}
+
+/* (you can keep your more detailed glyph shapes if you already had them) */
+
+/* Active state glow */
+.world-dock-button--active .world-dock-icon {
+  border-color: #38bdf8;
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.8),
+    0 10px 26px rgba(15, 23, 42, 0.95);
+}
+
+/* Bold, legible label under the icon */
+.world-dock-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;          /* <<< bold for readability */
+}
+
+/* Small pink-ish badge for “new” counts */
+.world-dock-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #f9a8d4;
+  color: #1f2933;
+  font-size: 0.6rem;
+  text-align: center;
+  line-height: 1.3;
+  box-shadow: 0 0 8px rgba(249, 168, 212, 0.9);
+}
+
+
+.world-dock {
+  position: absolute;
+  right: 5vw;
+  bottom: 2.2rem;
+  display: flex;
+  gap: 1.1rem;
+  z-index: 25;
+}
+
+.world-dock-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #e5e7eb;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.world-dock-label {
+  font-weight: 600; /* better legibility */
+}
+
+.world-dock-icon-wrap {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: radial-gradient(circle at 30% 20%, #020617, #111827);
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.world-dock-icon {
+  width: 16px;
+  height: 16px;
+  position: relative;
+}
+
+/* Example glyphs; tweak as you like */
+.world-dock-icon--inventory::before,
+.world-dock-icon--inventory::after {
+  content: "";
+  position: absolute;
+  inset: 15%;
+  border-radius: 3px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.world-dock-icon--inventory::after {
+  inset: 35% 20% 15% 20%;
+}
+
+.world-dock-icon--dreamself::before {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  border-radius: 999px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.world-dock-icon--map::before {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border-radius: 4px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.world-dock-icon--journal::before,
+.world-dock-icon--journal::after {
+  content: "";
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  border-top: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.world-dock-icon--journal::before {
+  top: 32%;
+}
+
+.world-dock-icon--journal::after {
+  top: 60%;
+}
+
+.world-dock-icon--debug::before {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border-radius: 3px;
+  border: 1px solid rgba(248, 250, 252, 0.9);
+  transform: rotate(45deg);
+}
+
+/* Tiny notification badge (pink, Nier-style) */
+.world-dock-notification {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  padding: 0 4px;
+  border-radius: 10px;
+  background: #f9a8d4;
+  color: #111827;
+  font-size: 0.65rem;
+  text-align: center;
+  line-height: 1.2;
+  box-shadow: 0 0 10px rgba(248, 113, 171, 0.9);
+}
+
+
+.world-hud-bars {
+  position: absolute;
+  left: 5vw;
+  bottom: 2.4rem;
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(229, 231, 235, 0.85);
+  z-index: 25;
+}
+
+.world-hud-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.world-hud-bar-label {
+  opacity: 0.8;
+}
+
+.world-hud-bar-track {
+  width: 130px;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.85);
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.95);
+}
+
+.world-hud-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  transform-origin: left center;
+}
+
+/* Colors */
+.world-hud-bar--hp .world-hud-bar-fill {
+  background: linear-gradient(90deg, #fecaca, #f97373);
+}
+
+.world-hud-bar--mp .world-hud-bar-fill {
+  background: linear-gradient(90deg, #bfdbfe, #60a5fa);
+}
+
+.world-hud-bar--stamina .world-hud-bar-fill {
+  background: linear-gradient(90deg, #fef3c7, #facc15);
+}
+
+@media (max-width: 768px) {
+  .world-hud-bars {
+    left: 1.5rem;
+    bottom: 1.8rem;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.75rem;
   }
 
-  .world-hud-right {
-    align-items: flex-start;
-  }
-
-  .world-hud-meters {
-    align-items: flex-start;
-  }
-
-  .world-dock {
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-  }
-
-  .world-panel-shell {
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-  }
-
-  .world-panel {
-    max-width: 100%;
-    border-radius: 1rem;
+  .world-hud-bar-track {
+    width: 110px;
   }
 }

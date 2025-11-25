@@ -4103,3 +4103,114 @@ body {
 .app-screen-world .world-dock-btn {
   border-radius: 0 !important;
 }
+
+
+/* ============================================================
+   WORLD DOCK — Clean, Sharp, Borderless, Polished
+   ============================================================ */
+
+.world-dock {
+  position: absolute;
+  right: 4vw;
+  bottom: 2rem;
+  display: flex;
+  gap: 2.6rem;
+  z-index: 40;
+  pointer-events: auto;
+}
+
+/* -------- Dock Buttons -------- */
+
+.world-dock-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  color: rgba(240, 244, 255, 0.88);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.68rem;
+  transition: opacity 180ms ease, transform 160ms ease;
+  pointer-events: auto;
+}
+
+.world-dock-btn:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.world-dock-btn--active {
+  transform: translateY(-1px);
+  opacity: 1;
+}
+
+/* -------- Icon (32px glyph) -------- */
+
+.world-dock-icon-wrap {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* No borders, no rings, no circles */
+.world-dock-icon {
+  width: 32px;
+  height: 32px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.9;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+/* Hover brighten */
+.world-dock-btn:hover .world-dock-icon {
+  opacity: 1;
+  transform: scale(1.06);
+}
+
+/* -------- Icon Images (Replace with your assets) -------- */
+
+.world-dock-icon--inventory { background-image: url("/icons/inventory.png"); }
+.world-dock-icon--dreamself { background-image: url("/icons/dreamself.png"); }
+.world-dock-icon--map       { background-image: url("/icons/map.png"); }
+.world-dock-icon--journal   { background-image: url("/icons/journal.png"); }
+.world-dock-icon--debug     { background-image: url("/icons/debug.png"); }
+
+/* -------- Label -------- */
+
+.world-dock-label {
+  font-weight: 600;
+  opacity: 0.75;
+  transition: opacity 180ms ease;
+}
+
+.world-dock-btn:hover .world-dock-label {
+  opacity: 1;
+}
+
+/* -------- Pink Notification Bubble -------- */
+
+.world-dock-notification {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 18px;
+  padding: 0 4px;
+  height: 16px;
+  font-size: 0.65rem;
+  line-height: 16px;
+  border-radius: 4px; /* SHARP corners now */
+  background: #f9a8d4;
+  color: #111827;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(248, 113, 171, 0.7);
+  font-weight: 600;
+}

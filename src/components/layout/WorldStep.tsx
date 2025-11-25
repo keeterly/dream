@@ -37,13 +37,14 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   activeEncounterItem,
   onResolveEncounter,
 }) => {
-  const [activePanel, setActivePanel] = useState<WorldPanelId | null>("inventory");
+  // ⬇️ no panel open by default; inventory is handled by the modal
+  const [activePanel, setActivePanel] = useState<WorldPanelId | null>(null);
 
   // Timing constants (ms)
-  const LOOT_TRAVEL_MS = 5500;      // walk-in from offscreen
-  const LOOT_PICKUP_ANIM_MS = 450;  // MUST match CSS pickup duration
+  const LOOT_TRAVEL_MS = 5500; // walk-in from offscreen
+  const LOOT_PICKUP_ANIM_MS = 450; // MUST match CSS pickup duration
   const AUTO_PICKUP_DELAY_MS = 250; // delay before auto pickup (Relic Found visible)
-  const INVENTORY_TOAST_MS = 1600;  // "+1 Relic" toast lifetime
+  const INVENTORY_TOAST_MS = 1600; // "+1 Relic" toast lifetime
 
   const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
   const [inventoryToastItem, setInventoryToastItem] =
@@ -85,6 +86,8 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   const isWalking = isAutoWalking && !(!isAutoPickup && isEncounterActive);
 
   const togglePanel = (panel: WorldPanelId) => {
+    // whenever we open a side panel, close the inventory modal
+    setIsInventoryModalOpen(false);
     setActivePanel((current) => (current === panel ? null : panel));
   };
 
@@ -94,35 +97,31 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     element: dominantElement,
   });
 
+  const DockButton: React.FC<{
+    label: string;
+    icon: string;
+    active?: boolean;
+    notification?: number;
+    onClick: () => void;
+  }> = ({ label, icon, active = false, notification = 0, onClick }) => {
+    return (
+      <button
+        className={
+          "world-dock-btn" + (active ? " world-dock-btn--active" : "")
+        }
+        onClick={onClick}
+      >
+        <div className="world-dock-icon-wrap">
+          <span className={`world-dock-icon world-dock-icon--${icon}`} />
+          {notification > 0 && (
+            <span className="world-dock-notification">{notification}</span>
+          )}
+        </div>
 
-const DockButton: React.FC<{
-  label: string;
-  icon: string;
-  active?: boolean;
-  notification?: number;
-  onClick: () => void;
-}> = ({ label, icon, active = false, notification = 0, onClick }) => {
-  return (
-    <button
-      className={
-        "world-dock-btn" + (active ? " world-dock-btn--active" : "")
-      }
-      onClick={onClick}
-    >
-      <div className="world-dock-icon-wrap">
-        <span className={`world-dock-icon world-dock-icon--${icon}`} />
-        {notification > 0 && (
-          <span className="world-dock-notification">{notification}</span>
-        )}
-      </div>
-
-      <div className="world-dock-label">{label}</div>
-    </button>
-  );
-};
-
-
-
+        <div className="world-dock-label">{label}</div>
+      </button>
+    );
+  };
 
   /**
    * If an encounter becomes active while auto-walk is enabled
@@ -224,6 +223,13 @@ const DockButton: React.FC<{
 
   // Encounter UI (glyph + top banner) hides once we've clicked / auto-picked
   const showEncounterUI = isEncounterActive && !isLootCollected;
+
+  // Inventory dock click handler – controls the modal
+  const handleInventoryClick = () => {
+    setIsInventoryModalOpen((open) => !open);
+    // ensure no side panel is “active” when inventory modal is used
+    setActivePanel(null);
+  };
 
   return (
     <section className="app-screen app-screen-world">
@@ -346,44 +352,45 @@ const DockButton: React.FC<{
 
           {/* DOCK BUTTONS */}
           <div className="world-dock">
-  <DockButton
-    label="Inventory"
-    icon="inventory"
-    active={activePanel === "inventory"}
-    notification={inventory.length > 0 && !isInventoryModalOpen ? 1 : 0}
-    onClick={() => togglePanel("inventory")}
-  />
+            <DockButton
+              label="Inventory"
+              icon="inventory"
+              active={isInventoryModalOpen}
+              notification={
+                inventory.length > 0 && !isInventoryModalOpen ? 1 : 0
+              }
+              onClick={handleInventoryClick}
+            />
 
-  <DockButton
-    label="Dreamself"
-    icon="dreamself"
-    active={activePanel === "character"}
-    onClick={() => togglePanel("character")}
-  />
+            <DockButton
+              label="Dreamself"
+              icon="dreamself"
+              active={activePanel === "character"}
+              onClick={() => togglePanel("character")}
+            />
 
-  <DockButton
-    label="Map"
-    icon="map"
-    active={activePanel === "map"}
-    onClick={() => togglePanel("map")}
-  />
+            <DockButton
+              label="Map"
+              icon="map"
+              active={activePanel === "map"}
+              onClick={() => togglePanel("map")}
+            />
 
-  <DockButton
-    label="Journal"
-    icon="journal"
-    active={activePanel === "journal"}
-    notification={journalEntries.length > 0 ? 1 : 0}
-    onClick={() => togglePanel("journal")}
-  />
+            <DockButton
+              label="Journal"
+              icon="journal"
+              active={activePanel === "journal"}
+              notification={journalEntries.length > 0 ? 1 : 0}
+              onClick={() => togglePanel("journal")}
+            />
 
-  <DockButton
-    label="Debug"
-    icon="debug"
-    active={activePanel === "debug"}
-    onClick={() => togglePanel("debug")}
-  />
-</div>
-
+            <DockButton
+              label="Debug"
+              icon="debug"
+              active={activePanel === "debug"}
+              onClick={() => togglePanel("debug")}
+            />
+          </div>
 
           {/* +1 RELIC TOAST NEAR INVENTORY DOCK */}
           {inventoryToastItem && (

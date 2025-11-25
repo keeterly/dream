@@ -548,15 +548,6 @@ body {
   overflow: hidden;
 }
 
-/* sky */
-
-.world-lane-sky {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 10% -10%, #e5e7eb33, transparent 65%),
-    linear-gradient(to bottom, #020617 0%, #020725 45%, #020617 100%);
-  z-index: 0;
-}
 
 .world-lane-stars {
   position: absolute;
@@ -812,21 +803,6 @@ body {
 }
 
 
-
-/* dusk overlay so valley matches D.R.E.A.M palette */
-.world-lane::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 5;
-  background: radial-gradient(
-    ellipse at top,
-    rgba(15, 23, 42, 0.65),
-    rgba(15, 23, 42, 0.35),
-    transparent 70%
-  );
-}
 
 
 
@@ -4220,70 +4196,7 @@ body {
 }
 
 
-.world-hud-bars {
-  position: absolute;
-  left: 5vw;
-  bottom: 2.4rem;
-  display: flex;
-  gap: 1.2rem;
-  align-items: center;
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(229, 231, 235, 0.85);
-  z-index: 25;
-}
 
-.world-hud-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-}
-
-.world-hud-bar-label {
-  opacity: 0.8;
-}
-
-.world-hud-bar-track {
-  width: 130px;
-  height: 3px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.85);
-  overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.95);
-}
-
-.world-hud-bar-fill {
-  height: 100%;
-  border-radius: inherit;
-  transform-origin: left center;
-}
-
-/* Colors */
-.world-hud-bar--hp .world-hud-bar-fill {
-  background: linear-gradient(90deg, #fecaca, #f97373);
-}
-
-.world-hud-bar--mp .world-hud-bar-fill {
-  background: linear-gradient(90deg, #bfdbfe, #60a5fa);
-}
-
-.world-hud-bar--stamina .world-hud-bar-fill {
-  background: linear-gradient(90deg, #fef3c7, #facc15);
-}
-
-@media (max-width: 768px) {
-  .world-hud-bars {
-    left: 1.5rem;
-    bottom: 1.8rem;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .world-hud-bar-track {
-    width: 110px;
-  }
-}
 
 
 
@@ -4456,43 +4369,6 @@ body {
 
 
 
-/* === STATUS BARS (bottom, aligned with dock) === */
-
-.world-hud-bars {
-  position: absolute;
-  right: calc(4vw + 200px);  /* shifts left to align with dock */
-  bottom: 2.4rem;
-  display: flex;
-  gap: 1.5rem;
-  z-index: 30;
-}
-
-.world-hud-bar-track {
-  width: 140px;
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(0,0,0,0.4);
-  overflow: hidden;
-}
-
-.world-hud-bar-fill {
-  height: 100%;
-}
-
-.world-hud-bar--hp .world-hud-bar-fill {
-  background: linear-gradient(90deg, #fca5a5, #f87171);
-}
-
-.world-hud-bar--mp .world-hud-bar-fill {
-  background: linear-gradient(90deg, #93c5fd, #3b82f6);
-}
-
-.world-hud-bar--stamina .world-hud-bar-fill {
-  background: linear-gradient(90deg, #fde68a, #facc15);
-}
-
-
-
 /* === WORLD DOCK – OPTION 2 / 32px CIRCULAR ICONS ==================== */
 
 .world-dock {
@@ -4522,13 +4398,19 @@ body {
   font-weight: 600;
 }
 
-/* 32px glassy circle */
 .world-dock-icon {
+  display: inline-block;              /* <<< ADD THIS */
+  box-sizing: border-box;             /* keeps borders tidy */
   width: 32px;
   height: 32px;
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 184, 0.7);
-  background: radial-gradient(circle at 30% 20%, #020617, #111827 70%, #020617);
+  background: radial-gradient(
+    circle at 30% 20%,
+    #020617,
+    #111827 70%,
+    #020617
+  );
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.9);
   position: relative;
 }
@@ -4655,72 +4537,6 @@ body {
 }
 
 
-/* === WORLD HUD BARS – bottom-left =============================== */
-
-.world-hud-bars {
-  position: absolute;
-  left: 5vw;
-  bottom: 2.4rem;
-  display: flex;
-  gap: 1.4rem;
-  align-items: center;
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(229, 231, 235, 0.85);
-  z-index: 30;
-}
-
-.world-hud-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-}
-
-.world-hud-bar-label {
-  opacity: 0.8;
-}
-
-.world-hud-bar-track {
-  width: 140px;
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.45);
-  overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.95);
-}
-
-.world-hud-bar-fill {
-  height: 100%;
-  border-radius: inherit;
-  transform-origin: left center;
-}
-
-/* colors */
-.world-hud-bar--hp .world-hud-bar-fill {
-  background: linear-gradient(90deg, #fecaca, #f97373);
-}
-.world-hud-bar--mp .world-hud-bar-fill {
-  background: linear-gradient(90deg, #bfdbfe, #60a5fa);
-}
-.world-hud-bar--stamina .world-hud-bar-fill {
-  background: linear-gradient(90deg, #fef3c7, #facc15);
-}
-
-@media (max-width: 768px) {
-  .world-hud-bars {
-    left: 1.6rem;
-    bottom: 1.8rem;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .world-hud-bar-track {
-    width: 110px;
-  }
-}
-
-
 /* =========================================================
    DREAM – FINAL WORLD OVERRIDES (Option A, 32px icons)
    Paste this at the VERY END of app.css
@@ -4733,10 +4549,11 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 10% -20%, rgba(229, 231, 235, 0.22), transparent 70%),
-    linear-gradient(to bottom, #020617 0%, #02061b 55%, #020617 100%);
+    radial-gradient(circle at 10% -10%, #e5e7eb33, transparent 65%),
+    linear-gradient(to bottom, #020617 0%, #02071f 100%);
   z-index: 0;
 }
+
 
 /* dusk overlay – lighter so it doesn’t create a hard stripe */
 .world-lane::before {
@@ -4746,12 +4563,13 @@ body {
   pointer-events: none;
   z-index: 5;
   background: radial-gradient(
-      ellipse at top,
-      rgba(15, 23, 42, 0.5),
-      rgba(15, 23, 42, 0.25),
-      transparent 75%
-    );
+    ellipse at top,
+    rgba(15, 23, 42, 0.45),
+    rgba(15, 23, 42, 0.25),
+    transparent 70%
+  );
 }
+
 
 /* subtle top vignette only (no mid-screen band) */
 .world-card::before {
@@ -4767,70 +4585,6 @@ body {
   mix-blend-mode: soft-light;
 }
 
-/* --- 2) HUD status bars – bottom-left, always visible ------ */
-
-.world-hud-bars {
-  position: absolute;
-  left: 5vw;
-  bottom: 2.4rem;
-  display: flex;
-  gap: 1.4rem;
-  align-items: center;
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(229, 231, 235, 0.85);
-  z-index: 30;
-}
-
-.world-hud-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-}
-
-.world-hud-bar-label {
-  opacity: 0.8;
-}
-
-.world-hud-bar-track {
-  width: 140px;
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.45);
-  overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.95);
-}
-
-.world-hud-bar-fill {
-  height: 100%;
-  border-radius: inherit;
-  transform-origin: left center;
-}
-
-/* colors */
-.world-hud-bar--hp .world-hud-bar-fill {
-  background: linear-gradient(90deg, #fecaca, #f97373);
-}
-.world-hud-bar--mp .world-hud-bar-fill {
-  background: linear-gradient(90deg, #bfdbfe, #60a5fa);
-}
-.world-hud-bar--stamina .world-hud-bar-fill {
-  background: linear-gradient(90deg, #fef3c7, #facc15);
-}
-
-@media (max-width: 768px) {
-  .world-hud-bars {
-    left: 1.6rem;
-    bottom: 1.8rem;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .world-hud-bar-track {
-    width: 110px;
-  }
-}
 
 /* --- 3) WORLD DOCK – OPTION A (32px circular glass icons) -- */
 
@@ -5008,4 +4762,70 @@ body {
   text-align: center;
   line-height: 18px;
   box-shadow: 0 0 10px rgba(248, 113, 171, 0.9);
+}
+
+
+/* === WORLD HUD BARS – bottom-left =============================== */
+
+.world-hud-bars {
+  position: absolute;
+  left: 5vw;
+  bottom: 2.4rem;
+  display: flex;
+  gap: 1.4rem;
+  align-items: center;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(229, 231, 235, 0.85);
+  z-index: 30;
+}
+
+.world-hud-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.world-hud-bar-label {
+  opacity: 0.8;
+}
+
+.world-hud-bar-track {
+  width: 140px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.95);
+}
+
+.world-hud-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  transform-origin: left center;
+}
+
+/* colors */
+.world-hud-bar--hp .world-hud-bar-fill {
+  background: linear-gradient(90deg, #fecaca, #f97373);
+}
+.world-hud-bar--mp .world-hud-bar-fill {
+  background: linear-gradient(90deg, #bfdbfe, #60a5fa);
+}
+.world-hud-bar--stamina .world-hud-bar-fill {
+  background: linear-gradient(90deg, #fef3c7, #facc15);
+}
+
+@media (max-width: 768px) {
+  .world-hud-bars {
+    left: 1.6rem;
+    bottom: 1.8rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .world-hud-bar-track {
+    width: 110px;
+  }
 }

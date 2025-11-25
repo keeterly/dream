@@ -359,29 +359,45 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             </div>
           </div>
 
-          {/* HP / MP / STAMINA BARS – bottom-left, aligned with dock */}
-          <div className="world-status-bars">
-            <div className="world-status-bar world-status-bar--hp">
-              <span className="world-status-bar-label">HP</span>
-              <span className="world-status-bar-track">
-                <span className="world-status-bar-fill world-status-bar-fill--hp" />
-              </span>
+          {/* Bottom-left HP / MP / Stamina bars */}
+            <div className="world-hud-bars">
+              <div className="world-hud-bar world-hud-bar--hp">
+                <span className="world-hud-bar-label">HP</span>
+                <div className="world-hud-bar-track">
+                  {/* TODO: wire these widths to real state later */}
+                  <div
+                    className="world-hud-bar-fill"
+                    style={{ width: '76%' }}
+                  />
+                </div>
+              </div>
+
+              <div className="world-hud-bar world-hud-bar--mp">
+                <span className="world-hud-bar-label">MP</span>
+                <div className="world-hud-bar-track">
+                  <div
+                    className="world-hud-bar-fill"
+                    style={{ width: '54%' }}
+                  />
+                </div>
+              </div>
+
+              <div className="world-hud-bar world-hud-bar--stamina">
+                <span className="world-hud-bar-label">STAMINA</span>
+                <div className="world-hud-bar-track">
+                  <div
+                    className="world-hud-bar-fill"
+                    style={{ width: '88%' }}
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="world-status-bar world-status-bar--mp">
-              <span className="world-status-bar-label">MP</span>
-              <span className="world-status-bar-track">
-                <span className="world-status-bar-fill world-status-bar-fill--mp" />
-              </span>
-            </div>
 
-            <div className="world-status-bar world-status-bar--stamina">
-              <span className="world-status-bar-label">STAMINA</span>
-              <span className="world-status-bar-track">
-                <span className="world-status-bar-fill world-status-bar-fill--stamina" />
-              </span>
-            </div>
-          </div>
+
+
+
+
 
           {/* DOCK BUTTONS */}
           <div className="world-dock">
@@ -422,6 +438,8 @@ export const WorldStep: React.FC<WorldStepProps> = ({
               onClick={() => togglePanel("debug")}
             />
           </div>
+
+          
 
           {/* +1 RELIC TOAST NEAR INVENTORY DOCK */}
           {inventoryToastItem && (

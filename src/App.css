@@ -4385,3 +4385,48 @@ html, body {
 .world-overlay {
   z-index: 999;
 }
+
+
+
+/* World modal backdrop (behind HUD) */
+.world-panel-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(
+      circle at 50% 0%,
+      rgba(15, 23, 42, 0.55),
+      rgba(2, 6, 23, 0.65)
+    );
+  backdrop-filter: blur(14px);
+  z-index: 30; /* HUD sits above at 40 */
+}
+
+/* Modal shell that wraps Dreamself / Map / Journal / Debug */
+.world-panel-modal {
+  position: relative;
+  z-index: 31;
+}
+
+/* close “X” in the top-right, similar to inventory modal */
+.world-panel-modal-close {
+  position: absolute;
+  top: 0.9rem;
+  right: 1.1rem;
+  border: none;
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* Make sure HUD + dock + bars sit above the blur */
+.world-hud,
+.world-hud-bars,
+.world-dock,
+.world-inventory-toast {
+  position: relative;
+  z-index: 40;
+}

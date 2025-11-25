@@ -4298,3 +4298,12 @@ html, body {
   border-radius: 0;     /* no rounding on the game surface */
   border: none;
 }
+
+
+.App.app-root.app-root--world {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+}

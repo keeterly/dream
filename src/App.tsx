@@ -179,18 +179,23 @@ export const App: React.FC = () => {
     return <IntroStep onBegin={handleBegin} />;
   };
 
-  return (
-    <div className="App app-root">
-      {screen !== "world" && <AppHeader screen={screen} />}
-      <main
-        className={
-          "App-main app-main" + (screen === "world" ? " app-main--world" : "")
-        }
-      >
-        {renderScreen()}
-      </main>
-    </div>
-  );
+ return (
+  <div
+    className={
+      "App app-root" + (screen === "world" ? " app-root--world" : "")
+    }
+  >
+    {screen !== "world" && <AppHeader screen={screen} />}
+    <main
+      className={
+        "App-main app-main" + (screen === "world" ? " app-main--world" : "")
+      }
+    >
+      {renderScreen()}
+    </main>
+  </div>
+);
+
 };
 
 export default App;

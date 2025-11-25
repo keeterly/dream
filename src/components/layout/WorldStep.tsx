@@ -85,6 +85,8 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
   // Encounter is only "active" once the avatar has reached the loot.
   const isEncounterActive = !!activeEncounterItem && hasReachedLoot;
+
+  // "Walking" = auto-walk ON and not currently paused for a manual pickup.
   const isWalking = isAutoWalking && !(!isAutoPickup && isEncounterActive);
 
   const togglePanel = (panel: WorldPanelId) => {
@@ -143,20 +145,24 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   }, [isEncounterActive, isAutoWalking, isAutoPickup]);
 
   /**
-   * Auto-encounter roll while auto-walk is on.
+   * Auto-encounter roll while actually walking.
    * We don't spawn a new item if one is already walking in or active.
+   *
+   * NOTE: Previously this used `isAutoWalking` and an 8–16s delay,
+   * which made drops feel extremely rare in short sessions.
    */
   useEffect(() => {
-    if (!isAutoWalking || isEncounterActive || hasLootSpawned) return;
+    if (!isWalking || isEncounterActive || hasLootSpawned) return;
 
-    const delay = 8000 + Math.random() * 8000; // 8–16s
+    // 5–10 seconds between potential drops while walking
+    const delay = 5000 + Math.random() * 5000;
     const id = window.setTimeout(() => {
       setWasAutoWalkingBeforeEncounter(true);
       onSpawnDebugItem();
     }, delay);
 
     return () => window.clearTimeout(id);
-  }, [isAutoWalking, isEncounterActive, hasLootSpawned, onSpawnDebugItem]);
+  }, [isWalking, isEncounterActive, hasLootSpawned, onSpawnDebugItem]);
 
   /**
    * Player clicks the "Relic Found" banner.
@@ -238,6 +244,11 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   // When closing the modal, just flip the flag (counter already cleared)
   const handleCloseInventoryModal = () => {
     setIsInventoryModalOpen(false);
+  };
+
+  // Close any of the non-inventory modal panels
+  const handleCloseActivePanel = () => {
+    setActivePanel(null);
   };
 
   return (
@@ -360,44 +371,37 @@ export const WorldStep: React.FC<WorldStepProps> = ({
           </div>
 
           {/* Bottom-left HP / MP / Stamina bars */}
-            <div className="world-hud-bars">
-              <div className="world-hud-bar world-hud-bar--hp">
-                <span className="world-hud-bar-label">HP</span>
-                <div className="world-hud-bar-track">
-                  {/* TODO: wire these widths to real state later */}
-                  <div
-                    className="world-hud-bar-fill"
-                    style={{ width: '76%' }}
-                  />
-                </div>
-              </div>
-
-              <div className="world-hud-bar world-hud-bar--mp">
-                <span className="world-hud-bar-label">MP</span>
-                <div className="world-hud-bar-track">
-                  <div
-                    className="world-hud-bar-fill"
-                    style={{ width: '54%' }}
-                  />
-                </div>
-              </div>
-
-              <div className="world-hud-bar world-hud-bar--stamina">
-                <span className="world-hud-bar-label">STAMINA</span>
-                <div className="world-hud-bar-track">
-                  <div
-                    className="world-hud-bar-fill"
-                    style={{ width: '88%' }}
-                  />
-                </div>
+          <div className="world-hud-bars">
+            <div className="world-hud-bar world-hud-bar--hp">
+              <span className="world-hud-bar-label">HP</span>
+              <div className="world-hud-bar-track">
+                <div
+                  className="world-hud-bar-fill"
+                  style={{ width: "76%" }}
+                />
               </div>
             </div>
 
+            <div className="world-hud-bar world-hud-bar--mp">
+              <span className="world-hud-bar-label">MP</span>
+              <div className="world-hud-bar-track">
+                <div
+                  className="world-hud-bar-fill"
+                  style={{ width: "54%" }}
+                />
+              </div>
+            </div>
 
-
-
-
-
+            <div className="world-hud-bar world-hud-bar--stamina">
+              <span className="world-hud-bar-label">STAMINA</span>
+              <div className="world-hud-bar-track">
+                <div
+                  className="world-hud-bar-fill"
+                  style={{ width: "88%" }}
+                />
+              </div>
+            </div>
+          </div>
 
           {/* DOCK BUTTONS */}
           <div className="world-dock">
@@ -439,8 +443,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             />
           </div>
 
-          
-
           {/* +1 RELIC TOAST NEAR INVENTORY DOCK */}
           {inventoryToastItem && (
             <div className="world-inventory-toast">
@@ -451,44 +453,57 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             </div>
           )}
 
-          {/* PANELS */}
-          <div className="world-panels">
-            {activePanel === "character" && (
-              <DreamselfPanel profile={profile} inventory={inventory} />
-            )}
+          {/* === MODAL PANELS (Dreamself / Map / Journal / Debug) =======
+              Centered overlay, like InventoryGridModal.
+              HUD + health remain visible underneath the translucent backdrop.
+          */}
+          {activePanel && (
+            <div
+              className="world-panel-modal-backdrop"
+              onClick={handleCloseActivePanel}
+            >
+              <div
+                className="world-panel-modal"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {activePanel === "character" && (
+                  <DreamselfPanel profile={profile} inventory={inventory} />
+                )}
 
-            {activePanel === "map" && (
-              <MapPanel currentBiomeId="dusk_valley" phase={phase} />
-            )}
+                {activePanel === "map" && (
+                  <MapPanel currentBiomeId="dusk_valley" phase={phase} />
+                )}
 
-            {activePanel === "journal" && (
-              <JournalPanel entries={journalEntries} />
-            )}
+                {activePanel === "journal" && (
+                  <JournalPanel entries={journalEntries} />
+                )}
 
-            {activePanel === "debug" && (
-              <div className="world-panel world-panel-debug">
-                <div className="world-panel-header">
-                  <span className="world-panel-kicker">Debug</span>
-                  <span className="world-panel-title">Relic Testing</span>
-                </div>
-                <p className="world-panel-copy">
-                  Spawn a random relic event for testing drops and journal
-                  entries.
-                </p>
+                {activePanel === "debug" && (
+                  <div className="world-panel world-panel-debug">
+                    <div className="world-panel-header">
+                      <span className="world-panel-kicker">Debug</span>
+                      <span className="world-panel-title">Relic Testing</span>
+                    </div>
+                    <p className="world-panel-copy">
+                      Spawn a random relic event for testing drops and journal
+                      entries.
+                    </p>
 
-                <button
-                  type="button"
-                  className="world-debug-pill"
-                  onClick={onSpawnDebugItem}
-                >
-                  <span className="world-debug-pill__orb" />
-                  <span className="world-debug-pill__label">
-                    Spawn Random Relic
-                  </span>
-                </button>
+                    <button
+                      type="button"
+                      className="world-debug-pill"
+                      onClick={onSpawnDebugItem}
+                    >
+                      <span className="world-debug-pill__orb" />
+                      <span className="world-debug-pill__label">
+                        Spawn Random Relic
+                      </span>
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 

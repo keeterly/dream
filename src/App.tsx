@@ -74,6 +74,38 @@ export const App: React.FC = () => {
     return () => window.clearInterval(id);
   }, [screen]);
 
+
+    // Simple random encounter spawner while in the world
+  useEffect(() => {
+    if (screen !== "world") return;
+
+    // If an encounter is already active or visually on the ground, do nothing
+    if (activeEncounterItem || encounterItemName) return;
+
+    // Random delay between 8–20 seconds before next encounter
+    const delay = 8000 + Math.random() * 12000;
+
+    const id = window.setTimeout(() => {
+      const baseItem = getRandomWorldItem();
+      const acquiredAt = new Date().toISOString();
+
+      const pending: InventoryItem = {
+        ...baseItem,
+        id: `${baseItem.id}_${Date.now()}_${Math.random()
+          .toString(36)
+          .slice(2, 6)}`,
+        acquiredAt,
+      };
+
+      setActiveEncounterItem(pending);
+      setEncounterItemName(baseItem.name);
+    }, delay);
+
+    return () => window.clearTimeout(id);
+  }, [screen, activeEncounterItem, encounterItemName]);
+
+  
+
   const handleBegin = () => {
     setScreen("questions");
   };

@@ -37,8 +37,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   activeEncounterItem,
   onResolveEncounter,
 }) => {
-  // slide-up panels (dreamself / map / journal / debug)
-  const [activePanel, setActivePanel] = useState<WorldPanelId | null>(null);
+  const [activePanel, setActivePanel] = useState<WorldPanelId | null>("inventory");
 
   // Timing constants (ms)
   const LOOT_TRAVEL_MS = 5500; // walk-in from offscreen
@@ -46,7 +45,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   const AUTO_PICKUP_DELAY_MS = 250; // delay before auto pickup (Relic Found visible)
   const INVENTORY_TOAST_MS = 1600; // "+1 Relic" toast lifetime
 
-  // Inventory grid modal
   const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
   const [inventoryToastItem, setInventoryToastItem] =
     useState<InventoryItem | null>(null);
@@ -86,13 +84,20 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   const isEncounterActive = !!activeEncounterItem && hasReachedLoot;
   const isWalking = isAutoWalking && !(!isAutoPickup && isEncounterActive);
 
+  const togglePanel = (panel: WorldPanelId) => {
+    setActivePanel((current) => (current === panel ? null : panel));
+    // When opening a slide panel, make sure the inventory modal is closed.
+    if (panel !== "inventory") {
+      setIsInventoryModalOpen(false);
+    }
+  };
+
   const dominantElement = profile?.traits?.dominantElement ?? null;
   const lighting = useBiomeLighting({
     phase,
     element: dominantElement,
   });
 
-  // Dock button component (icon + label + optional notification)
   const DockButton: React.FC<{
     label: string;
     icon: string;
@@ -105,7 +110,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
         className={
           "world-dock-btn" + (active ? " world-dock-btn--active" : "")
         }
-        type="button"
         onClick={onClick}
       >
         <div className="world-dock-icon-wrap">
@@ -114,30 +118,10 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             <span className="world-dock-notification">{notification}</span>
           )}
         </div>
+
         <div className="world-dock-label">{label}</div>
       </button>
     );
-  };
-
-  /**
-   * Open/close slide-up panels (NOT the inventory modal).
-   * Any time a panel is opened, close the inventory modal so they never overlap.
-   */
-  const togglePanel = (panel: WorldPanelId) => {
-    if (panel === "inventory") {
-      // inventory is handled by its own modal toggler
-      return;
-    }
-
-    setIsInventoryModalOpen(false);
-    setActivePanel((current) => (current === panel ? null : panel));
-  };
-
-  // Separate handler for the Inventory dock → toggles the modal
-  const handleInventoryDockClick = () => {
-    setIsInventoryModalOpen((prev) => !prev);
-    // ensure slide-up panels are closed while the modal is open
-    setActivePanel(null);
   };
 
   /**
@@ -360,18 +344,41 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             </div>
           </div>
 
-          {/* HP / MP / STAMINA strip – already in your CSS */}
+          {/* BOTTOM-LEFT HP / MP / STAMINA GAUGES */}
+          <div className="world-gauges">
+            <div className="world-gauge">
+              <span className="world-gauge-label">HP</span>
+              <div className="world-gauge-track">
+                <div className="world-gauge-fill world-gauge-fill--hp" />
+              </div>
+            </div>
 
-          {/* DOCK BUTTONS */}
+            <div className="world-gauge">
+              <span className="world-gauge-label">MP</span>
+              <div className="world-gauge-track">
+                <div className="world-gauge-fill world-gauge-fill--mp" />
+              </div>
+            </div>
+
+            <div className="world-gauge">
+              <span className="world-gauge-label">Stamina</span>
+              <div className="world-gauge-track">
+                <div className="world-gauge-fill world-gauge-fill--stamina" />
+              </div>
+            </div>
+          </div>
+
+          {/* DOCK BUTTONS (bottom-right) */}
           <div className="world-dock">
             <DockButton
               label="Inventory"
               icon="inventory"
               active={isInventoryModalOpen}
-              notification={
-                inventory.length > 0 && !isInventoryModalOpen ? 1 : 0
-              }
-              onClick={handleInventoryDockClick}
+              notification={inventory.length > 0 && !isInventoryModalOpen ? 1 : 0}
+              onClick={() => {
+                setActivePanel(null);
+                setIsInventoryModalOpen(true);
+              }}
             />
 
             <DockButton

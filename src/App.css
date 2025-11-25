@@ -4057,3 +4057,49 @@ body {
 .world-dock button {
   pointer-events: auto;
 }
+
+
+/* =========================================================
+   DREAM – HUD POLISH
+   - Dock icons: borderless line glyphs
+   - HUD / panels: sharp-corner rectangles
+   ========================================================= */
+
+/* 1) Dock icons – remove circular border + glass button look */
+.app-screen-world .world-dock-icon {
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+/* Active dock state: no outer ring, just tint the glyph + label */
+.app-screen-world .world-dock-btn--active .world-dock-icon {
+  border: none;
+  box-shadow: none;
+}
+
+.app-screen-world .world-dock-btn--active .world-dock-icon::before,
+.app-screen-world .world-dock-btn--active .world-dock-icon::after {
+  border-color: #38bdf8;
+}
+
+.app-screen-world .world-dock-btn--active .world-dock-label {
+  color: #e0f2fe;
+}
+
+/* 2) Sharp corners for world HUD + inventory UI */
+.app-screen-world .world-autowalk-toggle,
+.app-screen-world .world-encounter-banner,
+.app-screen-world .world-inventory-toast,
+.app-screen-world .world-hud-bars .world-hud-bar-track,
+.app-screen-world .world-hud-bars .world-hud-bar-fill,
+.app-screen-world .world-debug-pill,
+.app-screen-world .world-panel,
+.inventory-modal,
+.inventory-modal .inventory-grid-slot,
+.inventory-modal .inventory-grid-item,
+.inventory-modal .inventory-sort-pill,
+.app-screen-world .world-dock-btn {
+  border-radius: 0 !important;
+}

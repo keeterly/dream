@@ -4214,3 +4214,49 @@ body {
   box-shadow: 0 0 10px rgba(248, 113, 171, 0.7);
   font-weight: 600;
 }
+
+
+
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100%;
+  overflow: hidden; /* removes scrollbars */
+}
+
+.app-screen-world {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100vh !important;
+  width: 100vw !important;
+  overflow: hidden !important;
+  position: relative;
+}
+
+
+.app-root--world {
+  padding: 0 !important;
+}
+
+
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100%;
+  overflow: hidden; /* removes scrollbars */
+}
+
+.world-lane {
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+.world-lane-inner {
+  height: 100% !important;
+}
+
+
+.world-hud-bars {
+  margin: 0 !important;
+  padding: 0 !important;
+}

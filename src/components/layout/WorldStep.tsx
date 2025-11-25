@@ -456,44 +456,33 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 className="world-panel-modal"
                 onClick={(e) => e.stopPropagation()}
               >
+                {/* shared close button, styled like Inventory modal */}
+                <button
+                  type="button"
+                  className="inventory-modal-close"
+                  onClick={closeActivePanel}
+                  aria-label="Close panel"
+                >
+                  ×
+                </button>
+
                 {activePanel === "character" && (
-                  <DreamselfPanel
-                    profile={profile}
-                    inventory={inventory}
-                    onClose={closeActivePanel}
-                  />
+                  <DreamselfPanel profile={profile} inventory={inventory} />
                 )}
 
                 {activePanel === "map" && (
-                  <MapPanel
-                    currentBiomeId="dusk_valley"
-                    phase={phase}
-                    onClose={closeActivePanel}
-                  />
+                  <MapPanel currentBiomeId="dusk_valley" phase={phase} />
                 )}
 
                 {activePanel === "journal" && (
-                  <JournalPanel
-                    entries={journalEntries}
-                    onClose={closeActivePanel}
-                  />
+                  <JournalPanel entries={journalEntries} />
                 )}
 
                 {activePanel === "debug" && (
                   <div className="world-panel world-panel-debug">
                     <div className="world-panel-header">
-                      <div>
-                        <div className="world-panel-kicker">Debug</div>
-                        <div className="world-panel-title">Relic Testing</div>
-                      </div>
-                      <button
-                        type="button"
-                        className="world-panel-modal-close"
-                        onClick={closeActivePanel}
-                        aria-label="Close panel"
-                      >
-                        ×
-                      </button>
+                      <div className="world-panel-kicker">Debug</div>
+                      <div className="world-panel-title">Relic Testing</div>
                     </div>
                     <p className="world-panel-copy">
                       Spawn a random relic event for testing drops and journal

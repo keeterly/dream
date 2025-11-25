@@ -921,20 +921,21 @@ body {
 }
 
 
-/* subtle top vignette behind HUD */
+/* subtle top vignette behind HUD – no banding */
 .world-card::before {
   content: "";
   pointer-events: none;
   position: absolute;
   inset: 0;
   background: radial-gradient(
-      circle at 50% -10%,
-      rgba(255, 255, 255, 0.06),
-      transparent 55%
-    ),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.65), transparent 35%);
+    circle at 50% -10%,
+    rgba(255, 255, 255, 0.04),
+    transparent 60%
+  );
   mix-blend-mode: soft-light;
 }
+
+
 
 /* glass strip behind HUD */
 .world-hud {
@@ -4052,11 +4053,6 @@ body {
   font-family: inherit;
 }
 
-/* circular icon wrapper with tiny padding for the badge */
-.world-dock-icon-wrapper {
-  position: relative;
-  padding: 0.1rem;
-}
 
 /* base icon – reduced ~25% from the “big” version */
 .world-dock-icon {
@@ -4142,18 +4138,7 @@ body {
   font-weight: 600; /* better legibility */
 }
 
-.world-dock-icon-wrap {
-  position: relative;
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.7);
-  background: radial-gradient(circle at 30% 20%, #020617, #111827);
-  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+
 
 .world-dock-icon {
   width: 16px;
@@ -4301,14 +4286,14 @@ body {
 
 
 
-/* === CLEAN FINAL DOCK ICONS === */
+/* === CLEAN FINAL DOCK ICONS (Option A – line glyphs, no circles) === */
 
 .world-dock {
   position: absolute;
   right: 4vw;
   bottom: 2.2rem;
   display: flex;
-  gap: 2rem;
+  gap: 1.6rem;
   z-index: 30;
 }
 
@@ -4320,34 +4305,138 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
-}
-
-.world-dock-icon {
-  width: 48px;   /* 2× size */
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  /* no circle ring */
-  border: none !important;
-  background: none !important;
-  box-shadow: none !important;
-}
-
-.world-dock-icon::before,
-.world-dock-icon::after {
-  border: none !important;   /* Remove rings */
-}
-
-/* Label */
-.world-dock-label {
-  font-size: 0.75rem;
+  gap: 0.35rem;
+  font-size: 0.72rem;
   letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
-/* Notification bubble */
+/* label under icon */
+.world-dock-label {
+  font-weight: 600;
+}
+
+/* ICON BASE – no circular border, just a 32×32 drawing area */
+.world-dock-icon {
+  width: 32px;
+  height: 32px;
+  position: relative;
+}
+
+/* ===== GLYPHS ===== */
+
+/* Inventory: small “bag” box with a flap */
+.world-dock-icon--inventory::before,
+.world-dock-icon--inventory::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  border-radius: 3px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.world-dock-icon--inventory::before {
+  top: 24%;
+  bottom: 44%;              /* flap */
+}
+
+.world-dock-icon--inventory::after {
+  top: 40%;
+  bottom: 18%;              /* body */
+}
+
+/* Dreamself: circle head + simple robe */
+.world-dock-icon--dreamself::before,
+.world-dock-icon--dreamself::after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+/* head */
+.world-dock-icon--dreamself::before {
+  width: 32%;
+  height: 32%;
+  border-radius: 999px;
+  left: 50%;
+  top: 12%;
+  transform: translateX(-50%);
+}
+
+/* robe */
+.world-dock-icon--dreamself::after {
+  left: 30%;
+  right: 30%;
+  top: 40%;
+  bottom: 15%;
+  border-radius: 40% 40% 10% 10%;
+}
+
+/* Map: small folded rectangle */
+.world-dock-icon--map::before,
+.world-dock-icon--map::after {
+  content: "";
+  position: absolute;
+  border-radius: 3px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+/* main page */
+.world-dock-icon--map::before {
+  left: 18%;
+  right: 18%;
+  top: 22%;
+  bottom: 18%;
+}
+
+/* inner fold line */
+.world-dock-icon--map::after {
+  left: 50%;
+  top: 24%;
+  bottom: 20%;
+  border-right: 1px solid rgba(226, 232, 240, 0.9);
+  border-left: none;
+}
+
+/* Journal: two horizontal lines */
+.world-dock-icon--journal::before,
+.world-dock-icon--journal::after {
+  content: "";
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  border-top: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.world-dock-icon--journal::before {
+  top: 32%;
+}
+
+.world-dock-icon--journal::after {
+  top: 60%;
+}
+
+/* Debug: diamond / warning marker */
+.world-dock-icon--debug::before {
+  content: "";
+  position: absolute;
+  left: 24%;
+  right: 24%;
+  top: 24%;
+  bottom: 24%;
+  border-radius: 3px;
+  border: 1px solid rgba(248, 250, 252, 0.9);
+  transform: rotate(45deg);
+}
+
+/* ACTIVE STATE – tint the glyph lines instead of a circle */
+.world-dock-btn--active .world-dock-icon::before,
+.world-dock-btn--active .world-dock-icon::after {
+  border-color: #38bdf8;
+}
+
+/* Small notification bubble (for “NEW” counts, etc.) */
 .world-dock-notification {
   position: absolute;
   top: -6px;
@@ -4361,8 +4450,9 @@ body {
   font-size: 0.65rem;
   text-align: center;
   line-height: 18px;
-  box-shadow: 0 0 10px rgba(248,113,171,0.9);
+  box-shadow: 0 0 10px rgba(248, 113, 171, 0.9);
 }
+
 
 
 /* === STATUS BARS (bottom, aligned with dock) === */

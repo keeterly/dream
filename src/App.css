@@ -27,7 +27,6 @@ body {
 .app-root--world {
   padding-inline: 0;
   padding-bottom: 0;
-   padding: 0;
 }
 
 /* header */
@@ -4753,4 +4752,3 @@ body {
     width: 90px;
   }
 }
-

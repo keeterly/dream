@@ -4385,3 +4385,13 @@ html, body {
 .world-overlay {
   z-index: 999;
 }
+
+
+
+/* When panels are shown in the center modal shell, don't draw their own card */
+.world-panel-modal .world-panel {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}

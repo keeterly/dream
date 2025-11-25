@@ -244,73 +244,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     setIsInventoryModalOpen(false);
   };
 
-  // --- Panel header meta so the non-inventory modals feel like the inventory modal ---
-  const getPanelHeader = (
-    id: WorldPanelId
-  ): { kicker: string; title: string } => {
-    switch (id) {
-      case "character":
-        return {
-          kicker: "Dreamself",
-          title: profile?.dreamName ?? "Dreamself",
-        };
-      case "map":
-        return {
-          kicker: "Map",
-          title: "Scrolling World",
-        };
-      case "journal":
-        return {
-          kicker: "Journal",
-          title: "Dream Log",
-        };
-      case "debug":
-      default:
-        return {
-          kicker: "Debug",
-          title: "Relic Testing",
-        };
-    }
-  };
-
-  const renderActivePanelContent = () => {
-    if (!activePanel) return null;
-
-    switch (activePanel) {
-      case "character":
-        return <DreamselfPanel profile={profile} inventory={inventory} />;
-      case "map":
-        return <MapPanel currentBiomeId="dusk_valley" phase={phase} />;
-      case "journal":
-        return <JournalPanel entries={journalEntries} />;
-      case "debug":
-        return (
-          <div className="world-panel world-panel-debug">
-            <div className="world-panel-header">
-              <span className="world-panel-kicker">Debug</span>
-              <span className="world-panel-title">Relic Testing</span>
-            </div>
-            <p className="world-panel-copy">
-              Spawn a random relic event for testing drops and journal entries.
-            </p>
-
-            <button
-              type="button"
-              className="world-debug-pill"
-              onClick={onSpawnDebugItem}
-            >
-              <span className="world-debug-pill__orb" />
-              <span className="world-debug-pill__label">
-                Spawn Random Relic
-              </span>
-            </button>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
     <section className="app-screen app-screen-world">
       <div className={cardClasses}>
@@ -513,7 +446,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             </div>
           )}
 
-          {/* MODAL PANELS (Dreamself / Map / Journal / Debug) */}
+          {/* CENTERED MODAL PANELS (Dreamself / Map / Journal / Debug) */}
           {activePanel && (
             <div
               className="inventory-modal-backdrop world-panel-modal-backdrop"
@@ -523,20 +456,28 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 className="inventory-modal world-panel-modal"
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* Shared header: kicker + title + top-right X, like inventory modal */}
-                <div className="inventory-modal-header">
-                  <div className="inventory-modal-title-block">
-                    <div className="inventory-modal-kicker">
-                      {getPanelHeader(activePanel).kicker}
-                    </div>
-                    <h2 className="inventory-modal-title">
-                      {getPanelHeader(activePanel).title}
+                <div className="world-panel-modal-header">
+                  <div className="world-panel-modal-title-block">
+                    <p className="world-panel-modal-kicker">
+                      {activePanel === "character"
+                        ? "Dreamself"
+                        : activePanel === "map"
+                        ? "Map"
+                        : activePanel === "journal"
+                        ? "Journal"
+                        : "Debug"}
+                    </p>
+                    <h2 className="world-panel-modal-title">
+                      {activePanel === "character" && "Equipment"}
+                      {activePanel === "map" && "World Map"}
+                      {activePanel === "journal" && "Dream Log"}
+                      {activePanel === "debug" && "Debug Tools"}
                     </h2>
                   </div>
 
                   <button
                     type="button"
-                    className="inventory-modal-close"
+                    className="world-panel-modal-close"
                     onClick={closeActivePanel}
                     aria-label="Close panel"
                   >
@@ -545,7 +486,41 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 </div>
 
                 <div className="world-panel-modal-body">
-                  {renderActivePanelContent()}
+                  {activePanel === "character" && (
+                    <DreamselfPanel profile={profile} inventory={inventory} />
+                  )}
+
+                  {activePanel === "map" && (
+                    <MapPanel currentBiomeId="dusk_valley" phase={phase} />
+                  )}
+
+                  {activePanel === "journal" && (
+                    <JournalPanel entries={journalEntries} />
+                  )}
+
+                  {activePanel === "debug" && (
+                    <div className="world-panel world-panel-debug">
+                      <div className="world-panel-header">
+                        <span className="world-panel-kicker">Debug</span>
+                        <span className="world-panel-title">Relic Testing</span>
+                      </div>
+                      <p className="world-panel-copy">
+                        Spawn a random relic event for testing drops and
+                        journal entries.
+                      </p>
+
+                      <button
+                        type="button"
+                        className="world-debug-pill"
+                        onClick={onSpawnDebugItem}
+                      >
+                        <span className="world-debug-pill__orb" />
+                        <span className="world-debug-pill__label">
+                          Spawn Random Relic
+                        </span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

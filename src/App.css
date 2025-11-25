@@ -924,16 +924,17 @@ body {
 /* subtle top vignette behind HUD – no banding */
 .world-card::before {
   content: "";
-  pointer-events: none;
   position: absolute;
   inset: 0;
+  pointer-events: none;
   background: radial-gradient(
-    circle at 50% -10%,
+    circle at 50% -20%,
     rgba(255, 255, 255, 0.04),
-    transparent 60%
+    transparent 68%
   );
   mix-blend-mode: soft-light;
 }
+
 
 
 
@@ -4488,4 +4489,233 @@ body {
 
 .world-hud-bar--stamina .world-hud-bar-fill {
   background: linear-gradient(90deg, #fde68a, #facc15);
+}
+
+
+
+/* === WORLD DOCK – OPTION 2 / 32px CIRCULAR ICONS ==================== */
+
+.world-dock {
+  position: absolute;
+  right: 4vw;
+  bottom: 2.2rem;
+  display: flex;
+  gap: 1.4rem;
+  z-index: 30;
+}
+
+.world-dock-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.world-dock-label {
+  font-weight: 600;
+}
+
+/* 32px glassy circle */
+.world-dock-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: radial-gradient(circle at 30% 20%, #020617, #111827 70%, #020617);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.9);
+  position: relative;
+}
+
+/* active glow */
+.world-dock-btn--active .world-dock-icon {
+  border-color: #38bdf8;
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.8),
+    0 10px 26px rgba(15, 23, 42, 0.95);
+}
+
+/* ===== GLYPHS (line icons inside the circle) ===== */
+
+/* Inventory – bag */
+.world-dock-icon--inventory::before,
+.world-dock-icon--inventory::after {
+  content: "";
+  position: absolute;
+  left: 26%;
+  right: 26%;
+  border-radius: 3px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.world-dock-icon--inventory::before {
+  top: 24%;
+  bottom: 48%;         /* flap */
+}
+
+.world-dock-icon--inventory::after {
+  top: 42%;
+  bottom: 22%;         /* body */
+}
+
+/* Dreamself – head + robe */
+.world-dock-icon--dreamself::before,
+.world-dock-icon--dreamself::after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+/* head */
+.world-dock-icon--dreamself::before {
+  width: 36%;
+  height: 36%;
+  border-radius: 999px;
+  left: 50%;
+  top: 14%;
+  transform: translateX(-50%);
+}
+
+/* robe */
+.world-dock-icon--dreamself::after {
+  left: 30%;
+  right: 30%;
+  top: 44%;
+  bottom: 18%;
+  border-radius: 40% 40% 10% 10%;
+}
+
+/* Map – folded page */
+.world-dock-icon--map::before,
+.world-dock-icon--map::after {
+  content: "";
+  position: absolute;
+  border-radius: 3px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+/* main sheet */
+.world-dock-icon--map::before {
+  left: 24%;
+  right: 24%;
+  top: 24%;
+  bottom: 22%;
+}
+
+/* center fold */
+.world-dock-icon--map::after {
+  left: 50%;
+  top: 26%;
+  bottom: 24%;
+  border-right: 1px solid rgba(226, 232, 240, 0.9);
+  border-left: none;
+}
+
+/* Journal – two lines */
+.world-dock-icon--journal::before,
+.world-dock-icon--journal::after {
+  content: "";
+  position: absolute;
+  left: 24%;
+  right: 24%;
+  border-top: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.world-dock-icon--journal::before {
+  top: 34%;
+}
+
+.world-dock-icon--journal::after {
+  top: 60%;
+}
+
+/* Debug – diamond */
+.world-dock-icon--debug::before {
+  content: "";
+  position: absolute;
+  left: 26%;
+  right: 26%;
+  top: 26%;
+  bottom: 26%;
+  border-radius: 4px;
+  border: 1px solid rgba(248, 250, 252, 0.95);
+  transform: rotate(45deg);
+}
+
+/* active tint for glyph lines */
+.world-dock-btn--active .world-dock-icon::before,
+.world-dock-btn--active .world-dock-icon::after {
+  border-color: #38bdf8;
+}
+
+
+/* === WORLD HUD BARS – bottom-left =============================== */
+
+.world-hud-bars {
+  position: absolute;
+  left: 5vw;
+  bottom: 2.4rem;
+  display: flex;
+  gap: 1.4rem;
+  align-items: center;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(229, 231, 235, 0.85);
+  z-index: 30;
+}
+
+.world-hud-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.world-hud-bar-label {
+  opacity: 0.8;
+}
+
+.world-hud-bar-track {
+  width: 140px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.95);
+}
+
+.world-hud-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  transform-origin: left center;
+}
+
+/* colors */
+.world-hud-bar--hp .world-hud-bar-fill {
+  background: linear-gradient(90deg, #fecaca, #f97373);
+}
+.world-hud-bar--mp .world-hud-bar-fill {
+  background: linear-gradient(90deg, #bfdbfe, #60a5fa);
+}
+.world-hud-bar--stamina .world-hud-bar-fill {
+  background: linear-gradient(90deg, #fef3c7, #facc15);
+}
+
+@media (max-width: 768px) {
+  .world-hud-bars {
+    left: 1.6rem;
+    bottom: 1.8rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .world-hud-bar-track {
+    width: 110px;
+  }
 }

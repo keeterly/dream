@@ -3305,20 +3305,6 @@ body {
 
 /* ===== INVENTORY GRID MODAL =================================== */
 
-.inventory-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(
-      circle at top,
-      rgba(15, 23, 42, 0.82),
-      rgba(2, 6, 23, 0.9)
-  );
- backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999; /* above world + panels */
-}
 
 .inventory-modal {
   width: min(920px, 94vw);
@@ -3570,39 +3556,7 @@ body {
 
 
 
-/* Backdrop: world remains clearly visible */
-.inventory-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(
-      circle at 50% 0%,
-      rgba(15, 23, 42, 0.45),
-      rgba(2, 6, 23, 0.35)
-    );
-  backdrop-filter: blur(12px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
 
-.inventory-modal.inventory-modal--minimal {
-  max-width: 680px;
-  width: min(92vw, 680px);
-  padding: 0.5rem; /* equal, minimal padding on all sides */
-  border-radius: 1.2rem;
-  background: linear-gradient(
-    135deg,
-    rgba(15, 23, 42, 0.72),
-    rgba(15, 23, 42, 0.6)
-  );
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  box-shadow:
-    0 26px 70px rgba(0, 0, 0, 0.9),
-    0 0 0 1px rgba(15, 23, 42, 0.9);
-  color: #e5e7eb;
-  z-index: 1000;
-}
 
 
 /* Header spacing a bit tighter */
@@ -3798,23 +3752,6 @@ body {
 
 
 
-.inventory-modal.inventory-modal--minimal {
-  max-width: 680px;                       /* feels tight but readable */
-  width: min(92vw, 680px);
-    padding: 0.35rem 0.5rem 0.65rem; /* ✅ minimal horizontal padding */
-  border-radius: 1.2rem;
-  background: linear-gradient(
-    135deg,
-    rgba(15, 23, 42, 0.72),
-    rgba(15, 23, 42, 0.6)
-  );
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  box-shadow:
-    0 26px 70px rgba(0, 0, 0, 0.9),
-    0 0 0 1px rgba(15, 23, 42, 0.9);
-  color: #e5e7eb;
-  z-index: 1000;
-}
 
 
 /* Bigger item art (≈2×) with just a soft drop shadow */
@@ -3891,23 +3828,6 @@ body {
   z-index: 999;
 }
 
-/* Modal – tighter, focused on grid */
-.inventory-modal.inventory-modal--minimal {
-  max-width: 720px;
-  width: min(92vw, 720px);
-  padding: 0.7rem 1rem 0.85rem;
-  border-radius: 1.2rem;
-  background: linear-gradient(
-    135deg,
-    rgba(15, 23, 42, 0.82),
-    rgba(15, 23, 42, 0.7)
-  );
-  border: 1px solid rgba(148, 163, 184, 0.45);
-  box-shadow:
-    0 26px 70px rgba(0, 0, 0, 0.9),
-    0 0 0 1px rgba(15, 23, 42, 0.9);
-  color: #e5e7eb;
-}
 
 /* Header */
 .inventory-modal-header {

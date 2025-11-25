@@ -147,9 +147,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   /**
    * Auto-encounter roll while actually walking.
    * We don't spawn a new item if one is already walking in or active.
-   *
-   * NOTE: Previously this used `isAutoWalking` and an 8–16s delay,
-   * which made drops feel extremely rare in short sessions.
    */
   useEffect(() => {
     if (!isWalking || isEncounterActive || hasLootSpawned) return;
@@ -177,7 +174,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     const shouldResumeAutoWalk = wasAutoWalkingBeforeEncounter;
     const itemForToast = activeEncounterItem;
 
-    // ✅ Parent actually adds the relic to inventory here
+    // Parent actually adds the relic to inventory here
     onResolveEncounter();
 
     // Increment unread counter for the inventory badge
@@ -249,6 +246,22 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   // Close any of the non-inventory modal panels
   const handleCloseActivePanel = () => {
     setActivePanel(null);
+  };
+
+  // Helper to label the modal based on active panel
+  const getActivePanelTitle = (): string => {
+    switch (activePanel) {
+      case "character":
+        return "Dreamself";
+      case "map":
+        return "Map";
+      case "journal":
+        return "Journal";
+      case "debug":
+        return "Debug";
+      default:
+        return "";
+    }
   };
 
   return (
@@ -453,10 +466,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             </div>
           )}
 
-          {/* === MODAL PANELS (Dreamself / Map / Journal / Debug) =======
-              Centered overlay, like InventoryGridModal.
-              HUD + health remain visible underneath the translucent backdrop.
-          */}
+          {/* === MODAL PANELS (Dreamself / Map / Journal / Debug) ======= */}
           {activePanel && (
             <div
               className="world-panel-modal-backdrop"
@@ -466,6 +476,21 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 className="world-panel-modal"
                 onClick={(e) => e.stopPropagation()}
               >
+                <button
+                  type="button"
+                  className="world-panel-modal-close"
+                  aria-label="Close panel"
+                  onClick={handleCloseActivePanel}
+                >
+                  ×
+                </button>
+                {/* Optional: title strip above the embedded panel */}
+                <div className="world-panel-modal-header">
+                  <span className="world-panel-modal-title">
+                    {getActivePanelTitle()}
+                  </span>
+                </div>
+
                 {activePanel === "character" && (
                   <DreamselfPanel profile={profile} inventory={inventory} />
                 )}

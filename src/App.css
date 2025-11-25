@@ -4331,3 +4331,57 @@ html, body {
   align-items: stretch;
   justify-content: center;
 }
+
+
+
+/* Fullscreen invisible overlay (HUD stays above) */
+.world-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500; /* BELOW HUD */
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
+}
+
+/* The MODAL container (same style as inventory modal) */
+.world-modal {
+  position: relative;
+  background: rgba(20,25,40,0.82);
+  border: 1px solid rgba(255,255,255,0.08);
+  width: 820px;
+  padding: 40px;
+  border-radius: 6px;
+  animation: modalFade 0.25s ease-out;
+}
+
+/* Close button (top right) */
+.world-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 22px;
+  color: #fff;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.world-modal-close:hover {
+  opacity: 1;
+}
+
+/* Fade animation */
+@keyframes modalFade {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* HUD always stays above modals */
+.world-overlay {
+  z-index: 999;
+}

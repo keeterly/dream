@@ -1143,6 +1143,44 @@ body {
 
 
 
+
+/* slide-up panels */
+
+/* Slide-up panels (inventory, map, etc.) */
+.world-panel-shell {
+  position: absolute;
+  right: 5vw;      /* aligns with dock */
+  bottom: 5.3rem;  /* sits above the icon row instead of covering it */
+  padding-bottom: 0;
+  pointer-events: none;
+  z-index: 30;     /* above dock */
+}
+
+.world-panel-shell--visible {
+  pointer-events: auto;
+}
+
+
+
+.world-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 0.7rem;
+}
+
+.world-panel-close {
+  border: none;
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
 /* inventory list */
 
 .world-inventory-empty {
@@ -1280,6 +1318,9 @@ body {
   }
 
 
+  .world-panel-shell {
+    padding-inline: 1.4rem;
+  }
 }
 
 @media (max-width: 720px) {
@@ -1329,6 +1370,9 @@ body {
   }
 
 
+  .world-panel-shell {
+    padding-inline: 1rem;
+  }
 
   .world-panel {
     max-width: 100%;
@@ -1455,6 +1499,85 @@ body {
   text-align: right;
 }
 
+
+/* ===== Panels (Inventory / Journal / Debug) ===== */
+
+.world-panels {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 2.5rem 4.8rem;
+}
+
+.world-panel {
+  max-width: 520px;
+  width: 100%;
+  padding: 1.2rem 1.4rem;
+  border-radius: 1.2rem 1.2rem 0 1.2rem;
+  background: linear-gradient(
+    135deg,
+    rgba(9, 15, 26, 0.96),
+    rgba(14, 27, 54, 0.94)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(24px);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.82rem;
+}
+
+.world-panel-title {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  margin-bottom: 0.6rem;
+  opacity: 0.8;
+}
+
+.world-panel-empty,
+.world-panel-body {
+  opacity: 0.75;
+}
+
+/* Inventory list within panel */
+.inventory-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.inventory-item {
+  padding: 0.45rem 0.5rem;
+  border-radius: 0.8rem;
+  background: radial-gradient(
+    circle at 0% 0%,
+    rgba(255, 255, 255, 0.09),
+    transparent
+  );
+}
+
+.inventory-item-main {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+/* subtle rarity tints */
+.inventory-item.rarity-common {
+  border-left: 2px solid rgba(255, 255, 255, 0.25);
+}
+
+.inventory-item.rarity-rare {
+  border-left: 2px solid rgba(156, 206, 255, 0.7);
+}
+
+.inventory-item.rarity-mythic {
+  border-left: 2px solid rgba(255, 215, 160, 0.95);
+}
 
 /* Journal entries */
 .journal-list {
@@ -4140,76 +4263,150 @@ html, body {
 
 
 
-
-
-/* === Force HUD modals to behave like INVENTORY modal === */
-
-.world-panel-shell,
-.world-panels {
-  all: unset;
-  display: contents;
+/* === DREAM – HARD FULLSCREEN WORLD LAYOUT ===================== */
+/* Kill all outer padding when we're in world mode */
+.app-root--world {
+  padding: 0 !important;
 }
 
-.world-panel {
-  position: fixed !important;
-  inset: 0 !important;
-  margin: auto !important;
-  width: min(920px, 90vw) !important;
-  height: auto !important;
-  max-height: 88vh !important;
-  padding: 1.4rem 1.6rem !important;
-
-  border-radius: 1.3rem !important;
-  background: radial-gradient(circle at 0% 0%, rgba(148, 197, 253, 0.15), transparent 55%), rgba(10, 16, 30, 0.98) !important;
-  border: 1px solid rgba(148, 163, 184, 0.6) !important;
-  box-shadow: 0 28px 70px rgba(0,0,0,0.92), 0 0 0 1px rgba(15,23,42,0.8) !important;
-  backdrop-filter: blur(20px) !important;
-  z-index: 999 !important;
+/* Make the main area just be a fullscreen canvas */
+.app-main--world {
+  padding: 0 !important;
+  margin: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  min-height: 100vh;
 }
 
-.world-panel-close {
+/* The world screen itself should fill the viewport */
+.app-main--world .app-screen-world {
+  margin: 0;
+  width: 100%;
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden; /* no scroll below the game */
+}
+
+/* The world card is the actual “game surface” → full bleed */
+.app-main--world .app-screen-world .world-card {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+  border-radius: 0;     /* no rounding on the game surface */
+  border: none;
+}
+
+
+.App.app-root.app-root--world {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+}
+
+
+.world-panel-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(
+      circle at 50% 0%,
+      rgba(15, 23, 42, 0.55),
+      rgba(2, 6, 23, 0.65)
+    );
+  backdrop-filter: blur(14px);
+  z-index: 30; /* HUD sits above at 40 */
+}
+
+.world-panel-modal {
+  width: min(960px, 94vw);
+  max-height: 88vh;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  position: relative;
+  z-index: 31;
+}
+
+
+/* close “X” in the top-right, similar to inventory modal */
+.world-panel-modal-close {
   position: absolute;
-  top: 1rem;
-  right: 1.2rem;
-  font-size: 1.3rem;
+  top: 0.9rem;
+  right: 1.1rem;
+  border: none;
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 1rem;
   cursor: pointer;
 }
 
-/* clicking outside closes modal */
-.world-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.35);
-  backdrop-filter: blur(10px);
-  z-index: 998;
-}
-
-
-
-
-
-/* === HUD ABOVE GLASS BACKDROP ==================================== */
-
-/* 1) The inventory backdrop: dim the world, but no global blur */
-.inventory-modal-backdrop {
-  z-index: 80; /* over game, under HUD + modals */
-  backdrop-filter: none; /* prevent blurring HUD/info */
-}
-
-/* 2) HUD / dock / gauges always sit above any backdrop */
+/* Make sure HUD + dock + bars sit above the blur */
 .world-hud,
 .world-hud-bars,
 .world-dock,
 .world-inventory-toast {
   position: relative;
-  z-index: 120;
+  z-index: 40;
 }
 
-/* 3) World info modals sit above HUD (same feel as inventory modal) */
-.world-panel-modal-backdrop {
-  z-index: 130;
+
+/* Fullscreen invisible overlay (HUD stays above) */
+.world-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500; /* BELOW HUD */
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
 }
 
-.inventory-modal-backdrop {
-  z-index: 140;
+/* The MODAL container (same style as inventory modal) */
+.world-modal {
+  position: relative;
+  background: rgba(20,25,40,0.82);
+  border: 1px solid rgba(255,255,255,0.08);
+  width: 820px;
+  padding: 40px;
+  border-radius: 6px;
+  animation: modalFade 0.25s ease-out;
 }
+
+/* Close button (top right) */
+.world-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 22px;
+  color: #fff;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.world-modal-close:hover {
+  opacity: 1;
+}
+
+/* Fade animation */
+@keyframes modalFade {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* HUD always stays above modals */
+.world-overlay {
+  z-index: 999;
+}
+
+

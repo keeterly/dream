@@ -4454,3 +4454,61 @@ html, body {
   position: relative;
   z-index: 50;
 }
+
+
+
+/* World panel modal (Dreamself / Map / Journal / Debug) */
+.world-panel-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+      circle at 50% 0%,
+      rgba(15, 23, 42, 0.45),
+      rgba(2, 6, 23, 0.35)
+    );
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40; /* below HUD, above world art */
+}
+
+.world-panel-modal {
+  position: relative;
+  max-width: 900px;
+  width: min(900px, 94vw);
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+/* Close X in the top-right */
+.world-panel-modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.9rem;
+  border: none;
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 1.3rem;
+  cursor: pointer;
+  line-height: 1;
+  z-index: 2;
+}
+
+/* Ensure HUD / dock sit above all backdrops */
+.world-hud,
+.world-hud-bars,
+.world-dock,
+.world-inventory-toast {
+  position: relative;
+  z-index: 50;
+}
+
+/* Inventory modal backdrop under HUD, but above world art */
+.inventory-modal-backdrop {
+  z-index: 35;
+}
+
+.inventory-modal {
+  z-index: 45; /* card above HUD elements that aren't overlapped by it */
+}

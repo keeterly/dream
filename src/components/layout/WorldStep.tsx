@@ -93,6 +93,8 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     setActivePanel((current) => (current === panel ? null : panel));
   };
 
+  const closeActivePanel = () => setActivePanel(null);
+
   const dominantElement = profile?.traits?.dominantElement ?? null;
   const lighting = useBiomeLighting({
     phase,
@@ -147,13 +149,12 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   /**
    * Auto-encounter roll while actually walking.
    * We don't spawn a new item if one is already walking in or active.
-   *
-   * NOTE: shortened to 5–10s so drops feel more frequent.
    */
   useEffect(() => {
     if (!isWalking || isEncounterActive || hasLootSpawned) return;
 
-    const delay = 5000 + Math.random() * 5000; // 5–10s
+    // 5–10 seconds between potential drops while walking
+    const delay = 5000 + Math.random() * 5000;
     const id = window.setTimeout(() => {
       setWasAutoWalkingBeforeEncounter(true);
       onSpawnDebugItem();
@@ -239,14 +240,8 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     setInventoryUnreadCount(0);
   };
 
-  // When closing the inventory modal, just flip the flag (counter already cleared)
   const handleCloseInventoryModal = () => {
     setIsInventoryModalOpen(false);
-  };
-
-  // Close any of the non-inventory modal panels
-  const handleCloseActivePanel = () => {
-    setActivePanel(null);
   };
 
   return (
@@ -305,7 +300,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
         {/* OVERLAY: HUD + DOCK + PANELS */}
         <div className="world-overlay">
-          {/* HUD */}
+          {/* HUD (top) */}
           <div className="world-hud">
             <div className="world-hud-left">
               <div className="world-hud-field">
@@ -451,69 +446,62 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             </div>
           )}
 
-          {/* === MODAL PANELS (Dreamself / Map / Journal / Debug) ======= */}
+          {/* MODAL PANELS (Dreamself / Map / Journal / Debug) */}
           {activePanel && (
-            <>
-              {/* Backdrop (blur world, HUD will sit above via z-index) */}
+            <div
+              className="world-panel-modal-backdrop"
+              onClick={closeActivePanel}
+            >
               <div
-                className="world-panel-modal-backdrop"
-                onClick={handleCloseActivePanel}
-              />
-
-              {/* Centered card */}
-              <div className="world-panel-modal">
-                <div
-                  className="world-panel-modal-card"
-                  onClick={(e) => e.stopPropagation()}
+                className="world-panel-modal"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  type="button"
+                  className="world-panel-modal-close"
+                  onClick={closeActivePanel}
+                  aria-label="Close panel"
                 >
-                  {/* X button – reuse inventory close style */}
-                  <button
-                    type="button"
-                    className="world-panel-modal-close inventory-modal-close"
-                    onClick={handleCloseActivePanel}
-                    aria-label="Close panel"
-                  >
-                    ×
-                  </button>
+                  ×
+                </button>
 
-                  {activePanel === "character" && (
-                    <DreamselfPanel profile={profile} inventory={inventory} />
-                  )}
+                {activePanel === "character" && (
+                  <DreamselfPanel profile={profile} inventory={inventory} />
+                )}
 
-                  {activePanel === "map" && (
-                    <MapPanel currentBiomeId="dusk_valley" phase={phase} />
-                  )}
+                {activePanel === "map" && (
+                  <MapPanel currentBiomeId="dusk_valley" phase={phase} />
+                )}
 
-                  {activePanel === "journal" && (
-                    <JournalPanel entries={journalEntries} />
-                  )}
+                {activePanel === "journal" && (
+                  <JournalPanel entries={journalEntries} />
+                )}
 
-                  {activePanel === "debug" && (
-                    <div className="world-panel world-panel-debug">
-                      <div className="world-panel-header">
-                        <span className="world-panel-kicker">Debug</span>
-                        <span className="world-panel-title">Relic Testing</span>
-                      </div>
-                      <p className="world-panel-copy">
-                        Spawn a random relic event for testing drops and
-                        journal entries.
-                      </p>
-
-                      <button
-                        type="button"
-                        className="world-debug-pill"
-                        onClick={onSpawnDebugItem}
-                      >
-                        <span className="world-debug-pill__orb" />
-                        <span className="world-debug-pill__label">
-                          Spawn Random Relic
-                        </span>
-                      </button>
+                {activePanel === "debug" && (
+                  <div className="world-panel world-panel-debug">
+                    <div className="world-panel-header">
+                      <span className="world-panel-kicker">Debug</span>
+                      <span className="world-panel-title">Relic Testing</span>
                     </div>
-                  )}
-                </div>
+                    <p className="world-panel-copy">
+                      Spawn a random relic event for testing drops and journal
+                      entries.
+                    </p>
+
+                    <button
+                      type="button"
+                      className="world-debug-pill"
+                      onClick={onSpawnDebugItem}
+                    >
+                      <span className="world-debug-pill__orb" />
+                      <span className="world-debug-pill__label">
+                        Spawn Random Relic
+                      </span>
+                    </button>
+                  </div>
+                )}
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>

@@ -17,8 +17,13 @@ body {
   color: inherit;
 }
 
+#root {
+  height: 100%;
+}
+
+
 .app-root {
-  min-height: 100vh;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   padding: 1.5rem 2rem 2rem;
@@ -522,22 +527,31 @@ body {
 .world-card {
   position: relative;
   width: 100%;
+  /* fill viewport */
   min-height: 100vh;
   height: 100svh;
   overflow: hidden;
   background: #020617;
 }
 
-/* WORLD LANE is pure background */
-.world-card .world-lane {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
+/* WORLD view: app-main variant – no extra padding, no scroll wrapper */
+.app-main--world {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
-/* ---------- WORLD LANE VISUALS / PARALLAX ---------- */
+.app-main--world .app-screen-world {
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden; /* <- prevents the “extra section” below */
+}
 
+.app-main--world .world-card {
+  margin-top: 0;
+  height: 100%;
+}
+
+/* WORLD LANE is pure background */
 .world-lane {
   position: absolute;
   inset: 0;
@@ -564,7 +578,7 @@ body {
   z-index: 1;
 }
 
-/* parallax layers */
+/* parallax layers (your PNGs get applied via inline styles) */
 .world-lane-layer {
   position: absolute;
   inset: 0;
@@ -574,7 +588,6 @@ body {
   transform: translate3d(0, 0, 0);
   will-change: background-position;
   animation: world-lane-art-scroll 80s linear infinite;
-  z-index: 0;
 }
 
 .world-lane-layer--depth-1 { z-index: 0; }
@@ -660,7 +673,7 @@ body {
     );
 }
 
-/* Global tint above world for encounters */
+/* Global tint during encounter */
 .world-tint-overlay {
   position: absolute;
   inset: 0;
@@ -684,6 +697,21 @@ body {
     );
 }
 
+/* TOP vignette behind HUD */
+.world-card::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+      circle at 50% -10%,
+      rgba(255, 255, 255, 0.06),
+      transparent 55%
+    ),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.65), transparent 35%);
+  mix-blend-mode: soft-light;
+}
+
 /* ---------------------------------------------------------
    WORLD OVERLAY (HUD + DOCK + PANELS)
    --------------------------------------------------------- */
@@ -703,894 +731,6 @@ body {
   pointer-events: auto;
 }
 
-/* HUD (top) */
-
-.world-hud {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 1rem 2.5rem 0.75rem;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.world-hud-left {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.world-hud-field {
-  font-size: 0.68rem;
-  letter-spacing: 0.22em;
-  opacity: 0.6;
-}
-
-.world-hud-title-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.world-hud-title {
-  font-size: 0.95rem;
-  letter-spacing: 0.22em;
-}
-
-.world-hud-pill {
-  font-size: 0.7rem;
-  padding: 0.08rem 0.6rem;
-  border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.8);
-  background: rgba(15, 23, 42, 0.8);
-}
-
-.world-hud-meta {
-  display: flex;
-  gap: 0.75rem;
-  font-size: 0.68rem;
-  margin-top: 0.1rem;
-}
-
-.hud-label {
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  opacity: 0.6;
-  margin-right: 0.3rem;
-}
-
-.hud-value {
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-}
-
-.world-hud-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.25rem;
-}
-
-.world-hud-phase {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  font-size: 0.68rem;
-}
-
-.world-hud-phase .hud-label {
-  margin-right: 0;
-}
-
-/* Auto-walk / auto-pickup pill buttons */
-
-.world-autowalk-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.16rem 0.7rem 0.16rem 0.6rem;
-  border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.8);
-  background: radial-gradient(
-    circle at top left,
-    rgba(15, 23, 42, 0.96),
-    #020617
-  );
-  font-size: 0.68rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #e5e7eb;
-  cursor: pointer;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.85);
-}
-
-.world-autowalk-toggle--off {
-  opacity: 0.75;
-  border-style: dashed;
-}
-
-.world-autowalk-label {
-  opacity: 0.7;
-}
-
-.world-autowalk-state {
-  font-weight: 500;
-}
-
-.world-autowalk-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: #22c55e;
-  box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
-}
-
-.world-autowalk-toggle--off .world-autowalk-dot {
-  background: #64748b;
-  box-shadow: none;
-  opacity: 0.7;
-}
-
-/* TOP vignette behind HUD */
-.world-card::before {
-  content: "";
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-      circle at 50% -10%,
-      rgba(255, 255, 255, 0.06),
-      transparent 55%
-    ),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.65), transparent 35%);
-  mix-blend-mode: soft-light;
-}
-
-/* -------------------------------------------
-   AVATAR STAGE
-   ------------------------------------------- */
-
-.world-stage-avatar {
-  position: absolute;
-  left: 50%;
-  bottom: 9vh;
-  transform: translateX(-50%);
-  transform-origin: 50% 100%;
-  z-index: 20;
-  pointer-events: none;
-}
-
-.world-stage-avatar .avatar-view-svg {
-  width: clamp(96px, 18vh, 140px);
-  height: auto;
-}
-
-/* Walk bob */
-.world-stage-avatar--walking .avatar-root {
-  animation: dreamself-walk 1.8s ease-in-out infinite;
-}
-
-@keyframes dreamself-walk {
-  0%   { transform: translateY(0); }
-  25%  { transform: translateY(-4px); }
-  50%  { transform: translateY(0); }
-  75%  { transform: translateY(3px); }
-  100% { transform: translateY(0); }
-}
-
-/* Pause animation when not walking */
-.world-stage-avatar--paused .avatar-view-svg {
-  animation-play-state: paused;
-}
-
-/* Phase tint onto avatar */
-.world-phase-dawn svg {
-  filter: brightness(1.05) saturate(1.1)
-    drop-shadow(0 0 6px rgba(255, 220, 170, 0.25));
-}
-
-.world-phase-night svg {
-  filter: brightness(0.85) saturate(0.9)
-    drop-shadow(0 0 6px rgba(90, 130, 255, 0.2));
-}
-
-.world-phase-dusk svg {
-  filter: brightness(0.9) saturate(0.85)
-    drop-shadow(0 0 4px rgba(60, 60, 120, 0.3));
-}
-
-/* ---------------------------------------------------------
-   ENCOUNTER UI (glyph + RELIC FOUND banner)
-   --------------------------------------------------------- */
-
-.world-encounter-glyph {
-  position: absolute;
-  left: 50%;
-  bottom: 180px;
-  transform: translateX(-50%);
-  font-size: 42px;
-  font-weight: 700;
-  color: #fce87a;
-  text-shadow: 0 0 12px rgba(255, 230, 120, 0.9);
-  animation: glyphPulse 1.2s ease-in-out infinite;
-}
-
-@keyframes glyphPulse {
-  0%   { opacity: 0.4; transform: translateX(-50%) translateY(0); }
-  50%  { opacity: 1;   transform: translateX(-50%) translateY(-4px); }
-  100% { opacity: 0.4; transform: translateX(-50%) translateY(0); }
-}
-
-/* Top-center banner */
-.world-encounter-banner {
-  position: absolute;
-  top: 48px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 0.7rem 1.6rem;
-  border-radius: 999px;
-  background: rgba(10, 14, 25, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.6);
-  backdrop-filter: blur(14px);
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  font-size: 0.7rem;
-  color: #e5e7eb;
-  box-shadow:
-    0 10px 30px rgba(15, 23, 42, 0.9),
-    0 0 0 1px rgba(15, 23, 42, 0.8);
-  z-index: 40;
-}
-
-.world-encounter-label {
-  opacity: 0.7;
-  margin-right: 0.6rem;
-}
-
-.world-encounter-name {
-  font-weight: 600;
-}
-
-.world-encounter-banner--rare {
-  border-color: rgba(56, 189, 248, 0.9);
-}
-.world-encounter-banner--mythic {
-  border-color: rgba(168, 85, 247, 0.9);
-}
-
-/* ---------------------------------------------------------
-   +1 RELIC TOAST
-   --------------------------------------------------------- */
-
-.world-inventory-toast {
-  position: absolute;
-  right: 5vw;
-  bottom: 5.4rem;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.15rem;
-  padding: 0.5rem 0.9rem;
-  border-radius: 0.9rem;
-  background: radial-gradient(
-      circle at 0% 0%,
-      rgba(148, 197, 253, 0.28),
-      transparent 60%
-    ),
-    rgba(10, 16, 30, 0.94);
-  border: 1px solid rgba(148, 197, 253, 0.7);
-  box-shadow:
-    0 14px 36px rgba(15, 23, 42, 0.95),
-    0 0 0 1px rgba(15, 23, 42, 0.8);
-  font-size: 0.78rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #e5f0ff;
-  animation: world-inventory-toast-pop 0.22s ease-out,
-             world-inventory-toast-fade 0.3s ease-out 1.4s forwards;
-  pointer-events: none;
-  z-index: 40;
-}
-
-.world-inventory-toast-name {
-  font-size: 0.76rem;
-  text-transform: none;
-  letter-spacing: 0.04em;
-  color: #cbd5ff;
-}
-
-@keyframes world-inventory-toast-pop {
-  0%   { opacity: 0; transform: translateY(6px) scale(0.96); }
-  100% { opacity: 1; transform: translateY(0)   scale(1); }
-}
-
-@keyframes world-inventory-toast-fade {
-  0%   { opacity: 1; transform: translateY(0)   scale(1); }
-  100% { opacity: 0; transform: translateY(-4px) scale(0.98); }
-}
-
-/* ---------------------------------------------------------
-   BOTTOM-RIGHT DOCK (Inventory / Dreamself / Map / Journal / Debug)
-   --------------------------------------------------------- */
-
-.world-dock {
-  position: absolute;
-  right: 5vw;
-  bottom: 2.2rem;
-  display: flex;
-  gap: 1.1rem;
-  z-index: 25;
-}
-
-.world-dock-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.35rem;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: #e5e7eb;
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.world-dock-label {
-  font-weight: 600;
-}
-
-.world-dock-icon-wrap {
-  position: relative;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.world-dock-icon {
-  width: 16px;
-  height: 16px;
-  position: relative;
-}
-
-/* Glyphs */
-.world-dock-icon--inventory::before,
-.world-dock-icon--inventory::after {
-  content: "";
-  position: absolute;
-  inset: 15%;
-  border-radius: 3px;
-  border: 1px solid rgba(226, 232, 240, 0.9);
-}
-
-.world-dock-icon--inventory::after {
-  inset: 35% 20% 15% 20%;
-}
-
-.world-dock-icon--dreamself::before {
-  content: "";
-  position: absolute;
-  inset: 12%;
-  border-radius: 999px;
-  border: 1px solid rgba(226, 232, 240, 0.9);
-}
-
-.world-dock-icon--map::before {
-  content: "";
-  position: absolute;
-  inset: 18%;
-  border-radius: 4px;
-  border: 1px solid rgba(226, 232, 240, 0.9);
-}
-
-.world-dock-icon--journal::before,
-.world-dock-icon--journal::after {
-  content: "";
-  position: absolute;
-  left: 22%;
-  right: 22%;
-  border-top: 1px solid rgba(226, 232, 240, 0.9);
-}
-
-.world-dock-icon--journal::before { top: 32%; }
-.world-dock-icon--journal::after  { top: 60%; }
-
-.world-dock-icon--debug::before {
-  content: "";
-  position: absolute;
-  inset: 18%;
-  border-radius: 3px;
-  border: 1px solid rgba(248, 250, 252, 0.9);
-  transform: rotate(45deg);
-}
-
-/* Pink notification bubble */
-.world-dock-notification {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  min-width: 18px;
-  padding: 0 4px;
-  border-radius: 10px;
-  background: #f9a8d4;
-  color: #111827;
-  font-size: 0.65rem;
-  text-align: center;
-  line-height: 1.2;
-  box-shadow: 0 0 10px rgba(248, 113, 171, 0.9);
-}
-
-/* ---------------------------------------------------------
-   BOTTOM-LEFT HP / MP / STAMINA (Nier-style)
-   --------------------------------------------------------- */
-
-.world-status-bars {
-  position: absolute;
-  left: 5vw;
-  bottom: 1.9rem; /* lines up with dock */
-  display: flex;
-  gap: 2.2rem;
-  align-items: center;
-  font-size: 0.68rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(226, 232, 240, 0.78);
-  pointer-events: none;
-  z-index: 25;
-}
-
-.world-status-bar {
-  display: flex;
-  flex-direction: column;
-  gap: 0.18rem;
-}
-
-.world-status-bar-label {
-  opacity: 0.8;
-}
-
-.world-status-bar-track {
-  position: relative;
-  width: 120px;
-  height: 3px;
-  background: rgba(15, 23, 42, 0.85);
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.world-status-bar-fill {
-  position: absolute;
-  inset: 0;
-  transform-origin: left center;
-}
-
-/* HP = red */
-.world-status-bar-fill--hp {
-  background: linear-gradient(90deg, #fecaca, #fb7185, #b91c1c);
-}
-
-/* MP = blue */
-.world-status-bar-fill--mp {
-  background: linear-gradient(90deg, #bfdbfe, #60a5fa, #1d4ed8);
-}
-
-/* Stamina = yellow */
-.world-status-bar-fill--stamina {
-  background: linear-gradient(90deg, #fef9c3, #fde68a, #ca8a04);
-}
-
-/* ---------------------------------------------------------
-   SLIDE-UP PANELS (Dreamself / Map / Journal / Debug)
-   --------------------------------------------------------- */
-
-.world-panels {
-  display: flex;
-  justify-content: flex-end;
-  margin: 0 5vw 4.8rem;
-}
-
-.world-panel {
-  max-width: 520px;
-  width: 100%;
-  padding: 1.2rem 1.4rem;
-  border-radius: 1.2rem 1.2rem 0 1.2rem;
-  background: linear-gradient(
-    135deg,
-    rgba(9, 15, 26, 0.96),
-    rgba(14, 27, 54, 0.94)
-  );
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(24px);
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.82rem;
-  transform: translateY(10px);
-  opacity: 0;
-  animation: panel-enter 240ms ease-out forwards;
-}
-
-@keyframes panel-enter {
-  from { transform: translateY(10px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
-}
-
-.world-panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.7rem;
-}
-
-.world-panel-kicker {
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  opacity: 0.7;
-}
-
-.world-panel-title {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-}
-
-.world-panel-copy {
-  font-size: 0.8rem;
-  opacity: 0.8;
-}
-
-/* Debug pill */
-.world-debug-pill {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.55rem 1.4rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: radial-gradient(
-    circle at 0% 0%,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(7, 10, 20, 0.98) 55%,
-    rgba(3, 6, 12, 1) 100%
-  );
-  box-shadow:
-    0 14px 38px rgba(0, 0, 0, 0.8),
-    0 0 0 1px rgba(255, 255, 255, 0.03);
-  font-size: 0.78rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(245, 247, 255, 0.9);
-  cursor: pointer;
-}
-
-.world-debug-pill__orb {
-  width: 0.9rem;
-  height: 0.9rem;
-  border-radius: 999px;
-  background: radial-gradient(
-    circle at 30% 20%,
-    #f9f4ff 0%,
-    #e2d4ff 30%,
-    #b299ff 55%,
-    #4f3aa7 100%
-  );
-  box-shadow:
-    0 0 12px rgba(188, 157, 255, 0.9),
-    0 0 0 1px rgba(255, 255, 255, 0.5);
-}
-
-/* ---------------------------------------------------------
-   INVENTORY GRID MODAL (icon-only grid)
-   --------------------------------------------------------- */
-
-.inventory-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(
-      circle at 50% 0%,
-      rgba(15, 23, 42, 0.45),
-      rgba(2, 6, 23, 0.35)
-    );
-  backdrop-filter: blur(12px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-
-.inventory-modal.inventory-modal--minimal {
-  max-width: 720px;
-  width: min(92vw, 720px);
-  padding: 0.7rem 1rem 0.85rem;
-  border-radius: 1.2rem;
-  background: linear-gradient(
-    135deg,
-    rgba(15, 23, 42, 0.82),
-    rgba(15, 23, 42, 0.7)
-  );
-  border: 1px solid rgba(148, 163, 184, 0.45);
-  box-shadow:
-    0 26px 70px rgba(0, 0, 0, 0.9),
-    0 0 0 1px rgba(15, 23, 42, 0.9);
-  color: #e5e7eb;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Header */
-
-.inventory-modal-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 0.25rem;
-}
-
-.inventory-modal-title-block {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-
-.inventory-modal-kicker {
-  font-size: 0.7rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  opacity: 0.7;
-}
-
-.inventory-modal-title {
-  font-size: 1.05rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  margin: 0;
-}
-
-/* sort pills + close */
-
-.inventory-sort-row {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.35rem;
-  font-size: 0.74rem;
-}
-
-.inventory-sort-label {
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  opacity: 0.6;
-  margin-right: 0.25rem;
-}
-
-.inventory-sort-pill {
-  border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  background: rgba(15, 23, 42, 0.7);
-  padding: 0.16rem 0.6rem;
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #e5e7eb;
-  cursor: pointer;
-  opacity: 0.7;
-}
-
-.inventory-sort-pill--active {
-  border-color: rgba(56, 189, 248, 0.9);
-  background: radial-gradient(
-    circle at 0% 0%,
-    rgba(56, 189, 248, 0.35),
-    rgba(15, 23, 42, 0.95)
-  );
-  opacity: 1;
-}
-
-.inventory-close-btn {
-  border: none;
-  background: transparent;
-  color: #e5e7eb;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-/* Grid shell */
-
-.inventory-grid-shell {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.4rem 0.4rem 0.35rem;
-}
-
-.inventory-grid.inventory-grid--dotted {
-  width: 100%;
-  max-width: 520px;
-  padding: 0.45rem;
-  border-radius: 0.9rem;
-  background: radial-gradient(
-      circle at 50% 0%,
-      rgba(15, 23, 42, 0.8),
-      rgba(3, 7, 18, 0.95)
-    );
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.95);
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  grid-template-rows: repeat(5, 1fr);
-  gap: 0.22rem;
-}
-
-/* slots */
-
-.inventory-grid-cell {
-  position: relative;
-  aspect-ratio: 1 / 1;
-  border-radius: 0.4rem;
-  border: 1px dashed rgba(148, 163, 184, 0.32);
-  background: radial-gradient(
-      circle at 0% 0%,
-      rgba(148, 163, 184, 0.12),
-      transparent 55%
-    ),
-    rgba(15, 23, 42, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: visible;
-}
-
-/* icon-only item */
-
-.inventory-grid-item-icon-only {
-  position: relative;
-  padding: 0;
-  margin: 0;
-  border: none;
-  background: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: grab;
-}
-
-.inventory-grid-item-icon-only--dragging {
-  opacity: 0.7;
-  cursor: grabbing;
-}
-
-/* item art */
-
-.inventory-grid-icon-img {
-  width: 120%;
-  max-width: 110px;
-  height: auto;
-  display: block;
-  filter:
-    drop-shadow(0 0 12px rgba(15, 23, 42, 0.95))
-    drop-shadow(0 6px 14px rgba(0, 0, 0, 0.85));
-  pointer-events: none;
-}
-
-/* tooltip */
-
-.inventory-tooltip {
-  position: absolute;
-  left: 50%;
-  bottom: 110%;
-  transform: translateX(-50%) translateY(-4px);
-  min-width: 220px;
-  max-width: 260px;
-  padding: 0.65rem 0.75rem;
-  border-radius: 0.6rem;
-  background: radial-gradient(
-      circle at 0% 0%,
-      rgba(15, 23, 42, 0.98),
-      rgba(15, 23, 42, 0.96)
-    );
-  border: 1px solid rgba(148, 163, 184, 0.7);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.95);
-  font-size: 0.78rem;
-  color: #e5e7eb;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 140ms ease-out, transform 140ms ease-out;
-  z-index: 1100;
-}
-
-.inventory-tooltip::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -6px;
-  width: 10px;
-  height: 10px;
-  background: rgba(15, 23, 42, 0.98);
-  border-left: 1px solid rgba(148, 163, 184, 0.7);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.7);
-  transform: translateX(-50%) rotate(45deg);
-}
-
-.inventory-grid-item-icon-only:hover .inventory-tooltip {
-  opacity: 1;
-  transform: translateX(-50%) translateY(-1px);
-}
-
-.inventory-tooltip-name {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 500;
-  margin-bottom: 0.25rem;
-}
-
-.inventory-tooltip-rarity {
-  font-size: 0.72rem;
-  text-transform: capitalize;
-  padding: 0.06rem 0.4rem;
-  border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.7);
-}
-
-.inventory-tooltip-body {
-  opacity: 0.85;
-  line-height: 1.4;
-}
-
-.inventory-tooltip-rarity.rarity-rare {
-  border-color: rgba(56, 189, 248, 0.85);
-  color: #e0f2fe;
-}
-.inventory-tooltip-rarity.rarity-mythic {
-  border-color: rgba(168, 85, 247, 0.95);
-  color: #f5d0fe;
-}
-
-
-/* =========================================================
-   DREAM – WORLD LAYOUT / DOCK / HP–MP–STAM BARS (Option A)
-   ========================================================= */
-
-/* WORLD view: no extra top padding, fill viewport, no scroll */
-.app-main--world {
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-.app-main--world .app-screen-world {
-  min-height: 100vh;
-  height: 100vh;
-  overflow: hidden; /* no extra section below */
-}
-
-.app-main--world .world-card {
-  margin-top: 0;
-  height: 100%;
-}
-
-/* Overlay that holds HUD, gauges, dock, panels */
-.world-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  pointer-events: none; /* children re-enable */
-}
-
-.world-hud,
-.world-dock,
-.world-panels {
-  pointer-events: auto;
-}
-
 /* ===== TOP HUD ================================================== */
 
 .world-hud {
@@ -1601,6 +741,9 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
   color: rgba(255, 255, 255, 0.9);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
 }
 
 .world-hud-left {
@@ -1665,10 +808,200 @@ body {
   text-align: right;
 }
 
-/* (keep your existing .world-autowalk-toggle styles from above) */
+/* Auto-walk / pickup pill */
+.world-autowalk-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.16rem 0.7rem 0.16rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.8);
+  background: radial-gradient(
+    circle at top left,
+    rgba(15, 23, 42, 0.96),
+    #020617
+  );
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #e5e7eb;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.85);
+}
 
+.world-autowalk-toggle--off {
+  opacity: 0.75;
+  border-style: dashed;
+}
 
-/* ===== BOTTOM-RIGHT DOCK ======================================== */
+.world-autowalk-label {
+  opacity: 0.7;
+}
+
+.world-autowalk-state {
+  font-weight: 500;
+}
+
+.world-autowalk-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+}
+
+.world-autowalk-toggle--off .world-autowalk-dot {
+  background: #64748b;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+/* ---------------------------------------------------------
+   AVATAR
+   --------------------------------------------------------- */
+
+.world-stage-avatar {
+  position: absolute;
+  left: 50%;
+  bottom: 9vh;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.world-stage-avatar .avatar-view-svg {
+  width: clamp(96px, 18vh, 140px);
+  height: auto;
+}
+
+.world-stage-avatar--walking .avatar-root {
+  animation: dreamself-walk 1.8s ease-in-out infinite;
+}
+
+@keyframes dreamself-walk {
+  0%   { transform: translateY(0); }
+  25%  { transform: translateY(-4px); }
+  50%  { transform: translateY(0); }
+  75%  { transform: translateY(3px); }
+  100% { transform: translateY(0); }
+}
+
+/* Phase tint */
+.world-phase-dawn svg {
+  filter: brightness(1.05) saturate(1.1)
+    drop-shadow(0 0 6px rgba(255, 220, 170, 0.25));
+}
+
+.world-phase-night svg {
+  filter: brightness(0.85) saturate(0.9)
+    drop-shadow(0 0 6px rgba(90, 130, 255, 0.2));
+}
+
+.world-phase-dusk svg {
+  filter: brightness(0.9) saturate(0.85)
+    drop-shadow(0 0 4px rgba(60, 60, 120, 0.3));
+}
+
+/* ---------------------------------------------------------
+   ENCOUNTER GLYPH + BANNER
+   --------------------------------------------------------- */
+
+.world-encounter-glyph {
+  position: absolute;
+  left: 50%;
+  bottom: 180px;
+  transform: translateX(-50%);
+  font-size: 42px;
+  font-weight: 700;
+  color: #fce87a;
+  text-shadow: 0 0 12px rgba(255, 230, 120, 0.9);
+  animation: glyphPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes glyphPulse {
+  0%   { opacity: 0.4; transform: translateX(-50%) translateY(0); }
+  50%  { opacity: 1;   transform: translateX(-50%) translateY(-4px); }
+  100% { opacity: 0.4; transform: translateX(-50%) translateY(0); }
+}
+
+.world-encounter-banner {
+  position: absolute;
+  top: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.7rem 1.6rem;
+  border-radius: 999px;
+  background: rgba(10, 14, 25, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  backdrop-filter: blur(14px);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.7rem;
+  color: #e5e7eb;
+  box-shadow:
+    0 10px 30px rgba(15, 23, 42, 0.9),
+    0 0 0 1px rgba(15, 23, 42, 0.8);
+  z-index: 40;
+}
+
+.world-encounter-label {
+  opacity: 0.7;
+  margin-right: 0.6rem;
+}
+
+.world-encounter-name {
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------
+   +1 RELIC TOAST
+   --------------------------------------------------------- */
+
+.world-inventory-toast {
+  position: absolute;
+  right: 5vw;
+  bottom: 5.4rem;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.9rem;
+  background: radial-gradient(
+      circle at 0% 0%,
+      rgba(148, 197, 253, 0.28),
+      transparent 60%
+    ),
+    rgba(10, 16, 30, 0.94);
+  border: 1px solid rgba(148, 197, 253, 0.7);
+  box-shadow:
+    0 14px 36px rgba(15, 23, 42, 0.95),
+    0 0 0 1px rgba(15, 23, 42, 0.8);
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #e5f0ff;
+  animation: world-inventory-toast-pop 0.22s ease-out,
+             world-inventory-toast-fade 0.3s ease-out 1.4s forwards;
+  pointer-events: none;
+  z-index: 40;
+}
+
+@keyframes world-inventory-toast-pop {
+  0%   { opacity: 0; transform: translateY(6px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+@keyframes world-inventory-toast-fade {
+  0%   { opacity: 1; transform: translateY(0)   scale(1); }
+  100% { opacity: 0; transform: translateY(-4px) scale(0.98); }
+}
+
+/* ---------------------------------------------------------
+   BOTTOM-RIGHT DOCK
+   --------------------------------------------------------- */
 
 .world-dock {
   position: absolute;
@@ -1694,7 +1027,7 @@ body {
 }
 
 .world-dock-label {
-  font-weight: 600; /* bold for legibility */
+  font-weight: 600;
 }
 
 .world-dock-icon-wrap {
@@ -1712,7 +1045,7 @@ body {
   position: relative;
 }
 
-/* Simple glyphs for each button */
+/* Simple glyphs */
 .world-dock-icon--inventory::before,
 .world-dock-icon--inventory::after {
   content: "";
@@ -1749,12 +1082,8 @@ body {
   right: 22%;
   border-top: 1px solid rgba(226, 232, 240, 0.9);
 }
-.world-dock-icon--journal::before {
-  top: 32%;
-}
-.world-dock-icon--journal::after {
-  top: 60%;
-}
+.world-dock-icon--journal::before { top: 32%; }
+.world-dock-icon--journal::after  { top: 60%; }
 
 .world-dock-icon--debug::before {
   content: "";
@@ -1765,7 +1094,7 @@ body {
   transform: rotate(45deg);
 }
 
-/* Active state glow */
+/* Active glow */
 .world-dock-btn.world-dock-btn--active .world-dock-icon {
   border-radius: 999px;
   box-shadow:
@@ -1773,7 +1102,7 @@ body {
     0 10px 26px rgba(15, 23, 42, 0.95);
 }
 
-/* Pink notification bubble with count */
+/* Pink badge for “new” count */
 .world-dock-notification {
   position: absolute;
   top: -6px;
@@ -1789,13 +1118,14 @@ body {
   box-shadow: 0 0 10px rgba(248, 113, 171, 0.9);
 }
 
-
-/* ===== BOTTOM-LEFT HP / MP / STAM BARS (Nier-style) ============== */
+/* ---------------------------------------------------------
+   BOTTOM-LEFT HP / MP / STAM
+   --------------------------------------------------------- */
 
 .world-status-bars {
   position: absolute;
   left: 5vw;
-  bottom: 2.2rem; /* matches .world-dock vertical alignment */
+  bottom: 2.2rem;
   display: flex;
   gap: 2.2rem;
   align-items: center;
@@ -1804,6 +1134,7 @@ body {
   text-transform: uppercase;
   color: rgba(226, 232, 240, 0.78);
   pointer-events: none;
+  z-index: 25;
 }
 
 .world-status-bar {
@@ -1831,22 +1162,54 @@ body {
   transform-origin: left center;
 }
 
-/* HP = red */
 .world-status-bar-fill--hp {
   background: linear-gradient(90deg, #fecaca, #fb7185, #b91c1c);
 }
 
-/* MP = blue */
 .world-status-bar-fill--mp {
   background: linear-gradient(90deg, #bfdbfe, #60a5fa, #1d4ed8);
 }
 
-/* Stamina = yellow */
 .world-status-bar-fill--stamina {
   background: linear-gradient(90deg, #fef9c3, #fde68a, #ca8a04);
 }
 
-/* Slightly shorter bars on smaller screens */
+/* ---------------------------------------------------------
+   SLIDE-UP PANELS (Dreamself / Map / Journal / Debug)
+   --------------------------------------------------------- */
+
+.world-panels {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 5vw 4.8rem;
+}
+
+.world-panel {
+  max-width: 520px;
+  width: 100%;
+  padding: 1.2rem 1.4rem;
+  border-radius: 1.2rem 1.2rem 0 1.2rem;
+  background: linear-gradient(
+    135deg,
+    rgba(9, 15, 26, 0.96),
+    rgba(14, 27, 54, 0.94)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(24px);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.82rem;
+  transform: translateY(10px);
+  opacity: 0;
+  animation: panel-enter 240ms ease-out forwards;
+}
+
+@keyframes panel-enter {
+  from { transform: translateY(10px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Responsive tweaks */
 @media (max-width: 768px) {
   .world-hud {
     padding-inline: 1.4rem;
@@ -1866,5 +1229,9 @@ body {
     right: 1.6rem;
     bottom: 1.6rem;
     gap: 0.9rem;
+  }
+
+  .world-panels {
+    margin: 0 1.5rem 4.2rem;
   }
 }

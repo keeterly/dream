@@ -1143,44 +1143,6 @@ body {
 
 
 
-
-/* slide-up panels */
-
-/* Slide-up panels (inventory, map, etc.) */
-.world-panel-shell {
-  position: absolute;
-  right: 5vw;      /* aligns with dock */
-  bottom: 5.3rem;  /* sits above the icon row instead of covering it */
-  padding-bottom: 0;
-  pointer-events: none;
-  z-index: 30;     /* above dock */
-}
-
-.world-panel-shell--visible {
-  pointer-events: auto;
-}
-
-
-
-.world-panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.8rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #94a3b8;
-  margin-bottom: 0.7rem;
-}
-
-.world-panel-close {
-  border: none;
-  background: transparent;
-  color: #e5e7eb;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
 /* inventory list */
 
 .world-inventory-empty {
@@ -1318,9 +1280,6 @@ body {
   }
 
 
-  .world-panel-shell {
-    padding-inline: 1.4rem;
-  }
 }
 
 @media (max-width: 720px) {
@@ -1370,9 +1329,6 @@ body {
   }
 
 
-  .world-panel-shell {
-    padding-inline: 1rem;
-  }
 
   .world-panel {
     max-width: 100%;
@@ -1499,85 +1455,6 @@ body {
   text-align: right;
 }
 
-
-/* ===== Panels (Inventory / Journal / Debug) ===== */
-
-.world-panels {
-  display: flex;
-  justify-content: flex-end;
-  margin: 0 2.5rem 4.8rem;
-}
-
-.world-panel {
-  max-width: 520px;
-  width: 100%;
-  padding: 1.2rem 1.4rem;
-  border-radius: 1.2rem 1.2rem 0 1.2rem;
-  background: linear-gradient(
-    135deg,
-    rgba(9, 15, 26, 0.96),
-    rgba(14, 27, 54, 0.94)
-  );
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(24px);
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.82rem;
-}
-
-.world-panel-title {
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  margin-bottom: 0.6rem;
-  opacity: 0.8;
-}
-
-.world-panel-empty,
-.world-panel-body {
-  opacity: 0.75;
-}
-
-/* Inventory list within panel */
-.inventory-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-}
-
-.inventory-item {
-  padding: 0.45rem 0.5rem;
-  border-radius: 0.8rem;
-  background: radial-gradient(
-    circle at 0% 0%,
-    rgba(255, 255, 255, 0.09),
-    transparent
-  );
-}
-
-.inventory-item-main {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-}
-
-/* subtle rarity tints */
-.inventory-item.rarity-common {
-  border-left: 2px solid rgba(255, 255, 255, 0.25);
-}
-
-.inventory-item.rarity-rare {
-  border-left: 2px solid rgba(156, 206, 255, 0.7);
-}
-
-.inventory-item.rarity-mythic {
-  border-left: 2px solid rgba(255, 215, 160, 0.95);
-}
 
 /* Journal entries */
 .journal-list {
@@ -4262,3 +4139,47 @@ html, body {
 }
 
 
+
+
+
+/* === Force HUD modals to behave like INVENTORY modal === */
+
+.world-panel-shell,
+.world-panels {
+  all: unset;
+  display: contents;
+}
+
+.world-panel {
+  position: fixed !important;
+  inset: 0 !important;
+  margin: auto !important;
+  width: min(920px, 90vw) !important;
+  height: auto !important;
+  max-height: 88vh !important;
+  padding: 1.4rem 1.6rem !important;
+
+  border-radius: 1.3rem !important;
+  background: radial-gradient(circle at 0% 0%, rgba(148, 197, 253, 0.15), transparent 55%), rgba(10, 16, 30, 0.98) !important;
+  border: 1px solid rgba(148, 163, 184, 0.6) !important;
+  box-shadow: 0 28px 70px rgba(0,0,0,0.92), 0 0 0 1px rgba(15,23,42,0.8) !important;
+  backdrop-filter: blur(20px) !important;
+  z-index: 999 !important;
+}
+
+.world-panel-close {
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+/* clicking outside closes modal */
+.world-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(10px);
+  z-index: 998;
+}

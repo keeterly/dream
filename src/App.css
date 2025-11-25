@@ -531,7 +531,6 @@ body {
 .world-card .world-lane {
   position: absolute;
   inset: 0;
-  pointer-events: none;
   z-index: 0; /* background only */
 }
 
@@ -4034,4 +4033,27 @@ body {
   border-radius: 4px;
   border: 1px solid rgba(248, 250, 252, 0.95);
   transform: rotate(45deg);
+}
+
+
+
+/* --- WORLD OVERLAY INTERACTION SAFETY NET --- */
+
+.world-overlay {
+  pointer-events: none; /* overlay itself ignores clicks */
+}
+
+/* anything that should be clickable on top of the world */
+.world-hud,
+.world-dock,
+.world-panels,
+.world-hud-bars,
+.world-inventory-toast {
+  pointer-events: auto;
+}
+
+/* make sure the actual buttons are clickable even if nested */
+.world-dock-btn,
+.world-dock button {
+  pointer-events: auto;
 }

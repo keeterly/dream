@@ -4317,11 +4317,11 @@ html, body {
   justify-content: center;
   background: radial-gradient(
       circle at 50% 0%,
-      rgba(15, 23, 42, 0.45),
-      rgba(2, 6, 23, 0.35)
+      rgba(15, 23, 42, 0.55),
+      rgba(2, 6, 23, 0.65)
     );
-  backdrop-filter: blur(12px);
-  z-index: 950; /* under inventory-modal-backdrop (999) but over world */
+  backdrop-filter: blur(14px);
+  z-index: 30; /* HUD sits above at 40 */
 }
 
 .world-panel-modal {
@@ -4330,8 +4330,31 @@ html, body {
   display: flex;
   align-items: stretch;
   justify-content: center;
+  position: relative;
+  z-index: 31;
 }
 
+
+/* close “X” in the top-right, similar to inventory modal */
+.world-panel-modal-close {
+  position: absolute;
+  top: 0.9rem;
+  right: 1.1rem;
+  border: none;
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* Make sure HUD + dock + bars sit above the blur */
+.world-hud,
+.world-hud-bars,
+.world-dock,
+.world-inventory-toast {
+  position: relative;
+  z-index: 40;
+}
 
 
 /* Fullscreen invisible overlay (HUD stays above) */

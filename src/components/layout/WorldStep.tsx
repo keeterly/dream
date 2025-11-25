@@ -248,22 +248,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     setActivePanel(null);
   };
 
-  // Helper to label the modal based on active panel
-  const getActivePanelTitle = (): string => {
-    switch (activePanel) {
-      case "character":
-        return "Dreamself";
-      case "map":
-        return "Map";
-      case "journal":
-        return "Journal";
-      case "debug":
-        return "Debug";
-      default:
-        return "";
-    }
-  };
-
   return (
     <section className="app-screen app-screen-world">
       <div className={cardClasses}>
@@ -320,7 +304,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
         {/* OVERLAY: HUD + DOCK + PANELS */}
         <div className="world-overlay">
-          {/* HUD */}
+          {/* HUD (top) */}
           <div className="world-hud">
             <div className="world-hud-left">
               <div className="world-hud-field">
@@ -416,7 +400,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             </div>
           </div>
 
-          {/* DOCK BUTTONS */}
+          {/* Dock (bottom-right) */}
           <div className="world-dock">
             <DockButton
               label="Inventory"
@@ -466,7 +450,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             </div>
           )}
 
-          {/* === MODAL PANELS (Dreamself / Map / Journal / Debug) ======= */}
+          {/* MODAL PANELS (Dreamself / Map / Journal / Debug) */}
           {activePanel && (
             <div
               className="world-panel-modal-backdrop"
@@ -476,20 +460,14 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 className="world-panel-modal"
                 onClick={(e) => e.stopPropagation()}
               >
+                {/* top-right X, to match Inventory modal behaviour */}
                 <button
                   type="button"
                   className="world-panel-modal-close"
-                  aria-label="Close panel"
                   onClick={handleCloseActivePanel}
                 >
                   ×
                 </button>
-                {/* Optional: title strip above the embedded panel */}
-                <div className="world-panel-modal-header">
-                  <span className="world-panel-modal-title">
-                    {getActivePanelTitle()}
-                  </span>
-                </div>
 
                 {activePanel === "character" && (
                   <DreamselfPanel profile={profile} inventory={inventory} />

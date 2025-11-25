@@ -93,6 +93,8 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     setActivePanel((current) => (current === panel ? null : panel));
   };
 
+  const closeActivePanel = () => setActivePanel(null);
+
   const dominantElement = profile?.traits?.dominantElement ?? null;
   const lighting = useBiomeLighting({
     phase,
@@ -238,30 +240,8 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     setInventoryUnreadCount(0);
   };
 
-  // When closing the modal, just flip the flag (counter already cleared)
   const handleCloseInventoryModal = () => {
     setIsInventoryModalOpen(false);
-  };
-
-  // Close any of the non-inventory modal panels
-  const handleCloseActivePanel = () => {
-    setActivePanel(null);
-  };
-
-  // Helper to label the modal based on active panel
-  const getActivePanelTitle = (): string => {
-    switch (activePanel) {
-      case "character":
-        return "Dreamself";
-      case "map":
-        return "Map";
-      case "journal":
-        return "Journal";
-      case "debug":
-        return "Debug";
-      default:
-        return "";
-    }
   };
 
   return (
@@ -320,7 +300,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
         {/* OVERLAY: HUD + DOCK + PANELS */}
         <div className="world-overlay">
-          {/* HUD */}
+          {/* HUD (top) */}
           <div className="world-hud">
             <div className="world-hud-left">
               <div className="world-hud-field">
@@ -466,11 +446,11 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             </div>
           )}
 
-          {/* === MODAL PANELS (Dreamself / Map / Journal / Debug) ======= */}
+          {/* MODAL PANELS (Dreamself / Map / Journal / Debug) */}
           {activePanel && (
             <div
               className="world-panel-modal-backdrop"
-              onClick={handleCloseActivePanel}
+              onClick={closeActivePanel}
             >
               <div
                 className="world-panel-modal"
@@ -479,17 +459,11 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 <button
                   type="button"
                   className="world-panel-modal-close"
+                  onClick={closeActivePanel}
                   aria-label="Close panel"
-                  onClick={handleCloseActivePanel}
                 >
                   ×
                 </button>
-                {/* Optional: title strip above the embedded panel */}
-                <div className="world-panel-modal-header">
-                  <span className="world-panel-modal-title">
-                    {getActivePanelTitle()}
-                  </span>
-                </div>
 
                 {activePanel === "character" && (
                   <DreamselfPanel profile={profile} inventory={inventory} />

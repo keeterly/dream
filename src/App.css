@@ -27,6 +27,7 @@ body {
 .app-root--world {
   padding-inline: 0;
   padding-bottom: 0;
+   padding: 0;
 }
 
 /* header */
@@ -4752,3 +4753,62 @@ body {
     width: 90px;
   }
 }
+
+
+/* === HP / MP / STAMINA strip (bottom-left, Nier-style) ========== */
+
+.world-status-bars {
+  position: absolute;
+  left: 5vw;
+  bottom: 1.9rem; /* match .world-dock bottom so they line up */
+  display: flex;
+  gap: 2.2rem;
+  align-items: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(226, 232, 240, 0.78);
+  pointer-events: none;
+}
+
+.world-status-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+
+.world-status-bar-label {
+  opacity: 0.8;
+}
+
+.world-status-bar-track {
+  position: relative;
+  width: 120px;
+  height: 3px;
+  background: rgba(15, 23, 42, 0.85);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.world-status-bar-fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+}
+
+/* HP = warm red */
+.world-status-bar-fill--hp {
+  background: linear-gradient(90deg, #fecaca, #fb7185, #b91c1c);
+}
+
+/* MP = cool blue */
+.world-status-bar-fill--mp {
+  background: linear-gradient(90deg, #bfdbfe, #60a5fa, #1d4ed8);
+}
+
+/* Stamina = soft yellow */
+.world-status-bar-fill--stamina {
+  background: linear-gradient(90deg, #fef9c3, #fde68a, #ca8a04);
+}
+
+/* Example: if you later want to animate value, you can scaleX() this element */

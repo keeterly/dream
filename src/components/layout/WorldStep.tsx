@@ -1,5 +1,5 @@
 // src/components/layout/WorldStep.tsx
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import type {
   DreamselfProfile,
   InventoryItem,
@@ -13,7 +13,7 @@ import { DreamselfPanel } from "../panels/DreamselfPanel";
 import { MapPanel } from "../panels/MapPanel";
 import { InventoryGridModal } from "../InventoryGridModal";
 
-type WorldPanelId = "inventory" | "character" | "map" | "journal" | "debug";
+type WorldPanelId = "character" | "map" | "journal" | "debug";
 
 interface WorldStepProps {
   profile: DreamselfProfile;
@@ -37,7 +37,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   activeEncounterItem,
   onResolveEncounter,
 }) => {
-  const [activePanel, setActivePanel] = useState<WorldPanelId | null>("inventory");
+  const [activePanel, setActivePanel] = useState<WorldPanelId | null>(null);
 
   // Timing constants (ms)
   const LOOT_TRAVEL_MS = 5500; // walk-in from offscreen
@@ -49,9 +49,8 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   const [inventoryToastItem, setInventoryToastItem] =
     useState<InventoryItem | null>(null);
 
-     // 🔔 Unseen inventory pickups since last time the inventory modal was opened
-  const [unseenInventoryCount, setUnseenInventoryCount] = useState(0);
-  const prevInventoryLengthRef = useRef(inventory.length);
+  // Number of relics picked up since the last time the inventory was opened
+  const [inventoryUnreadCount, setInventoryUnreadCount] = useState(0);
 
   // Auto-walk & auto-pickup toggles for HUD
   const [isAutoWalking, setIsAutoWalking] = useState(true);
@@ -61,30 +60,10 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   const [wasAutoWalkingBeforeEncounter, setWasAutoWalkingBeforeEncounter] =
     useState(false);
 
-
-  // Track how many new inventory items arrived while the inventory modal is closed.
-  useEffect(() => {
-    const prevLen = prevInventoryLengthRef.current;
-    const nextLen = inventory.length;
-
-    // Only count *new* items, and only if the modal isn't currently open
-    if (nextLen > prevLen && !isInventoryModalOpen) {
-      setUnseenInventoryCount((count) => count + (nextLen - prevLen));
-    }
-
-    prevInventoryLengthRef.current = nextLen;
-  }, [inventory.length, isInventoryModalOpen]);
-
-
-
-
   // --- Loot lifecycle state ---
   const hasLootSpawned = !!encounterItemName;
   const [hasReachedLoot, setHasReachedLoot] = useState(false);
   const [isLootCollected, setIsLootCollected] = useState(false);
-
-
-
 
   // New spawn → simulate walk-in time from off-screen to the avatar
   useEffect(() => {
@@ -110,10 +89,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
   const togglePanel = (panel: WorldPanelId) => {
     setActivePanel((current) => (current === panel ? null : panel));
-    // When opening a slide panel, make sure the inventory modal is closed.
-    if (panel !== "inventory") {
-      setIsInventoryModalOpen(false);
-    }
   };
 
   const dominantElement = profile?.traits?.dominantElement ?? null;
@@ -123,31 +98,32 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   });
 
   const DockButton: React.FC<{
-  label: string;
-  icon: string;
-  active?: boolean;
-  notification?: number;
-  onClick: () => void;
-}> = ({ label, icon, active = false, notification = 0, onClick }) => {
-  return (
-    <button
-      className={
-        "world-dock-btn" + (active ? " world-dock-btn--active" : "")
-      }
-      onClick={onClick}
-    >
-      <div className="world-dock-icon-wrap">
-        <span className={`world-dock-icon world-dock-icon--${icon}`} />
-        {notification > 0 && (
-          <span className="world-dock-notification">{notification}</span>
-        )}
-      </div>
-
-      <div className="world-dock-label">{label}</div>
-    </button>
-  );
-};
-
+    label: string;
+    icon: string;
+    active?: boolean;
+    notification?: number;
+    onClick: () => void;
+  }> = ({ label, icon, active = false, notification = 0, onClick }) => {
+    return (
+      <button
+        type="button"
+        className={
+          "world-dock-btn" + (active ? " world-dock-btn--active" : "")
+        }
+        onClick={onClick}
+      >
+        <div className="world-dock-icon-wrap">
+          <span className={`world-dock-icon world-dock-icon--${icon}`} />
+          {notification > 0 && (
+            <span className="world-dock-notification">
+              {notification > 99 ? "99+" : notification}
+            </span>
+          )}
+        </div>
+        <div className="world-dock-label">{label}</div>
+      </button>
+    );
+  };
 
   /**
    * If an encounter becomes active while auto-walk is enabled
@@ -197,6 +173,9 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
     // ✅ Parent actually adds the relic to inventory here
     onResolveEncounter();
+
+    // Increment unread counter for the inventory badge
+    setInventoryUnreadCount((prev) => prev + 1);
 
     // Toast: show "+1 Relic" immediately
     if (itemForToast) {
@@ -249,6 +228,17 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
   // Encounter UI (glyph + top banner) hides once we've clicked / auto-picked
   const showEncounterUI = isEncounterActive && !isLootCollected;
+
+  // Inventory dock click: open modal + clear notification
+  const handleInventoryDockClick = () => {
+    setIsInventoryModalOpen(true);
+    setInventoryUnreadCount(0);
+  };
+
+  // When closing the modal, just flip the flag (counter already cleared)
+  const handleCloseInventoryModal = () => {
+    setIsInventoryModalOpen(false);
+  };
 
   return (
     <section className="app-screen app-screen-world">
@@ -369,45 +359,38 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             </div>
           </div>
 
-                    {/* BOTTOM-LEFT HP / MP / STAMINA (Nier-style) */}
-          <div className="world-bottom-gauges">
-            <div className="world-bottom-gauges-row">
-              <div className="world-bottom-gauge">
-                <div className="world-bottom-gauge-label">HP</div>
-                <div className="world-bottom-gauge-track">
-                  <div className="world-bottom-gauge-fill world-bottom-gauge-fill--hp" />
-                </div>
-              </div>
+          {/* HP / MP / STAMINA BARS – bottom-left, aligned with dock */}
+          <div className="world-status-bars">
+            <div className="world-status-bar world-status-bar--hp">
+              <span className="world-status-bar-label">HP</span>
+              <span className="world-status-bar-track">
+                <span className="world-status-bar-fill world-status-bar-fill--hp" />
+              </span>
+            </div>
 
-              <div className="world-bottom-gauge">
-                <div className="world-bottom-gauge-label">MP</div>
-                <div className="world-bottom-gauge-track">
-                  <div className="world-bottom-gauge-fill world-bottom-gauge-fill--mp" />
-                </div>
-              </div>
+            <div className="world-status-bar world-status-bar--mp">
+              <span className="world-status-bar-label">MP</span>
+              <span className="world-status-bar-track">
+                <span className="world-status-bar-fill world-status-bar-fill--mp" />
+              </span>
+            </div>
 
-              <div className="world-bottom-gauge">
-                <div className="world-bottom-gauge-label">STAMINA</div>
-                <div className="world-bottom-gauge-track">
-                  <div className="world-bottom-gauge-fill world-bottom-gauge-fill--sta" />
-                </div>
-              </div>
+            <div className="world-status-bar world-status-bar--stamina">
+              <span className="world-status-bar-label">STAMINA</span>
+              <span className="world-status-bar-track">
+                <span className="world-status-bar-fill world-status-bar-fill--stamina" />
+              </span>
             </div>
           </div>
 
-
-                    {/* DOCK BUTTONS */}
+          {/* DOCK BUTTONS */}
           <div className="world-dock">
             <DockButton
               label="Inventory"
               icon="inventory"
               active={isInventoryModalOpen}
-              notification={unseenInventoryCount}
-              onClick={() => {
-                setIsInventoryModalOpen(true);
-                setActivePanel("inventory");
-                setUnseenInventoryCount(0); // ✅ opening clears the badge
-              }}
+              notification={inventoryUnreadCount}
+              onClick={handleInventoryDockClick}
             />
 
             <DockButton
@@ -428,7 +411,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
               label="Journal"
               icon="journal"
               active={activePanel === "journal"}
-              // you can make this smarter later; for now, 1+ entry = badge
               notification={journalEntries.length > 0 ? 1 : 0}
               onClick={() => togglePanel("journal")}
             />
@@ -440,7 +422,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
               onClick={() => togglePanel("debug")}
             />
           </div>
-
 
           {/* +1 RELIC TOAST NEAR INVENTORY DOCK */}
           {inventoryToastItem && (
@@ -497,7 +478,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
       <InventoryGridModal
         items={inventory}
         isOpen={isInventoryModalOpen}
-        onClose={() => setIsInventoryModalOpen(false)}
+        onClose={handleCloseInventoryModal}
       />
     </section>
   );

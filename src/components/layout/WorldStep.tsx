@@ -93,8 +93,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     setActivePanel((current) => (current === panel ? null : panel));
   };
 
-  const closeActivePanel = () => setActivePanel(null);
-
   const dominantElement = profile?.traits?.dominantElement ?? null;
   const lighting = useBiomeLighting({
     phase,
@@ -240,8 +238,14 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     setInventoryUnreadCount(0);
   };
 
+  // When closing the modal, just flip the flag (counter already cleared)
   const handleCloseInventoryModal = () => {
     setIsInventoryModalOpen(false);
+  };
+
+  // Close any of the non-inventory modal panels
+  const handleCloseActivePanel = () => {
+    setActivePanel(null);
   };
 
   return (
@@ -396,7 +400,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             </div>
           </div>
 
-          {/* DOCK BUTTONS */}
+          {/* Dock (bottom-right) */}
           <div className="world-dock">
             <DockButton
               label="Inventory"
@@ -450,17 +454,17 @@ export const WorldStep: React.FC<WorldStepProps> = ({
           {activePanel && (
             <div
               className="world-panel-modal-backdrop"
-              onClick={closeActivePanel}
+              onClick={handleCloseActivePanel}
             >
               <div
                 className="world-panel-modal"
                 onClick={(e) => e.stopPropagation()}
               >
+                {/* top-right X, to match Inventory modal behaviour */}
                 <button
                   type="button"
                   className="world-panel-modal-close"
-                  onClick={closeActivePanel}
-                  aria-label="Close panel"
+                  onClick={handleCloseActivePanel}
                 >
                   ×
                 </button>

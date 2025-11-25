@@ -4682,3 +4682,31 @@ body {
     width: 110px;
   }
 }
+
+
+/* === HUD dock icon tweaks === */
+
+/* Bigger hit area, no outer circle */
+.world-dock-icon-wrap {
+  width: 48px;   /* was ~24px */
+  height: 48px;
+  border: none;              /* kill any outline */
+  background: transparent;   /* no circular bg */
+  padding: 0;
+}
+
+/* Make the glyph itself bigger */
+.world-dock-icon {
+  width: 28px;   /* was ~14–16px */
+  height: 28px;
+  border: none;          /* remove circular border if it lived here */
+  border-radius: 0;
+}
+
+
+/* Hide the stray horizontal bar */
+.world-lane-line,
+.world-ground-line,
+.world-lane-debug {
+  display: none !important;
+}

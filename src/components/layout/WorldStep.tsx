@@ -446,65 +446,65 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             </div>
           )}
 
-          {/* MODAL PANELS (Dreamself / Map / Journal / Debug) */}
-          {activePanel && (
-            <div
-              className="world-panel-modal-backdrop"
-              onClick={closeActivePanel}
-            >
-              <div
-                className="world-panel-modal"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  type="button"
-                  className="world-panel-modal-close"
-                  onClick={closeActivePanel}
-                  aria-label="Close panel"
-                >
-                  ×
-                </button>
+          {/* === MODAL PANELS (Dreamself / Map / Journal / Debug) ======= */}
+{activePanel && (
+  <div
+    className="world-panel-modal-backdrop"
+    onClick={handleCloseActivePanel}
+  >
+    <div
+      className="world-panel-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* top-right X like inventory */}
+      <button
+        type="button"
+        className="world-panel-modal-close"
+        onClick={handleCloseActivePanel}
+        aria-label="Close panel"
+      >
+        ×
+      </button>
 
-                {activePanel === "character" && (
-                  <DreamselfPanel profile={profile} inventory={inventory} />
-                )}
+      {activePanel === "character" && (
+        <DreamselfPanel profile={profile} inventory={inventory} />
+      )}
 
-                {activePanel === "map" && (
-                  <MapPanel currentBiomeId="dusk_valley" phase={phase} />
-                )}
+      {activePanel === "map" && (
+        <MapPanel currentBiomeId="dusk_valley" phase={phase} />
+      )}
 
-                {activePanel === "journal" && (
-                  <JournalPanel entries={journalEntries} />
-                )}
+      {activePanel === "journal" && (
+        <JournalPanel entries={journalEntries} />
+      )}
 
-                {activePanel === "debug" && (
-                  <div className="world-panel world-panel-debug">
-                    <div className="world-panel-header">
-                      <span className="world-panel-kicker">Debug</span>
-                      <span className="world-panel-title">Relic Testing</span>
-                    </div>
-                    <p className="world-panel-copy">
-                      Spawn a random relic event for testing drops and journal
-                      entries.
-                    </p>
+      {activePanel === "debug" && (
+        <div className="world-panel world-panel-debug">
+          <div className="world-panel-header">
+            <span className="world-panel-kicker">Debug</span>
+            <span className="world-panel-title">Relic Testing</span>
+          </div>
+          <p className="world-panel-copy">
+            Spawn a random relic event for testing drops and journal
+            entries.
+          </p>
 
-                    <button
-                      type="button"
-                      className="world-debug-pill"
-                      onClick={onSpawnDebugItem}
-                    >
-                      <span className="world-debug-pill__orb" />
-                      <span className="world-debug-pill__label">
-                        Spawn Random Relic
-                      </span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+          <button
+            type="button"
+            className="world-debug-pill"
+            onClick={onSpawnDebugItem}
+          >
+            <span className="world-debug-pill__orb" />
+            <span className="world-debug-pill__label">
+              Spawn Random Relic
+            </span>
+          </button>
         </div>
-      </div>
+      )}
+    </div>
+  </div>
+)}
+
 
       {/* INVENTORY GRID MODAL */}
       <InventoryGridModal

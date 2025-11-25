@@ -37,8 +37,9 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   activeEncounterItem,
   onResolveEncounter,
 }) => {
-  // ⬇️ no panel open by default; inventory is handled by the modal
-  const [activePanel, setActivePanel] = useState<WorldPanelId | null>(null);
+  const [activePanel, setActivePanel] = useState<WorldPanelId | null>(
+    "inventory"
+  );
 
   // Timing constants (ms)
   const LOOT_TRAVEL_MS = 5500; // walk-in from offscreen
@@ -86,8 +87,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   const isWalking = isAutoWalking && !(!isAutoPickup && isEncounterActive);
 
   const togglePanel = (panel: WorldPanelId) => {
-    // whenever we open a side panel, close the inventory modal
-    setIsInventoryModalOpen(false);
     setActivePanel((current) => (current === panel ? null : panel));
   };
 
@@ -97,6 +96,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     element: dominantElement,
   });
 
+  // Dock button component (icon + label + optional badge)
   const DockButton: React.FC<{
     label: string;
     icon: string;
@@ -110,6 +110,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
           "world-dock-btn" + (active ? " world-dock-btn--active" : "")
         }
         onClick={onClick}
+        type="button"
       >
         <div className="world-dock-icon-wrap">
           <span className={`world-dock-icon world-dock-icon--${icon}`} />
@@ -117,7 +118,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             <span className="world-dock-notification">{notification}</span>
           )}
         </div>
-
         <div className="world-dock-label">{label}</div>
       </button>
     );
@@ -224,12 +224,10 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   // Encounter UI (glyph + top banner) hides once we've clicked / auto-picked
   const showEncounterUI = isEncounterActive && !isLootCollected;
 
-  // Inventory dock click handler – controls the modal
-  const handleInventoryClick = () => {
-    setIsInventoryModalOpen((open) => !open);
-    // ensure no side panel is “active” when inventory modal is used
-    setActivePanel(null);
-  };
+  // Simple placeholder ratios for HP / MP / Stamina bars
+  const HP_RATIO = 0.86;
+  const MP_RATIO = 0.64;
+  const STAMINA_RATIO = 0.72;
 
   return (
     <section className="app-screen app-screen-world">
@@ -350,16 +348,16 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             </div>
           </div>
 
-          {/* DOCK BUTTONS */}
+          {/* DOCK BUTTONS (bottom-right) */}
           <div className="world-dock">
             <DockButton
               label="Inventory"
               icon="inventory"
-              active={isInventoryModalOpen}
+              active={activePanel === "inventory"}
               notification={
                 inventory.length > 0 && !isInventoryModalOpen ? 1 : 0
               }
-              onClick={handleInventoryClick}
+              onClick={() => togglePanel("inventory")}
             />
 
             <DockButton
@@ -390,6 +388,39 @@ export const WorldStep: React.FC<WorldStepProps> = ({
               active={activePanel === "debug"}
               onClick={() => togglePanel("debug")}
             />
+          </div>
+
+          {/* HP / MP / STAMINA BARS (bottom-left, Nier-style minimal) */}
+          <div className="world-hud-bars">
+            <div className="world-hud-bar world-hud-bar--hp">
+              <span className="world-hud-bar-label">HP</span>
+              <div className="world-hud-bar-track">
+                <div
+                  className="world-hud-bar-fill"
+                  style={{ width: `${HP_RATIO * 100}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="world-hud-bar world-hud-bar--mp">
+              <span className="world-hud-bar-label">MP</span>
+              <div className="world-hud-bar-track">
+                <div
+                  className="world-hud-bar-fill"
+                  style={{ width: `${MP_RATIO * 100}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="world-hud-bar world-hud-bar--stamina">
+              <span className="world-hud-bar-label">STAMINA</span>
+              <div className="world-hud-bar-track">
+                <div
+                  className="world-hud-bar-fill"
+                  style={{ width: `${STAMINA_RATIO * 100}%` }}
+                />
+              </div>
+            </div>
           </div>
 
           {/* +1 RELIC TOAST NEAR INVENTORY DOCK */}

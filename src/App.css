@@ -4903,3 +4903,141 @@ body {
 .world-dock-btn.world-dock-btn--active .world-dock-label {
   color: #e0f2fe;
 }
+
+
+/* FINAL OVERRIDE — remove world ribbon / stray horizontal bars */
+.world-lane-ribbon,
+.world-lane-line,
+.world-ground-line,
+.world-lane-inner::before,
+.world-lane-inner::after {
+  display: none !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+
+/* === CLEAN DOCK ICON RESET ================================= */
+
+.world-dock-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+
+  cursor: pointer;
+  color: #e5e7eb;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.world-dock-label {
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.world-dock-icon-wrap {
+  width: 48px;     /* double size */
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none !important;
+  border: none !important;
+}
+
+.world-dock-icon {
+  width: 28px;     /* double-size glyph */
+  height: 28px;
+  position: relative;
+  border: none !important;
+}
+
+/* Remove ANY previous ::before/::after circles */
+.world-dock-icon::before,
+.world-dock-icon::after {
+  border-radius: 0 !important;
+  background: none !important;
+}
+
+/* === GLYPHS ======================================== */
+
+/* Inventory */
+.world-dock-icon--inventory::before,
+.world-dock-icon--inventory::after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 3px;
+}
+.world-dock-icon--inventory::before {
+  inset: 12% 16% auto 16%;
+}
+.world-dock-icon--inventory::after {
+  inset: 32% 18% 16% 18%;
+}
+
+/* Dreamself */
+.world-dock-icon--dreamself::before,
+.world-dock-icon--dreamself::after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+.world-dock-icon--dreamself::before {
+  width: 32%;
+  height: 32%;
+  border-radius: 50%;
+  left: 50%;
+  top: 6%;
+  transform: translateX(-50%);
+}
+.world-dock-icon--dreamself::after {
+  left: 20%;
+  right: 20%;
+  top: 38%;
+  bottom: 10%;
+  border-radius: 4px;
+}
+
+/* Map */
+.world-dock-icon--map::before {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 4px;
+}
+
+/* Journal */
+.world-dock-icon--journal::before,
+.world-dock-icon--journal::after {
+  content: "";
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  border-top: 1px solid rgba(226, 232, 240, 0.9);
+}
+.world-dock-icon--journal::before { top: 32%; }
+.world-dock-icon--journal::after { top: 60%; }
+
+/* Debug */
+.world-dock-icon--debug::before {
+  content: "";
+  position: absolute;
+  inset: 22%;
+  border: 1px solid rgba(248, 250, 252, 0.9);
+  transform: rotate(45deg);
+}
+
+
+.world-hud-bars {
+  bottom: 2.4rem;
+  left: 5vw;
+}

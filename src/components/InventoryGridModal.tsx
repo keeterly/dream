@@ -13,7 +13,10 @@ interface InventoryGridModalProps {
   items: InventoryItem[];
   isOpen: boolean;
   onClose: () => void;
+  /** When true, render inside an existing panel shell (WorldStep) */
+  embedded?: boolean;
 }
+
 
 // Simple rarity weight for sorting
 const rarityOrder: Record<string, number> = {
@@ -27,7 +30,9 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
   items,
   isOpen,
   onClose,
+  embedded = false,
 }) => {
+
   const baseUrl = import.meta.env.BASE_URL || "/";
 
   const [sortMode, setSortMode] = useState<SortMode>("newest");
@@ -163,143 +168,151 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
     setSortMode(mode);
   };
 
-  if (!isOpen) return null;
+    if (!isOpen) return null;
 
+  const content = (
+    <>
+      {/* Header */}
+      <div className="inventory-modal-header">
+        <div className="inventory-modal-title-block">
+          <div className="inventory-modal-title">Inventory</div>
+        </div>
+
+        <div className="inventory-modal-header-right">
+          <div className="inventory-sort-row">
+            <span className="inventory-sort-label">Sort</span>
+
+            <button
+              className={
+                "inventory-sort-pill" +
+                (sortMode === "newest" ? " inventory-sort-pill--active" : "")
+              }
+              onClick={() => handleSortClick("newest")}
+            >
+              Newest
+            </button>
+
+            <button
+              className={
+                "inventory-sort-pill" +
+                (sortMode === "oldest" ? " inventory-sort-pill--active" : "")
+              }
+              onClick={() => handleSortClick("oldest")}
+            >
+              Oldest
+            </button>
+
+            <button
+              className={
+                "inventory-sort-pill" +
+                (sortMode === "rarity" ? " inventory-sort-pill--active" : "")
+              }
+              onClick={() => handleSortClick("rarity")}
+            >
+              Rarity
+            </button>
+
+            <button
+              className={
+                "inventory-sort-pill" +
+                (sortMode === "name" ? " inventory-sort-pill--active" : "")
+              }
+              onClick={() => handleSortClick("name")}
+            >
+              Name
+            </button>
+          </div>
+        </div>
+
+        {/* shared close button, positioned top-right */}
+        <button
+          type="button"
+          className="inventory-close-btn"
+          onClick={onClose}
+          aria-label="Close inventory"
+        >
+          ×
+        </button>
+      </div>
+
+      {/* Grid */}
+      <div className="inventory-grid-shell">
+        <div className="inventory-grid inventory-grid--dotted">
+          {grid.map((item, index) => {
+            const isDragging = dragIndex === index && !!item;
+
+            let iconSrc: string | null = null;
+            if (item) {
+              const spriteFile = getSpriteForItemName(item.name);
+              iconSrc = `${baseUrl}items/foundItems/${spriteFile}`;
+            }
+
+            return (
+              <div
+                key={index}
+                className="inventory-grid-cell"
+                onDragOver={handleDragOver}
+                onDrop={() => handleDrop(index)}
+              >
+                {item && iconSrc && (
+                  <div
+                    className={
+                      "inventory-grid-item-icon-only" +
+                      (isDragging
+                        ? " inventory-grid-item-icon-only--dragging"
+                        : "")
+                    }
+                    draggable
+                    onDragStart={() => handleDragStart(index)}
+                    onMouseEnter={() => setHoveredItemId(item.id)}
+                    onMouseLeave={() => setHoveredItemId(null)}
+                  >
+                    <img
+                      src={iconSrc}
+                      alt={item.name}
+                      className="inventory-grid-icon-img"
+                    />
+
+                    {hoveredItemId === item.id && (
+                      <div className="inventory-tooltip">
+                        <div className="inventory-tooltip-name">
+                          <span>{item.name}</span>
+                          <span
+                            className={
+                              "inventory-tooltip-rarity rarity-" + item.rarity
+                            }
+                          >
+                            {item.rarity}
+                          </span>
+                        </div>
+                        <div className="inventory-tooltip-body">
+                          {item.description}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+
+  // Embedded: inside WorldStep's world-panel-modal shell
+  if (embedded) {
+    return <div className="world-panel world-panel-inventory">{content}</div>;
+  }
+
+  // Standalone modal (currently not used, but kept for flexibility)
   return (
-    <div
-      className="inventory-modal-backdrop"
-      onClick={onClose} // click outside closes
-    >
+    <div className="inventory-modal-backdrop" onClick={onClose}>
       <div
         className="inventory-modal inventory-modal--minimal"
-        onClick={(e) => e.stopPropagation()} // but not when clicking inside
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="inventory-modal-header">
-          <div className="inventory-modal-title-block">
-            <div className="inventory-modal-title">Inventory</div>
-          </div>
-
-          <div className="inventory-modal-header-right">
-            <div className="inventory-sort-row">
-              <span className="inventory-sort-label">Sort</span>
-
-              <button
-                className={
-                  "inventory-sort-pill" +
-                  (sortMode === "newest" ? " inventory-sort-pill--active" : "")
-                }
-                onClick={() => handleSortClick("newest")}
-              >
-                Newest
-              </button>
-
-              <button
-                className={
-                  "inventory-sort-pill" +
-                  (sortMode === "oldest" ? " inventory-sort-pill--active" : "")
-                }
-                onClick={() => handleSortClick("oldest")}
-              >
-                Oldest
-              </button>
-
-              <button
-                className={
-                  "inventory-sort-pill" +
-                  (sortMode === "rarity" ? " inventory-sort-pill--active" : "")
-                }
-                onClick={() => handleSortClick("rarity")}
-              >
-                Rarity
-              </button>
-
-              <button
-                className={
-                  "inventory-sort-pill" +
-                  (sortMode === "name" ? " inventory-sort-pill--active" : "")
-                }
-                onClick={() => handleSortClick("name")}
-              >
-                Name
-              </button>
-            </div>
-          </div>
-
-          {/* shared close button, positioned top-right */}
-          <button
-            type="button"
-            className="inventory-close-btn"
-            onClick={onClose}
-            aria-label="Close inventory"
-          >
-            ×
-          </button>
-        </div>
-
-        {/* Grid */}
-        <div className="inventory-grid-shell">
-          <div className="inventory-grid inventory-grid--dotted">
-            {grid.map((item, index) => {
-              const isDragging = dragIndex === index && !!item;
-
-              let iconSrc: string | null = null;
-              if (item) {
-                const spriteFile = getSpriteForItemName(item.name);
-                iconSrc = `${baseUrl}items/foundItems/${spriteFile}`;
-              }
-
-              return (
-                <div
-                  key={index}
-                  className="inventory-grid-cell"
-                  onDragOver={handleDragOver}
-                  onDrop={() => handleDrop(index)}
-                >
-                  {item && iconSrc && (
-                    <div
-                      className={
-                        "inventory-grid-item-icon-only" +
-                        (isDragging
-                          ? " inventory-grid-item-icon-only--dragging"
-                          : "")
-                      }
-                      draggable
-                      onDragStart={() => handleDragStart(index)}
-                      onMouseEnter={() => setHoveredItemId(item.id)}
-                      onMouseLeave={() => setHoveredItemId(null)}
-                    >
-                      <img
-                        src={iconSrc}
-                        alt={item.name}
-                        className="inventory-grid-icon-img"
-                      />
-
-                      {hoveredItemId === item.id && (
-                        <div className="inventory-tooltip">
-                          <div className="inventory-tooltip-name">
-                            <span>{item.name}</span>
-                            <span
-                              className={
-                                "inventory-tooltip-rarity rarity-" +
-                                item.rarity
-                              }
-                            >
-                              {item.rarity}
-                            </span>
-                          </div>
-                          <div className="inventory-tooltip-body">
-                            {item.description}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        {content}
       </div>
     </div>
   );

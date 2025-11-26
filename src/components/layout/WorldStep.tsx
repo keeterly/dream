@@ -13,7 +13,8 @@ import { DreamselfPanel } from "../panels/DreamselfPanel";
 import { MapPanel } from "../panels/MapPanel";
 import { InventoryGridModal } from "../InventoryGridModal";
 
-type WorldPanelId = "character" | "map" | "journal" | "debug";
+type WorldPanelId = "inventory" | "character" | "map" | "journal" | "debug";
+
 
 interface WorldStepProps {
   profile: DreamselfProfile;
@@ -45,12 +46,12 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   const AUTO_PICKUP_DELAY_MS = 250; // delay before auto pickup (Relic Found visible)
   const INVENTORY_TOAST_MS = 1600; // "+1 Relic" toast lifetime
 
-  const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
-  const [inventoryToastItem, setInventoryToastItem] =
+   const [inventoryToastItem, setInventoryToastItem] =
     useState<InventoryItem | null>(null);
 
   // Number of relics picked up since the last time the inventory was opened
   const [inventoryUnreadCount, setInventoryUnreadCount] = useState(0);
+
 
   // Auto-walk & auto-pickup toggles for HUD
   const [isAutoWalking, setIsAutoWalking] = useState(true);
@@ -234,15 +235,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   // Encounter UI (glyph + top banner) hides once we've clicked / auto-picked
   const showEncounterUI = isEncounterActive && !isLootCollected;
 
-  // Inventory dock click: open modal + clear notification
-  const handleInventoryDockClick = () => {
-    setIsInventoryModalOpen(true);
-    setInventoryUnreadCount(0);
-  };
-
-  const handleCloseInventoryModal = () => {
-    setIsInventoryModalOpen(false);
-  };
+ 
 
   return (
     <section className="app-screen app-screen-world">
@@ -398,13 +391,20 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
           {/* DOCK BUTTONS */}
           <div className="world-dock">
-            <DockButton
-              label="Inventory"
-              icon="inventory"
-              active={isInventoryModalOpen}
-              notification={inventoryUnreadCount}
-              onClick={handleInventoryDockClick}
-            />
+                      <DockButton
+            label="Inventory"
+            icon="inventory"
+            active={activePanel === "inventory"}
+            notification={inventoryUnreadCount}
+            onClick={() => {
+              setActivePanel((current) =>
+                current === "inventory" ? null : "inventory"
+              );
+              // Opening inventory clears the unread badge
+              setInventoryUnreadCount(0);
+            }}
+          />
+
 
             <DockButton
               label="Dreamself"
@@ -466,6 +466,17 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                   ×
                 </button>
 
+
+                {activePanel === "inventory" && (
+                  <InventoryGridModal
+                    items={inventory}
+                    isOpen={true}
+                    onClose={closeActivePanel}
+                    embedded
+                  />
+                )}
+
+
                {activePanel === "character" && (
                 <DreamselfPanel
                   profile={profile}
@@ -512,12 +523,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
         </div>
       </div>
 
-      {/* INVENTORY GRID MODAL */}
-      <InventoryGridModal
-        items={inventory}
-        isOpen={isInventoryModalOpen}
-        onClose={handleCloseInventoryModal}
-      />
     </section>
   );
 };

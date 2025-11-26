@@ -466,9 +466,14 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                   ×
                 </button>
 
-                {activePanel === "character" && (
-                  <DreamselfPanel profile={profile} inventory={inventory} />
-                )}
+               {activePanel === "character" && (
+                <DreamselfPanel
+                  profile={profile}
+                  inventory={inventory}
+                  onClose={closeActivePanel}
+                />
+              )}
+
 
                 {activePanel === "map" && (
                   <MapPanel currentBiomeId="dusk_valley" phase={phase} />

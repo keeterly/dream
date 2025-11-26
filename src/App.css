@@ -4633,3 +4633,64 @@ html, body {
 .inventory-modal-close:hover {
   color: #e5e7eb;
 }
+
+
+
+/* === World panel modal headers (Dreamself / Map / Journal / Debug) ====== */
+
+.world-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.8rem 2.1rem 2rem;
+}
+
+/* Inner frame matching Inventory’s inset look */
+.world-panel-frame {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+}
+
+/* Header layout 1:1 with Inventory */
+.world-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.4rem;
+}
+
+.world-panel-kicker {
+  font-size: 0.78rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 0.2rem;
+}
+
+.world-panel-title {
+  font-size: 0.98rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #e5e7eb;
+}
+
+/* Optional subtitle line under title (currently only Journal uses copy) */
+.world-panel-subtitle {
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+/* Body copy spacing under header */
+.world-panel-copy {
+  margin: 0.6rem 0 1.2rem;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: #cbd5f5;
+}
+
+/* Debug panel’s single button gets a bit of breathing room from copy */
+.world-panel-debug .world-debug-pill {
+  margin-top: 0.4rem;
+}

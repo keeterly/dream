@@ -2,101 +2,134 @@ import React from "react";
 import type { DreamselfProfile, InventoryItem } from "../../types";
 import { AvatarView } from "../AvatarView";
 
-interface DreamselfPanelProps {
+export interface DreamselfPanelProps {
   profile: DreamselfProfile;
   inventory: InventoryItem[];
+  onClose?: () => void;
 }
 
-/**
- * RPG-style character sheet:
- * - Big avatar on the left
- * - Equipment slots on the right (visual skeleton for now)
- */
 export const DreamselfPanel: React.FC<DreamselfPanelProps> = ({
   profile,
   inventory,
+  onClose,
 }) => {
-  const traits = profile.traits;
+  const carriedRelics = inventory.filter(
+    (item) => item.type === "relic" || item.slot === "relic"
+  );
 
   return (
     <div className="world-panel world-panel-dreamself">
-      <div className="dreamself-layout">
-        <div className="dreamself-avatar-column">
-          <div className="dreamself-avatar-card">
-            <AvatarView
-              avatar={profile.avatar}
-              traits={profile.traits}
-              dreamName={profile.dreamName}
-            />
+      {/* Unified header frame (matches Inventory) */}
+      <div className="world-panel-header">
+        <div>
+          <div className="world-panel-kicker">Dreamself</div>
+          <div className="world-panel-title">
+            {profile.dreamName || "Dreamself"}
           </div>
-          <div className="dreamself-tags">
-            <span className="dreamself-tag">
-              {traits.primaryArchetype.toUpperCase()}
-            </span>
-            {traits.dominantElement && (
-              <span className="dreamself-tag">
-                {traits.dominantElement.toUpperCase()}
-              </span>
-            )}
-          </div>
-          <p className="dreamself-temperament">
-            Temperament:{" "}
-            {traits.temperamentTags && traits.temperamentTags.join(" · ")}
-          </p>
         </div>
+        {onClose && (
+          <button
+            type="button"
+            className="world-panel-modal-close"
+            onClick={onClose}
+            aria-label="Close dreamself panel"
+          >
+            ×
+          </button>
+        )}
+      </div>
 
-        <div className="dreamself-equip-column">
-          <h3 className="world-panel-title">Equipment</h3>
-          <div className="dreamself-slot-grid">
-            <div className="dreamself-slot">
-              <div className="dreamself-slot-label">Mask</div>
-              <div className="dreamself-slot-body dreamself-slot-body--empty">
-                —
-              </div>
+      {/* Body */}
+      <div className="world-panel-body">
+        <div className="dreamself-layout">
+          {/* Avatar column */}
+          <div className="dreamself-avatar-column">
+            <div className="dreamself-avatar-card">
+              <AvatarView
+                avatar={profile.avatar}
+                traits={profile.traits}
+                dreamName={profile.dreamName}
+              />
             </div>
-            <div className="dreamself-slot">
-              <div className="dreamself-slot-label">Cloak</div>
-              <div className="dreamself-slot-body dreamself-slot-body--empty">
-                —
-              </div>
+
+            <div className="dreamself-archetype-toggle">
+              <button
+                type="button"
+                className="dreamself-archetype-pill dreamself-archetype-pill--active"
+              >
+                Seer
+              </button>
+              <button
+                type="button"
+                className="dreamself-archetype-pill"
+                disabled
+              >
+                Shadow
+              </button>
             </div>
-            <div className="dreamself-slot">
-              <div className="dreamself-slot-label">Relic</div>
-              <div className="dreamself-slot-body dreamself-slot-body--empty">
-                —
-              </div>
-            </div>
-            <div className="dreamself-slot">
-              <div className="dreamself-slot-label">Accessory</div>
-              <div className="dreamself-slot-body dreamself-slot-body--empty">
-                —
+
+            <div className="dreamself-temperament">
+              <div className="dreamself-temperament-label">Temperament</div>
+              <div className="dreamself-temperament-tags">
+                {profile.traits.temperament.join(" · ")}
               </div>
             </div>
           </div>
 
-          <div className="dreamself-inventory-preview">
-            <h4 className="dreamself-inventory-title">Carried Relics</h4>
-            {inventory.length === 0 ? (
-              <p className="dreamself-inventory-empty">
-                No relics yet. The world is still learning your outline.
-              </p>
-            ) : (
-              <ul className="dreamself-inventory-list">
-                {inventory.map((item) => (
-                  <li
-                    key={item.id + item.acquiredAt}
-                    className={`dreamself-inventory-item rarity-${item.rarity}`}
-                  >
-                    <span className="dreamself-inventory-name">
-                      {item.name}
-                    </span>
-                    <span className="dreamself-inventory-rarity">
-                      {item.rarity}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
+          {/* Equipment + carried relics */}
+          <div className="dreamself-equip-column">
+            <div className="dreamself-equip-grid">
+              <div className="dreamself-equip-header">Equipment</div>
+
+              <div className="dreamself-equip-row">
+                <div className="dreamself-equip-slot">
+                  <div className="dreamself-equip-slot-label">Mask</div>
+                  <div className="dreamself-equip-slot-field">—</div>
+                </div>
+
+                <div className="dreamself-equip-slot">
+                  <div className="dreamself-equip-slot-label">Cloak</div>
+                  <div className="dreamself-equip-slot-field">—</div>
+                </div>
+              </div>
+
+              <div className="dreamself-equip-row">
+                <div className="dreamself-equip-slot">
+                  <div className="dreamself-equip-slot-label">Relic</div>
+                  <div className="dreamself-equip-slot-field">—</div>
+                </div>
+
+                <div className="dreamself-equip-slot">
+                  <div className="dreamself-equip-slot-label">Accessory</div>
+                  <div className="dreamself-equip-slot-field">—</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="dreamself-carried">
+              <div className="dreamself-carried-header">Carried Relics</div>
+              {carriedRelics.length === 0 ? (
+                <div className="dreamself-carried-empty">
+                  You are not carrying any relics yet.
+                </div>
+              ) : (
+                <ul className="dreamself-carried-list">
+                  {carriedRelics.map((item) => (
+                    <li
+                      key={item.id}
+                      className={`dreamself-carried-row dreamself-carried-row--${item.rarity}`}
+                    >
+                      <span className="dreamself-carried-name">
+                        {item.name}
+                      </span>
+                      <span className="dreamself-carried-rarity">
+                        {item.rarity}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -4595,3 +4595,41 @@ html, body {
   color: #cbd5f5;
   max-width: 36rem;
 }
+
+
+
+/* Shared modal chrome: square corners on all popups */
+.inventory-modal,
+.world-panel-modal {
+  position: relative;
+  border-radius: 0;              /* no rounded corners */
+}
+
+/* If the inner world panels themselves also had rounding, flatten them too */
+.world-panel {
+  border-radius: 0;
+}
+
+
+/* Shared modal close button: simple "×" text, no circle */
+.inventory-close-btn,
+.inventory-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;       /* make sure there's no circular border */
+  background: none;
+  color: #9ca3af;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;             /* above header content, but tiny hitbox */
+}
+
+.inventory-close-btn:hover,
+.inventory-modal-close:hover {
+  color: #e5e7eb;
+}

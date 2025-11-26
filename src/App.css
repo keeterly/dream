@@ -4551,3 +4551,47 @@ html, body {
   transform: translateY(0);
   opacity: 0.9;
 }
+
+
+/* === Inner panel layout inside the modal card =================== */
+
+.world-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+/* Full-width variant, used by Dreamself */
+.world-panel--full {
+  width: 100%;
+}
+
+.world-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.world-panel-kicker {
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 0.25rem;
+}
+
+.world-panel-title {
+  font-size: 0.96rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #e5e7eb;
+}
+
+.world-panel-subtitle {
+  margin: 0;
+  font-size: 0.86rem;
+  color: #cbd5f5;
+  max-width: 36rem;
+}

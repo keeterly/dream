@@ -447,68 +447,76 @@ export const WorldStep: React.FC<WorldStepProps> = ({
           )}
 
           {/* MODAL PANELS (Dreamself / Map / Journal / Debug) */}
-          {activePanel && (
-            <div
-              className="world-panel-modal-backdrop"
-              onClick={closeActivePanel}
-            >
-              <div
-                className="world-panel-modal"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {/* shared close button, styled like Inventory modal */}
-                <button
-                  type="button"
-                  className="inventory-modal-close"
-                  onClick={closeActivePanel}
-                  aria-label="Close panel"
-                >
-                  ×
-                </button>
+         {activePanel && (
+  <div
+    className="world-panel-modal-backdrop"
+    onClick={closeActivePanel}
+  >
+    <div
+      className="world-panel-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {activePanel === "character" && (
+        <DreamselfPanel
+          profile={profile}
+          inventory={inventory}
+          onClose={closeActivePanel}
+        />
+      )}
 
-               {activePanel === "character" && (
-                <DreamselfPanel
-                  profile={profile}
-                  inventory={inventory}
-                  onClose={closeActivePanel}
-                />
-              )}
+      {activePanel === "map" && (
+        <MapPanel
+          currentBiomeId="dusk_valley"
+          phase={phase}
+          onClose={closeActivePanel}
+        />
+      )}
 
+      {activePanel === "journal" && (
+        <JournalPanel
+          entries={journalEntries}
+          onClose={closeActivePanel}
+        />
+      )}
 
-                {activePanel === "map" && (
-                  <MapPanel currentBiomeId="dusk_valley" phase={phase} />
-                )}
-
-                {activePanel === "journal" && (
-                  <JournalPanel entries={journalEntries} />
-                )}
-
-                {activePanel === "debug" && (
-                  <div className="world-panel world-panel-debug">
-                    <div className="world-panel-header">
-                      <div className="world-panel-kicker">Debug</div>
-                      <div className="world-panel-title">Relic Testing</div>
-                    </div>
-                    <p className="world-panel-copy">
-                      Spawn a random relic event for testing drops and journal
-                      entries.
-                    </p>
-
-                    <button
-                      type="button"
-                      className="world-debug-pill"
-                      onClick={onSpawnDebugItem}
-                    >
-                      <span className="world-debug-pill__orb" />
-                      <span className="world-debug-pill__label">
-                        Spawn Random Relic
-                      </span>
-                    </button>
-                  </div>
-                )}
-              </div>
+      {activePanel === "debug" && (
+        <div className="world-panel world-panel-debug">
+          <div className="world-panel-header">
+            <div>
+              <div className="world-panel-kicker">Debug</div>
+              <div className="world-panel-title">Relic Testing</div>
             </div>
-          )}
+
+            <button
+              type="button"
+              className="world-panel-modal-close"
+              onClick={closeActivePanel}
+              aria-label="Close panel"
+            >
+              ×
+            </button>
+          </div>
+
+          <p className="world-panel-copy">
+            Spawn a random relic event for testing drops and journal entries.
+          </p>
+
+          <button
+            type="button"
+            className="world-debug-pill"
+            onClick={onSpawnDebugItem}
+          >
+            <span className="world-debug-pill__orb" />
+            <span className="world-debug-pill__label">
+              Spawn Random Relic
+            </span>
+          </button>
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
         </div>
       </div>
 

@@ -6,11 +6,11 @@ interface MapPanelProps {
   onClose?: () => void;
 }
 
-const biomes: { id: string; label: string }[] = [
+const BIOMES = [
   { id: "dusk_valley", label: "Dusk Valley Ruins" },
-  { id: "biome_2", label: "???" },
-  { id: "biome_3", label: "???" },
-  { id: "biome_4", label: "???" },
+  { id: "node_2", label: "???" },
+  { id: "node_3", label: "???" },
+  { id: "node_4", label: "???" },
 ];
 
 export const MapPanel: React.FC<MapPanelProps> = ({
@@ -19,16 +19,11 @@ export const MapPanel: React.FC<MapPanelProps> = ({
   onClose,
 }) => {
   return (
-    <div className="world-panel world-panel-map">
-      {/* Unified header (matches Inventory frame) */}
-      <div className="world-panel-header">
-        <div>
+    <section className="world-panel world-panel-map">
+      <header className="world-panel-header">
+        <div className="world-panel-header-main">
           <div className="world-panel-kicker">Map</div>
-          <div className="world-panel-title">World Map</div>
-          <div className="world-panel-subtitle">
-            You walk a ribbon between worlds. Current phase:{" "}
-            <span className="world-panel-phase">{phase}</span>
-          </div>
+          <h2 className="world-panel-title">World Map</h2>
         </div>
 
         {onClose && (
@@ -41,34 +36,35 @@ export const MapPanel: React.FC<MapPanelProps> = ({
             ×
           </button>
         )}
-      </div>
+      </header>
 
       <div className="world-panel-body">
-        <div className="map-panel">
-          <div className="map-track">
-            <div className="map-track-line" />
-            <div className="map-track-nodes">
-              {biomes.map((biome) => {
-                const isActive = biome.id === currentBiomeId;
+        <p className="map-intro">
+          You walk a ribbon between worlds. Current phase:{" "}
+          <span className="map-phase">{phase}</span>
+        </p>
 
-                return (
-                  <button
-                    key={biome.id}
-                    type="button"
-                    className={
-                      "map-node" + (isActive ? " map-node--active" : "")
-                    }
-                    disabled={!isActive}
-                  >
-                    <span className="map-node-dot" />
-                    <span className="map-node-label">{biome.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+        <div className="map-track">
+          {BIOMES.map((biome, index) => {
+            const isActive = biome.id === currentBiomeId;
+            const isLast = index === BIOMES.length - 1;
+
+            return (
+              <div
+                key={biome.id}
+                className={
+                  "map-node" +
+                  (isActive ? " map-node--active" : "") +
+                  (isLast ? " map-node--last" : "")
+                }
+              >
+                <div className="map-node-pin" />
+                <div className="map-node-label">{biome.label}</div>
+              </div>
+            );
+          })}
         </div>
       </div>
-    </div>
+    </section>
   );
 };

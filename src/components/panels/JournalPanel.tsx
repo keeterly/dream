@@ -1,7 +1,7 @@
 import React from "react";
 import type { JournalEntry } from "../../types";
 
-export interface JournalPanelProps {
+interface JournalPanelProps {
   entries: JournalEntry[];
   onClose?: () => void;
 }
@@ -10,52 +10,96 @@ export const JournalPanel: React.FC<JournalPanelProps> = ({
   entries,
   onClose,
 }) => {
-  return (
-    <section className="world-panel world-panel-journal">
-      <header className="world-panel-header">
-        <div className="world-panel-header-main">
-          <div className="world-panel-kicker">Journal</div>
-          <h2 className="world-panel-title">Dream Log</h2>
-        </div>
+  const handleClose = () => {
+    if (onClose) onClose();
+  };
 
-        {onClose && (
+  if (!entries || entries.length === 0) {
+    return (
+      <section className="world-panel world-panel-journal">
+        <header
+          className="world-panel-header"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: "1.5rem",
+          }}
+        >
+          <div>
+            <div className="world-panel-kicker">Journal</div>
+            <div className="world-panel-title">Dream Log</div>
+          </div>
+
           <button
             type="button"
             className="world-panel-modal-close"
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Close journal"
           >
             ×
           </button>
-        )}
+        </header>
+
+        <div className="world-panel-body">
+          <p className="world-panel-empty">Your dream log is still blank.</p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="world-panel world-panel-journal">
+      {/* HEADER */}
+      <header
+        className="world-panel-header"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "1.5rem",
+        }}
+      >
+        <div>
+          <div className="world-panel-kicker">Journal</div>
+          <div className="world-panel-title">Dream Log</div>
+        </div>
+
+        <button
+          type="button"
+          className="world-panel-modal-close"
+          onClick={handleClose}
+          aria-label="Close journal"
+        >
+          ×
+        </button>
       </header>
 
+      {/* BODY */}
       <div className="world-panel-body">
-        {entries.length === 0 ? (
-          <p className="journal-empty">
-            Your journal is quiet for now. Relics and events you encounter will
-            be recorded here.
-          </p>
-        ) : (
-          <div className="journal-list">
-            {entries.map((entry) => (
-              <article key={entry.id} className="journal-entry">
-                <header className="journal-entry-header">
-                  <div className="journal-entry-pill-row">
-                    <span className="journal-entry-pill">
-                      {entry.type.toUpperCase()}
-                    </span>
-                    <time className="journal-entry-timestamp">
-                      {entry.timestampIso}
-                    </time>
-                  </div>
-                  <h3 className="journal-entry-title">{entry.title}</h3>
-                </header>
+        <div className="journal-list">
+          {entries.map((entry) => (
+            <article key={entry.id} className="journal-entry">
+              <div className="journal-entry-header">
+                <span className={`journal-entry-type tag-${entry.type}`}>
+                  {entry.type === "dreamself_created" && "Dreamself"}
+                  {entry.type === "item_found" && "Relic"}
+                  {entry.type === "biome_visited" && "Biome"}
+                </span>
+                <span className="journal-entry-date">
+                  {entry.timestampDisplay}
+                </span>
+              </div>
+
+              <div className="journal-entry-divider" />
+
+              <h4 className="journal-entry-title">{entry.title}</h4>
+              {entry.body && (
                 <p className="journal-entry-body">{entry.body}</p>
-              </article>
-            ))}
-          </div>
-        )}
+              )}
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );

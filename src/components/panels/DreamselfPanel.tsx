@@ -32,15 +32,6 @@ export const DreamselfPanel: React.FC<DreamselfPanelProps> = ({
             <div className="world-panel-kicker">Dreamself</div>
             <div className="world-panel-title">Equipment</div>
           </div>
-
-          <button
-            type="button"
-            className="world-panel-close"
-            onClick={onClose}
-            aria-label="Close dreamself panel"
-          >
-            ×
-          </button>
         </div>
 
         <div className="dreamself-layout">

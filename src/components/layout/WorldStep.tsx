@@ -483,26 +483,26 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                   <JournalPanel entries={journalEntries} />
                 )}
 
-                {activePanel === "debug" && (
+               {activePanel === "debug" && (
                   <div className="world-panel world-panel-debug">
                     <div className="world-panel-header">
-                      <div className="world-panel-kicker">Debug</div>
-                      <div className="world-panel-title">Relic Testing</div>
+                      <div>
+                        <div className="world-panel-kicker">Debug</div>
+                        <div className="world-panel-title">Relic Testing</div>
+                      </div>
                     </div>
                     <p className="world-panel-copy">
                       Spawn a random relic event for testing drops and journal
                       entries.
                     </p>
 
-                    <button
+                   <button
                       type="button"
                       className="world-debug-pill"
                       onClick={onSpawnDebugItem}
                     >
                       <span className="world-debug-pill__orb" />
-                      <span className="world-debug-pill__label">
-                        Spawn Random Relic
-                      </span>
+                      <span className="world-debug-pill__label">Spawn Random Relic</span>
                     </button>
                   </div>
                 )}

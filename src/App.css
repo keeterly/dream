@@ -4475,3 +4475,79 @@ html, body {
 .world-panel-modal-close:active {
   transform: translateY(0);
 }
+
+
+
+
+
+
+
+/* === Shared fullscreen modal shell ===================== */
+
+/* Backdrop used by Inventory AND world panels */
+.inventory-modal-backdrop,
+.world-panel-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2.5rem 3rem;
+  background: radial-gradient(
+      circle at top,
+      rgba(15, 23, 42, 0.80),
+      rgba(2, 6, 23, 0.96)
+    );
+  backdrop-filter: blur(22px);
+  z-index: 40;
+}
+
+/* Main glass card */
+.inventory-modal,
+.world-panel-modal {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  background: radial-gradient(
+      circle at top left,
+      rgba(148, 163, 184, 0.22),
+      transparent 55%
+    ),
+    rgba(15, 23, 42, 0.98);
+  box-shadow: 0 26px 70px rgba(15, 23, 42, 0.98);
+  padding: 1.6rem 1.9rem 2rem;
+}
+
+/* Close button – shared between Inventory + other panels */
+.inventory-close-btn,
+.inventory-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1.3rem;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: rgba(15, 23, 42, 0.92);
+  color: #e5e7eb;
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 120ms ease, transform 120ms ease, opacity 120ms ease;
+}
+
+.inventory-close-btn:hover,
+.inventory-modal-close:hover {
+  background: rgba(15, 23, 42, 0.98);
+  transform: translateY(-1px);
+}
+
+.inventory-close-btn:active,
+.inventory-modal-close:active {
+  transform: translateY(0);
+  opacity: 0.9;
+}

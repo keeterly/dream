@@ -1,62 +1,54 @@
 import React from "react";
 import type { JournalEntry } from "../../types";
 
-export interface JournalPanelProps {
+interface JournalPanelProps {
   entries: JournalEntry[];
-  onClose?: () => void;
 }
 
-export const JournalPanel: React.FC<JournalPanelProps> = ({
-  entries,
-  onClose,
-}) => {
-  return (
-    <section className="world-panel world-panel-journal">
-      <header className="world-panel-header">
-        <div className="world-panel-header-main">
-          <div className="world-panel-kicker">Journal</div>
-          <h2 className="world-panel-title">Dream Log</h2>
-        </div>
-
-        {onClose && (
-          <button
-            type="button"
-            className="world-panel-modal-close"
-            onClick={onClose}
-            aria-label="Close journal"
-          >
-            ×
-          </button>
-        )}
-      </header>
-
-      <div className="world-panel-body">
-        {entries.length === 0 ? (
-          <p className="journal-empty">
-            Your journal is quiet for now. Relics and events you encounter will
-            be recorded here.
-          </p>
-        ) : (
-          <div className="journal-list">
-            {entries.map((entry) => (
-              <article key={entry.id} className="journal-entry">
-                <header className="journal-entry-header">
-                  <div className="journal-entry-pill-row">
-                    <span className="journal-entry-pill">
-                      {entry.type.toUpperCase()}
-                    </span>
-                    <time className="journal-entry-timestamp">
-                      {entry.timestampIso}
-                    </time>
-                  </div>
-                  <h3 className="journal-entry-title">{entry.title}</h3>
-                </header>
-                <p className="journal-entry-body">{entry.body}</p>
-              </article>
-            ))}
-          </div>
-        )}
+export const JournalPanel: React.FC<JournalPanelProps> = ({ entries }) => {
+  if (!entries.length) {
+    return (
+      <div className="world-panel world-panel-journal">
+        <h3 className="world-panel-title">Journal</h3>
+        <p className="world-panel-empty">
+          Your journal is quiet. Walk further and let the world write itself.
+        </p>
       </div>
-    </section>
+    );
+  }
+
+  return (
+    <div className="world-panel world-panel-journal">
+      <h3 className="world-panel-title">Journal</h3>
+      <div className="journal-list">
+  {entries.map((entry, index) => (
+    <article key={entry.id} className="journal-entry">
+      <div className="journal-entry-header">
+        <span className={`journal-entry-type tag-${entry.type}`}>
+          {entry.type === "dreamself_created" && "Dreamself"}
+          {entry.type === "item_found" && "Relic"}
+          {entry.type === "biome_visited" && "Biome"}
+        </span>
+        <div className="journal-entry-meta">
+          <time className="journal-entry-time">
+            {new Date(entry.timestampIso).toLocaleString()}
+          </time>
+          {index === 0 && (
+            <span className="journal-entry-badge">NEW</span>
+          )}
+        </div>
+      </div>
+
+      <div className="journal-entry-divider" />
+
+      <h4 className="journal-entry-title">{entry.title}</h4>
+      {entry.body && (
+        <p className="journal-entry-body">{entry.body}</p>
+      )}
+    </article>
+  ))}
+</div>
+
+    </div>
   );
 };

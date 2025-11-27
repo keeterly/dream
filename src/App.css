@@ -5115,3 +5115,134 @@ html, body {
   align-items: flex-end;
   z-index: 45;
 }
+
+
+/* Backdrop under HUD chrome */
+.world-panel-modal-backdrop {
+  z-index: 30;
+}
+
+/* Top HUD + bottom gauges float above blur & panels */
+.world-hud {
+  position: relative;
+  z-index: 40;
+}
+
+.world-overlay-bottom {
+  position: relative;
+  z-index: 40;
+}
+
+/* Dock highest so it stays clickable */
+.world-dock {
+  position: absolute;
+  right: 5vw;
+  bottom: 1.6rem;
+  display: flex;
+  gap: 2.2rem;
+  align-items: flex-end;
+  z-index: 45;
+}
+
+
+/* === HUD MODAL BASE ======================================= */
+
+/* Card for Inventory / Dreamself / Map / Journal / Debug */
+.world-panel {
+  max-width: min(78vw, 1180px);
+  margin: 0 auto;
+  padding: 26px 40px 24px;
+  border-radius: 0;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(148, 163, 184, 0.14),
+      transparent 55%
+    ),
+    rgba(6, 12, 24, 0.96);
+  box-shadow:
+    0 32px 70px rgba(15, 23, 42, 0.9),
+    0 0 0 1px rgba(15, 23, 42, 0.7);
+}
+
+/* Header: title on left, X on right */
+.world-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.6rem;
+  margin-bottom: 16px;
+}
+
+.world-panel-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.world-panel-header-eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  opacity: 0.8;
+}
+
+.world-panel-header-title {
+  font-size: 0.86rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: #e5e7eb;
+}
+
+/* Shared close button (rendered by WorldStep) */
+.inventory-modal-close {
+  border: none;
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 140ms ease, transform 120ms ease;
+}
+
+.inventory-modal-close:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+/* Body rhythm */
+.world-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+/* === PANEL-SPECIFIC SPACING ================================ */
+
+/* Inventory: keep grid close but not cramped */
+.world-panel-inventory .inventory-sort-row {
+  margin-top: 4px;
+}
+
+.world-panel-inventory .inventory-grid-shell {
+  margin-top: 12px;
+}
+
+/* Map: extra breathing room before track */
+.world-panel-map .world-map-track {
+  margin-top: 18px;
+}
+
+/* Journal: move list off header a hair */
+.world-panel-journal .world-panel-journal-entries {
+  margin-top: 10px;
+}
+
+/* Debug: copy + button rhythm */
+.world-panel-debug .world-panel-copy {
+  margin: 4px 0 14px;
+}

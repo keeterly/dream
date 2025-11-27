@@ -168,11 +168,9 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
     setSortMode(mode);
   };
 
-    if (!isOpen) return null;
+      if (!isOpen) return null;
 
   const content = (
-    <>
-       const content = (
     <>
       {/* Header */}
       <div className="world-panel-header">
@@ -224,8 +222,7 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
           </div>
         </div>
 
-        {/* Only show this X when we're NOT inside the HUD modal.
-            When embedded, WorldStep renders the shared close button. */}
+        {/* Only show this X when NOT embedded in the HUD modal */}
         {!embedded && (
           <button
             type="button"
@@ -236,88 +233,23 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
             ×
           </button>
         )}
-      </div>
-
-
-               {/* Only show this X when we're NOT inside the HUD modal.
-            When embedded, WorldStep renders the shared close button. */}
-        {!embedded && (
-          <button
-            type="button"
-            className="inventory-close-btn"
-            onClick={onClose}
-            aria-label="Close inventory"
-          >
-            ×
-          </button>
-        )}
-
       </div>
 
       {/* Grid */}
       <div className="inventory-grid-shell">
         <div className="inventory-grid inventory-grid--dotted">
+          {/* KEEP your existing grid-mapping code here, e.g.:
+
           {grid.map((item, index) => {
-            const isDragging = dragIndex === index && !!item;
-
-            let iconSrc: string | null = null;
-            if (item) {
-              const spriteFile = getSpriteForItemName(item.name);
-              iconSrc = `${baseUrl}items/foundItems/${spriteFile}`;
-            }
-
-            return (
-              <div
-                key={index}
-                className="inventory-grid-cell"
-                onDragOver={handleDragOver}
-                onDrop={() => handleDrop(index)}
-              >
-                {item && iconSrc && (
-                  <div
-                    className={
-                      "inventory-grid-item-icon-only" +
-                      (isDragging
-                        ? " inventory-grid-item-icon-only--dragging"
-                        : "")
-                    }
-                    draggable
-                    onDragStart={() => handleDragStart(index)}
-                    onMouseEnter={() => setHoveredItemId(item.id)}
-                    onMouseLeave={() => setHoveredItemId(null)}
-                  >
-                    <img
-                      src={iconSrc}
-                      alt={item.name}
-                      className="inventory-grid-icon-img"
-                    />
-
-                    {hoveredItemId === item.id && (
-                      <div className="inventory-tooltip">
-                        <div className="inventory-tooltip-name">
-                          <span>{item.name}</span>
-                          <span
-                            className={
-                              "inventory-tooltip-rarity rarity-" + item.rarity
-                            }
-                          >
-                            {item.rarity}
-                          </span>
-                        </div>
-                        <div className="inventory-tooltip-body">
-                          {item.description}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
+            ...
           })}
+
+          */}
         </div>
       </div>
     </>
   );
+
 
   // Embedded: inside WorldStep's world-panel-modal shell
   if (embedded) {

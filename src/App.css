@@ -5549,3 +5549,403 @@ html, body {
 }
 
 
+
+/* ============================
+   START SCREEN
+   ============================ */
+
+.app-screen-start {
+  position: relative;
+  min-height: 100vh;
+  padding: 10vh 7vw;
+  display: flex;
+  align-items: center;
+  color: #f7f7fb;
+  overflow: hidden;
+  background: radial-gradient(circle at 20% 0%, #24344f 0, #050810 48%, #02040a 100%);
+}
+
+/* Soft vignette + subtle “light bloom” on the left */
+.app-screen-start::before,
+.app-screen-start::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.app-screen-start::before {
+  background: radial-gradient(circle at 20% 40%, rgba(140, 180, 255, 0.18), transparent 60%);
+  mix-blend-mode: screen;
+}
+
+.app-screen-start::after {
+  background: radial-gradient(circle at 95% 5%, rgba(186, 134, 255, 0.13), transparent 55%);
+  opacity: 0.9;
+}
+
+/* Inner column so we’re not hard-depending on exact JSX */
+.app-screen-start > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* If you wrap your content in a helper, it will pick this up */
+.start-screen-inner {
+  max-width: 520px;
+  animation: start-screen-fade 900ms ease-out forwards;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* “DREAM” logo stack */
+.app-screen-start h1 {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 500;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+}
+
+.app-screen-start .start-kicker {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.app-screen-start .start-tagline {
+  margin-top: 14px;
+  font-size: 13px;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+/* Button row – will attach to any “actions” wrapper you add */
+.app-screen-start .start-actions,
+.app-screen-start .start-screen-actions,
+.app-screen-start .start-buttons {
+  margin-top: 32px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Menu buttons */
+.app-screen-start button {
+  position: relative;
+  min-width: 140px;
+  padding: 10px 22px;
+  border: 1px solid rgba(180, 197, 255, 0.4);
+  background: rgba(5, 11, 20, 0.85);
+  color: #f7f7fb;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  text-align: center;
+  outline: none;
+  cursor: pointer;
+  transition:
+    background 140ms ease-out,
+    border-color 140ms ease-out,
+    transform 120ms ease-out,
+    box-shadow 140ms ease-out,
+    color 120ms ease-out;
+}
+
+.app-screen-start button:hover:not(:disabled) {
+  background: radial-gradient(circle at 50% 0%, rgba(106, 166, 255, 0.45), rgba(9, 18, 36, 0.96));
+  border-color: rgba(190, 210, 255, 0.85);
+  box-shadow: 0 0 28px rgba(106, 166, 255, 0.35);
+  transform: translateY(-1px);
+}
+
+.app-screen-start button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 0 12px rgba(106, 166, 255, 0.18);
+}
+
+/* Primary vs secondary emphasis (New Game vs others) */
+.app-screen-start .start-btn-primary {
+  background: radial-gradient(circle at 50% 0%, rgba(142, 186, 255, 0.7), rgba(12, 22, 40, 0.98));
+  border-color: rgba(201, 217, 255, 1);
+}
+
+.app-screen-start .start-btn-secondary {
+  opacity: 0.92;
+}
+
+/* Disabled “Continue” if no save yet */
+.app-screen-start button:disabled {
+  cursor: default;
+  opacity: 0.35;
+  border-color: rgba(120, 130, 150, 0.5);
+  background: rgba(9, 14, 24, 0.8);
+  box-shadow: none;
+}
+
+/* Tiny footer copy, optional */
+.app-screen-start .start-meta {
+  margin-top: 32px;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+@keyframes start-screen-fade {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+/* ============================
+   INTRO STEP — ENTER THE DREAM
+   ============================ */
+
+.app-screen-intro {
+  position: relative;
+  min-height: 100vh;
+  padding: 9vh 7vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f7f7fb;
+  background: radial-gradient(circle at 50% 0%, #1d293d 0, #050814 48%, #02040a 100%);
+}
+
+.intro-layout {
+  position: relative;
+  width: 100%;
+  max-width: 880px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2.3fr);
+  gap: 80px;
+}
+
+.intro-left {
+  align-self: flex-start;
+}
+
+.intro-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.intro-title {
+  margin-top: 8px;
+  font-size: 20px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.intro-subtitle {
+  margin-top: 14px;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* Main card */
+.intro-main {
+  position: relative;
+}
+
+.intro-card {
+  position: relative;
+  padding: 38px 42px 32px;
+  border-radius: 0; /* keep it sharp like the HUD */
+  border: 1px solid rgba(171, 193, 255, 0.35);
+  background:
+    linear-gradient(135deg, rgba(8, 17, 32, 0.98), rgba(4, 9, 18, 0.98));
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.85),
+    0 32px 80px rgba(0, 0, 0, 0.8);
+}
+
+/* subtle light sweep behind the card */
+.intro-card::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(146, 191, 255, 0.15), transparent 60%),
+    radial-gradient(circle at 110% 110%, rgba(168, 126, 255, 0.2), transparent 60%);
+  opacity: 0.75;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.intro-card-heading {
+  font-size: 14px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.intro-card-body {
+  margin-top: 18px;
+  font-size: 13px;
+  line-height: 1.7;
+  max-width: 36rem;
+  opacity: 0.92;
+}
+
+.intro-card-cta {
+  margin-top: 28px;
+  display: inline-flex;
+}
+
+/* Reuse same button visual language as start screen */
+.intro-card-cta button {
+  padding: 10px 26px;
+  border-radius: 0;
+  border: 1px solid rgba(186, 204, 255, 0.75);
+  background: radial-gradient(circle at 50% 0%, rgba(142, 186, 255, 0.85), rgba(6, 12, 24, 1));
+  color: #f8f9ff;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 140ms ease-out,
+    border-color 140ms ease-out,
+    transform 120ms ease-out,
+    box-shadow 140ms ease-out;
+}
+
+.intro-card-cta button:hover {
+  background: radial-gradient(circle at 50% 0%, rgba(170, 209, 255, 0.9), rgba(10, 18, 36, 1));
+  box-shadow: 0 0 32px rgba(142, 186, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.intro-card-cta button:active {
+  transform: translateY(0);
+  box-shadow: 0 0 14px rgba(142, 186, 255, 0.25);
+}
+
+
+/* ============================
+   QUESTION SEQUENCE
+   ============================ */
+
+.app-screen-questions {
+  position: relative;
+  min-height: 100vh;
+  padding: 8vh 7vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f7f7fb;
+  background: radial-gradient(circle at 50% 0%, #1a2436 0, #050814 50%, #020308 100%);
+}
+
+.question-layout {
+  width: 100%;
+  max-width: 920px;
+  display: flex;
+  justify-content: center;
+}
+
+.question-card {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  padding: 32px 40px 28px;
+  border-radius: 0;
+  border: 1px solid rgba(175, 196, 255, 0.4);
+  background: linear-gradient(135deg, rgba(9, 15, 28, 0.98), rgba(5, 9, 18, 0.98));
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.9),
+    0 32px 80px rgba(0, 0, 0, 0.9);
+}
+
+/* Question meta row (e.g. "Question 3 of 6 · Dreamself Creation") */
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.question-title {
+  margin-top: 18px;
+  font-size: 15px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Answer options as slim pills */
+.question-options {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.question-option {
+  position: relative;
+  width: 100%;
+  padding: 9px 16px;
+  border-radius: 0;
+  border: 1px solid rgba(130, 147, 190, 0.7);
+  background: rgba(6, 11, 22, 0.95);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: none;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 130ms ease-out,
+    border-color 130ms ease-out,
+    box-shadow 130ms ease-out,
+    transform 80ms ease-out,
+    color 100ms ease-out;
+}
+
+.question-option:hover {
+  background: radial-gradient(circle at 50% 0%, rgba(130, 166, 255, 0.4), rgba(6, 11, 22, 0.98));
+  border-color: rgba(190, 208, 255, 0.9);
+  color: #f9f9ff;
+  box-shadow: 0 0 18px rgba(130, 166, 255, 0.35);
+  transform: translateY(-1px);
+}
+
+.question-option:active {
+  transform: translateY(0);
+  box-shadow: 0 0 10px rgba(130, 166, 255, 0.25);
+}
+
+/* Little progress bar under the card, optional */
+.question-progress {
+  margin-top: 18px;
+  height: 2px;
+  width: 100%;
+  background: rgba(30, 40, 60, 0.9);
+  overflow: hidden;
+}
+
+.question-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffe7a3, #ffd66b);
+  transform-origin: left;
+}

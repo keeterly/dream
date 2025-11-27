@@ -5246,3 +5246,31 @@ html, body {
 .world-panel-debug .world-panel-copy {
   margin: 4px 0 14px;
 }
+
+
+/* Backdrop under HUD chrome */
+.world-panel-modal-backdrop {
+  z-index: 30;
+}
+
+/* Top HUD + bottom gauges float above blur & panels */
+.world-hud {
+  position: relative;
+  z-index: 40;
+}
+
+.world-overlay-bottom {
+  position: relative;
+  z-index: 40;
+}
+
+/* Bottom-right dock stays on top */
+.world-dock {
+  position: absolute;
+  right: 5vw;
+  bottom: 1.6rem;
+  display: flex;
+  gap: 2.2rem;
+  align-items: flex-end;
+  z-index: 45;
+}

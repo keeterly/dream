@@ -235,18 +235,69 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
         )}
       </div>
 
-      {/* Grid */}
+            {/* Grid */}
       <div className="inventory-grid-shell">
         <div className="inventory-grid inventory-grid--dotted">
-          {/* KEEP your existing grid-mapping code here, e.g.:
-
           {grid.map((item, index) => {
-            ...
-          })}
+            const isDragging = dragIndex === index && !!item;
 
-          */}
+            let iconSrc: string | null = null;
+            if (item) {
+              const spriteFile = getSpriteForItemName(item.name);
+              iconSrc = `${baseUrl}items/foundItems/${spriteFile}`;
+            }
+
+            return (
+              <div
+                key={index}
+                className="inventory-grid-cell"
+                onDragOver={handleDragOver}
+                onDrop={() => handleDrop(index)}
+              >
+                {item && iconSrc && (
+                  <div
+                    className={
+                      "inventory-grid-item-icon-only" +
+                      (isDragging
+                        ? " inventory-grid-item-icon-only--dragging"
+                        : "")
+                    }
+                    draggable
+                    onDragStart={() => handleDragStart(index)}
+                    onMouseEnter={() => setHoveredItemId(item.id)}
+                    onMouseLeave={() => setHoveredItemId(null)}
+                  >
+                    <img
+                      src={iconSrc}
+                      alt={item.name}
+                      className="inventory-grid-icon-img"
+                    />
+
+                    {hoveredItemId === item.id && (
+                      <div className="inventory-tooltip">
+                        <div className="inventory-tooltip-name">
+                          <span>{item.name}</span>
+                          <span
+                            className={
+                              "inventory-tooltip-rarity rarity-" + item.rarity
+                            }
+                          >
+                            {item.rarity}
+                          </span>
+                        </div>
+                        <div className="inventory-tooltip-body">
+                          {item.description}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
+
     </>
   );
 

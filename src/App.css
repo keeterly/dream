@@ -5517,3 +5517,33 @@ html, body {
     padding: 1.4rem 1.5rem 1.6rem;
   }
 }
+
+
+/* === DREAM – FINAL HUD / MODAL STACKING =================== */
+/* Keep HUD chrome visible even when panels are open */
+
+/* Backdrop sits under everything interactive */
+.world-panel-modal-backdrop {
+  z-index: 30;
+}
+
+/* Panel card floats above backdrop but below HUD */
+.world-panel-modal {
+  position: relative;
+  z-index: 35;
+}
+
+/* Top HUD + bottom bars sit above the panel card */
+.world-hud,
+.world-overlay-bottom,
+.world-hud-bars {
+  position: relative;
+  z-index: 40;
+}
+
+/* Bottom dock + toast on the very top so they stay clickable */
+.world-dock,
+.world-inventory-toast {
+  position: absolute;
+  z-index: 45;
+}

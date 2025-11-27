@@ -5384,3 +5384,136 @@ html, body {
   margin: 4px 0 14px;
 }
 
+
+
+
+
+/* === DREAM – FINAL MODAL RESET (Inventory + HUD panels) ================ */
+/* Put this at the very bottom of App.css */
+
+/* Shared fullscreen backdrop */
+.inventory-modal-backdrop,
+.world-panel-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 3rem;
+  background: radial-gradient(
+      circle at top,
+      rgba(15, 23, 42, 0.82),
+      rgba(2, 6, 23, 0.96)
+    );
+  backdrop-filter: blur(22px);
+  z-index: 40;
+}
+
+/* Main card frame (Inventory + Dreamself / Map / Journal / Debug) */
+.inventory-modal,
+.world-panel-modal {
+  position: relative;
+  width: min(960px, 96vw);
+  max-height: 80vh;
+  overflow: hidden;
+
+  border-radius: 0; /* sharp, to match HUD */
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  background: radial-gradient(
+      circle at top left,
+      rgba(148, 163, 184, 0.18),
+      transparent 55%
+    ),
+    rgba(6, 12, 24, 0.98);
+  box-shadow:
+    0 32px 80px rgba(15, 23, 42, 0.98),
+    0 0 0 1px rgba(15, 23, 42, 0.7);
+  padding: 1.9rem 2.4rem 2.2rem;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* Inner world panel content (Dreamself / Map / Journal / Debug) */
+.world-panel {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+/* Shared header layout for Inventory + other HUD panels */
+.inventory-modal-header,
+.world-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.6rem;
+  margin-bottom: 1.2rem;
+  padding-right: 3.5rem; /* makes room for the close “×” */
+}
+
+.inventory-modal-title-block,
+.world-panel-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.inventory-modal-subtitle,
+.world-panel-subtitle {
+  margin: 0.3rem 0 0;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+/* Shared close button – simple “×” at the frame edge */
+.inventory-modal-close,
+.inventory-close-btn,
+.world-panel-close {
+  position: absolute;
+  top: 1rem;
+  right: 1.4rem;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.inventory-modal-close:hover,
+.inventory-close-btn:hover,
+.world-panel-close:hover {
+  opacity: 1;
+}
+
+/* Panel body area */
+.world-panel-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+  overflow: auto; /* scroll inner content, not the world */
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .inventory-modal-backdrop,
+  .world-panel-modal-backdrop {
+    padding: 1.4rem;
+  }
+
+  .inventory-modal,
+  .world-panel-modal {
+    padding: 1.4rem 1.5rem 1.6rem;
+  }
+}

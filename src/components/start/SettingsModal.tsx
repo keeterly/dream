@@ -1,28 +1,40 @@
 import React from "react";
-import "./start.css";
 
-export const SettingsModal = ({ onClose }) => {
+interface SettingsModalProps {
+  onClose: () => void;
+}
+
+export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
   return (
-    <div className="start-settings-backdrop" onClick={onClose}>
-      <div className="start-settings-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="start-settings-close" onClick={onClose}>×</button>
+    <div className="world-panel-modal-backdrop" onClick={onClose}>
+      <div
+        className="world-panel-modal start-settings-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          className="inventory-modal-close"
+          onClick={onClose}
+          aria-label="Close settings"
+        >
+          ×
+        </button>
 
-        <h2 className="settings-title">Settings</h2>
+        <div className="world-panel">
+          <div className="world-panel-header">
+            <div className="world-panel-header-left">
+              <span className="world-panel-header-eyebrow">System</span>
+              <span className="world-panel-header-title">Settings</span>
+            </div>
+          </div>
 
-        <div className="settings-section">
-          <label>Audio Volume</label>
-          <input type="range" min="0" max="100" />
+          <div className="world-panel-body">
+            <p className="world-panel-copy">
+              Settings are coming soon. For now this is just a placeholder
+              modal.
+            </p>
+          </div>
         </div>
-
-        <div className="settings-section">
-          <label>Graphics Quality</label>
-          <select>
-            <option>Low</option>
-            <option>Medium</option>
-            <option>High</option>
-          </select>
-        </div>
-
       </div>
     </div>
   );

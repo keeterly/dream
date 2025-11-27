@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import "./App.css";
 
 import { AppHeader } from "./components/layout/AppHeader";
-import { StartScreen } from "./components/start/StartScreen";
-
 import { IntroStep } from "./components/layout/IntroStep";
 import { QuestionStep } from "./components/layout/QuestionStep";
 import { SummaryStep } from "./components/layout/SummaryStep";
 import { WorldStep } from "./components/layout/WorldStep";
+
+import { StartScreen } from "./components/start/StartScreen";
+import { SettingsModal } from "./components/start/SettingsModal";
 
 import { QUESTIONS } from "./questions";
 import { computeTraitsAndAvatar } from "./traits";
@@ -21,7 +22,7 @@ import type {
   JournalEntry,
 } from "./types";
 
-type ScreenId = "intro" | "questions" | "summary" | "world";
+type ScreenId = "start" | "intro" | "questions" | "summary" | "world";
 
 const PHASES = ["Dawn", "Day", "Dusk", "Night"] as const;
 
@@ -36,14 +37,16 @@ function getRandomWorldItem() {
 }
 
 export const App: React.FC = () => {
-  const [screen, setScreen] = useState<ScreenId>("intro");
-
-  const [answers, setAnswers] = useState<AnswerMap>({});
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-
-  const [profile, setProfile] = useState<DreamselfProfile | null>(null);
+  // ----- GLOBAL SCREEN STATE -----
+  const [screen, setScreen] = useState<ScreenId>("start");
   const [showSettings, setShowSettings] = useState(false);
 
+  // ----- CHARACTER CREATION STATE -----
+  const [answers, setAnswers] = useState<AnswerMap>({});
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [profile, setProfile] = useState<DreamselfProfile | null>(null);
+
+  // ----- WORLD STATE -----
   // Inventory is the *actual* carried relics
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
 
@@ -63,10 +66,10 @@ export const App: React.FC = () => {
     entries: journalEntries,
     logDreamselfCreated,
     logItemFound,
-    logBiomeVisited,
+    logBiomeVisited, // currently unused but keep for future
   } = useJournal();
 
-  // Simple world clock just for phase changes (you can tweak interval later)
+  // ----- WORLD CLOCK (ONLY RUNS IN WORLD) -----
   useEffect(() => {
     if (screen !== "world") return;
 
@@ -77,8 +80,7 @@ export const App: React.FC = () => {
     return () => window.clearInterval(id);
   }, [screen]);
 
-
-    // Simple random encounter spawner while in the world
+  // ----- RANDOM ENCOUNTERS (ONLY RUNS IN WORLD) -----
   useEffect(() => {
     if (screen !== "world") return;
 
@@ -107,9 +109,33 @@ export const App: React.FC = () => {
     return () => window.clearTimeout(id);
   }, [screen, activeEncounterItem, encounterItemName]);
 
-  
+  // ----- START SCREEN HANDLERS -----
+
+  /** Reset character creation + world state and begin a fresh run. */
+  const startCharacterCreation = () => {
+    setAnswers({});
+    setCurrentQuestionIndex(0);
+    setProfile(null);
+    setInventory([]);
+    setWorldTick(0);
+    setEncounterItemName(null);
+    setActiveEncounterItem(null);
+    setScreen("intro");
+  };
+
+  /** Continue: if we have a profile, drop back into the world; otherwise start new. */
+  const handleContinue = () => {
+    if (profile) {
+      setScreen("world");
+    } else {
+      startCharacterCreation();
+    }
+  };
+
+  // ----- CHARACTER CREATION FLOW -----
 
   const handleBegin = () => {
+    // From Intro → first question
     setScreen("questions");
   };
 
@@ -136,6 +162,8 @@ export const App: React.FC = () => {
   const handleEnterWorld = () => {
     setScreen("world");
   };
+
+  // ----- WORLD ENCOUNTER HELPERS -----
 
   // DEBUG: force-spawn a relic encounter immediately
   const handleSpawnDebugItem = () => {
@@ -173,8 +201,21 @@ export const App: React.FC = () => {
     setEncounterItemName(null);
   };
 
+  // ----- SCREEN RENDERING -----
+
   const renderScreen = () => {
     const phase = getPhaseFromTick(worldTick);
+
+    if (screen === "start") {
+      return (
+        <StartScreen
+          hasExistingProfile={!!profile}
+          onNewGame={startCharacterCreation}
+          onContinue={handleContinue}
+          onOpenSettings={() => setShowSettings(true)}
+        />
+      );
+    }
 
     if (screen === "intro") {
       return <IntroStep onBegin={handleBegin} />;
@@ -196,64 +237,50 @@ export const App: React.FC = () => {
     }
 
     if (screen === "world" && profile) {
-     return (
-  <>
-    {!profile ? (
-      <StartScreen
-        hasProfile={false}
-        onNewGame={() => startCharacterCreation()}
-        onContinue={() => {}}
-        onSettings={() => setShowSettings(true)}
-      />
-    ) : (
-      <StartScreen
-        hasProfile={true}
-        onNewGame={() => startCharacterCreation()}
-        onContinue={() => setInGame(true)}
-        onSettings={() => setShowSettings(true)}
-      />
-    )}
-
-    {profile && inGame && (
-      <WorldStep
-        profile={profile}
-        inventory={inventory}
-        journalEntries={journalEntries}
-        onSpawnDebugItem={onSpawnDebugItem}
-        encounterItemName={encounterItemName}
-        phase={phase}
-        activeEncounterItem={activeEncounterItem}
-        onResolveEncounter={onResolveEncounter}
-      />
-    )}
-
-    {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
-  </>
-);
-
+      return (
+        <WorldStep
+          profile={profile}
+          inventory={inventory}
+          journalEntries={journalEntries as JournalEntry[]}
+          onSpawnDebugItem={handleSpawnDebugItem}
+          encounterItemName={encounterItemName}
+          phase={phase}
+          activeEncounterItem={activeEncounterItem}
+          onResolveEncounter={handleResolveEncounter}
+        />
+      );
     }
 
     // fallback
     return <IntroStep onBegin={handleBegin} />;
   };
 
- return (
-  <div
-    className={
-      "App app-root" + (screen === "world" ? " app-root--world" : "")
-    }
-  >
-    {screen !== "world" && <AppHeader screen={screen} />}
-    <main
-      className={
-        "App-main app-main" + (screen === "world" ? " app-main--world" : "")
-      }
-    >
-      {renderScreen()}
-    </main>
-  </div>
-);
+  return (
+    <>
+      <div
+        className={
+          "App app-root" + (screen === "world" ? " app-root--world" : "")
+        }
+      >
+        {/* Hide the old header on start + world screens */}
+        {screen !== "world" && screen !== "start" && (
+          <AppHeader screen={screen} />
+        )}
 
+        <main
+          className={
+            "App-main app-main" + (screen === "world" ? " app-main--world" : "")
+          }
+        >
+          {renderScreen()}
+        </main>
+      </div>
+
+      {showSettings && (
+        <SettingsModal onClose={() => setShowSettings(false)} />
+      )}
+    </>
+  );
 };
 
 export default App;

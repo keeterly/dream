@@ -1,45 +1,55 @@
 import React from "react";
-import "./start.css";
 
 interface StartScreenProps {
-  hasProfile: boolean;
+  hasExistingProfile: boolean;
   onNewGame: () => void;
   onContinue: () => void;
-  onSettings: () => void;
+  onOpenSettings: () => void;
 }
 
 export const StartScreen: React.FC<StartScreenProps> = ({
-  hasProfile,
+  hasExistingProfile,
   onNewGame,
   onContinue,
-  onSettings,
+  onOpenSettings,
 }) => {
   return (
-    <div className="start-screen">
-      <div className="start-screen-inner start-fade-in">
+    <section className="start-screen">
+      <div className="start-screen-inner">
+        <div className="start-screen-title-block">
+          <h1 className="start-screen-logo">DREAM</h1>
+          <p className="start-screen-tagline">
+            Dynamic Reality Engineered Apparel Machine
+          </p>
+        </div>
 
-        <h1 className="start-title">D R E A M</h1>
-        <p className="start-subtitle">
-          Dynamic Reality Engineered Apparel Machine
-        </p>
-
-        <div className="start-buttons start-buttons-fade">
-          {hasProfile && (
-            <button className="start-btn" onClick={onContinue}>
-              Continue
-            </button>
-          )}
-
-          <button className="start-btn" onClick={onNewGame}>
-            {hasProfile ? "New Game" : "Begin"}
+        <div className="start-screen-menu">
+          <button
+            type="button"
+            className="start-screen-btn start-screen-btn--primary"
+            onClick={onNewGame}
+          >
+            New Game
           </button>
 
-          <button className="start-btn" onClick={onSettings}>
+          <button
+            type="button"
+            className="start-screen-btn"
+            onClick={onContinue}
+            disabled={!hasExistingProfile}
+          >
+            Continue
+          </button>
+
+          <button
+            type="button"
+            className="start-screen-btn"
+            onClick={onOpenSettings}
+          >
             Settings
           </button>
         </div>
-
       </div>
-    </div>
+    </section>
   );
 };

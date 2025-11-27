@@ -4310,7 +4310,7 @@ html, body {
 
 
 .world-panel-modal-backdrop {
-  position: fixed;
+  position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
@@ -5274,3 +5274,113 @@ html, body {
   align-items: flex-end;
   z-index: 45;
 }
+
+
+.world-panel-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.95));
+  backdrop-filter: blur(28px);
+}
+
+
+
+/* Bottom-left HP / MP / Stamina HUD – always above backdrop/panels */
+.world-hud-bars {
+  position: absolute;
+  left: 5vw;
+  bottom: 1.7rem;
+  display: flex;
+  gap: 1.6rem;
+  z-index: 50; /* > backdrop (30) and panel card */
+}
+
+
+.world-dock {
+  position: absolute;
+  right: 5vw;
+  bottom: 1.6rem;
+  display: flex;
+  gap: 2.2rem;
+  align-items: flex-end;
+  z-index: 60; /* above bars & backdrop */
+}
+
+
+/* Modal card base */
+.world-panel {
+  max-width: min(78vw, 1180px);
+  margin: 0 auto;
+  padding: 26px 40px 24px;
+  border-radius: 0;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background:
+    radial-gradient(circle at top left, rgba(148, 163, 184, 0.14), transparent 55%),
+    rgba(6, 12, 24, 0.96);
+  box-shadow:
+    0 32px 70px rgba(15, 23, 42, 0.9),
+    0 0 0 1px rgba(15, 23, 42, 0.7);
+}
+
+/* Header layout */
+.world-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.6rem;
+  margin-bottom: 16px;
+}
+
+.world-panel-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.world-panel-header-eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  opacity: 0.8;
+}
+
+.world-panel-header-title {
+  font-size: 0.86rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: #e5e7eb;
+}
+
+/* Panel body rhythm */
+.world-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+/* Inventory-specific */
+.world-panel-inventory .inventory-sort-row {
+  margin-top: 4px;
+}
+
+.world-panel-inventory .inventory-grid-shell {
+  margin-top: 12px;
+}
+
+/* Map track spacing */
+.world-panel-map .world-map-track {
+  margin-top: 18px;
+}
+
+/* Journal list spacing */
+.world-panel-journal .world-panel-journal-entries {
+  margin-top: 10px;
+}
+
+/* Debug copy/button spacing */
+.world-panel-debug .world-panel-copy {
+  margin: 4px 0 14px;
+}
+

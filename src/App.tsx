@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./App.css";
 
 import { AppHeader } from "./components/layout/AppHeader";
+import { StartScreen } from "./components/start/StartScreen";
+
 import { IntroStep } from "./components/layout/IntroStep";
 import { QuestionStep } from "./components/layout/QuestionStep";
 import { SummaryStep } from "./components/layout/SummaryStep";
@@ -40,6 +42,7 @@ export const App: React.FC = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   const [profile, setProfile] = useState<DreamselfProfile | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Inventory is the *actual* carried relics
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
@@ -193,18 +196,41 @@ export const App: React.FC = () => {
     }
 
     if (screen === "world" && profile) {
-      return (
-        <WorldStep
-          profile={profile}
-          inventory={inventory}
-          journalEntries={journalEntries as JournalEntry[]}
-          onSpawnDebugItem={handleSpawnDebugItem}
-          encounterItemName={encounterItemName}
-          phase={phase}
-          activeEncounterItem={activeEncounterItem}
-          onResolveEncounter={handleResolveEncounter}
-        />
-      );
+     return (
+  <>
+    {!profile ? (
+      <StartScreen
+        hasProfile={false}
+        onNewGame={() => startCharacterCreation()}
+        onContinue={() => {}}
+        onSettings={() => setShowSettings(true)}
+      />
+    ) : (
+      <StartScreen
+        hasProfile={true}
+        onNewGame={() => startCharacterCreation()}
+        onContinue={() => setInGame(true)}
+        onSettings={() => setShowSettings(true)}
+      />
+    )}
+
+    {profile && inGame && (
+      <WorldStep
+        profile={profile}
+        inventory={inventory}
+        journalEntries={journalEntries}
+        onSpawnDebugItem={onSpawnDebugItem}
+        encounterItemName={encounterItemName}
+        phase={phase}
+        activeEncounterItem={activeEncounterItem}
+        onResolveEncounter={onResolveEncounter}
+      />
+    )}
+
+    {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+  </>
+);
+
     }
 
     // fallback

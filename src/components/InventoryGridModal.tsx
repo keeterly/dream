@@ -224,15 +224,19 @@ export const InventoryGridModal: React.FC<InventoryGridModalProps> = ({
           </div>
         </div>
 
-        {/* shared close button, positioned top-right */}
-        <button
-          type="button"
-          className="inventory-close-btn"
-          onClick={onClose}
-          aria-label="Close inventory"
-        >
-          ×
-        </button>
+               {/* Only show this X when we're NOT inside the HUD modal.
+            When embedded, WorldStep renders the shared close button. */}
+        {!embedded && (
+          <button
+            type="button"
+            className="inventory-close-btn"
+            onClick={onClose}
+            aria-label="Close inventory"
+          >
+            ×
+          </button>
+        )}
+
       </div>
 
       {/* Grid */}

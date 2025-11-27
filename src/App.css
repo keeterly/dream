@@ -4791,3 +4791,72 @@ html, body {
 .world-panel-modal {
   border-radius: 0;
 }
+
+
+
+
+/* === HUD modal layout: single, clean padding ===================== */
+
+/* Frame card (border, background, shadow) */
+.world-panel-modal {
+  padding: 0; /* remove inner padding; let panel control it */
+}
+
+/* Inner content panel */
+.world-panel {
+  padding: 1.9rem 2.4rem 2.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+/* Header block */
+.world-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+/* Keep Inventory grid a bit looser from edges */
+.world-panel-inventory .inventory-grid-shell {
+  margin-top: 1.4rem;
+}
+
+.world-panel-journal .journal-list {
+  margin-top: 1.1rem;
+}
+
+.world-panel-map .map-track {
+  margin-top: 1.5rem;
+}
+
+.world-panel-debug .world-panel-copy {
+  margin-top: 0.9rem;
+  margin-bottom: 1.3rem;
+}
+
+
+/* Make HUD layers sit above the vignette backdrop */
+.world-hud {
+  position: relative;
+  z-index: 40;
+}
+
+/* Bottom status bars (HP / MP / Stamina) above backdrop as well */
+.world-status-bars {
+  position: relative;
+  z-index: 40;
+}
+
+/* Dock row is already clickable over the backdrop,
+   but explicitly give it a high z-index for clarity */
+.world-dock {
+  position: relative;
+  z-index: 45;
+}
+
+/* Backdrop stays underneath all HUD chrome but above the world lane */
+.world-panel-modal-backdrop {
+  z-index: 30;
+}

@@ -4860,3 +4860,36 @@ html, body {
 .world-panel-modal-backdrop {
   z-index: 30;
 }
+
+
+
+/* --- Bottom-right HUD dock (Inventory / Dreamself / Map / Journal / Debug) --- */
+
+.world-dock {
+  position: absolute;
+  right: 5vw;          /* line up with panel + toast */
+  bottom: 1.6rem;      /* just above the bottom HUD bars */
+  display: flex;
+  gap: 2.2rem;         /* space between icons */
+  align-items: flex-end;
+}
+
+/* Keep buttons visually tight so they don’t expand the row weirdly */
+.world-dock-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* Ensure the icon wrapper doesn’t push things around */
+.world-dock-icon-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

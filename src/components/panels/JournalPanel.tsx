@@ -7,14 +7,15 @@ interface JournalPanelProps {
 }
 
 export const JournalPanel: React.FC<JournalPanelProps> = ({ entries }) => {
-  const Header: React.FC = () => (
+   const Header: React.FC = () => (
     <div className="world-panel-header">
-      <div>
-        <div className="world-panel-kicker">Journal</div>
-        <div className="world-panel-title">Entries</div>
+      <div className="world-panel-header-left">
+        <span className="world-panel-header-eyebrow">Journal</span>
+        <span className="world-panel-header-title">Entries</span>
       </div>
     </div>
   );
+
 
   if (!entries.length) {
     return (
@@ -27,11 +28,14 @@ export const JournalPanel: React.FC<JournalPanelProps> = ({ entries }) => {
     );
   }
 
-  return (
+    return (
     <div className="world-panel world-panel-journal">
       <Header />
-      <div className="journal-list">
-        {entries.map((entry, index) => (
+      <div className="world-panel-body">
+        <div className="world-panel-journal-entries">
+          <div className="journal-list">
+            {entries.map((entry, index) => (
+
           <article key={entry.id} className="journal-entry">
             <div className="journal-entry-header">
               <span className={`journal-entry-type tag-${entry.type}`}>
@@ -53,11 +57,16 @@ export const JournalPanel: React.FC<JournalPanelProps> = ({ entries }) => {
 
             <h4 className="journal-entry-title">{entry.title}</h4>
             {entry.body && (
-              <p className="journal-entry-body">{entry.body}</p>
+              <p className="journal-entry-body">{entry.body}              
+              
+              </p>
             )}
           </article>
         ))}
+          </div>
+        </div>
       </div>
     </div>
   );
 };
+

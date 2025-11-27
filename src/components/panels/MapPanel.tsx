@@ -23,20 +23,22 @@ export const MapPanel: React.FC<MapPanelProps> = ({
   ];
 
   return (
-    <div className="world-panel world-panel-map">
+      <div className="world-panel world-panel-map">
       <div className="world-panel-header">
-        <div>
-          <div className="world-panel-kicker">Map</div>
-          <div className="world-panel-title">Overworld</div>
+        <div className="world-panel-header-left">
+          <span className="world-panel-header-eyebrow">Map</span>
+          <span className="world-panel-header-title">Overworld</span>
         </div>
       </div>
 
-      <p className="world-panel-subtitle">
-        You walk a ribbon between worlds. Current phase:{" "}
-        <strong>{phase}</strong>
-      </p>
+      <div className="world-panel-body">
+        <p className="world-panel-subtitle">
+          You walk a ribbon between worlds. Current phase:{" "}
+          <strong>{phase}</strong>
+        </p>
 
-      <div className="map-track">
+        <div className="world-map-track">
+
         {biomes.map((biome, index) => {
           const isActive = biome.id === currentBiomeId;
           return (
@@ -54,6 +56,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
             </div>
           );
         })}
+       </div>
       </div>
     </div>
   );

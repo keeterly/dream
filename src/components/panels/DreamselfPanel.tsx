@@ -26,13 +26,14 @@ export const DreamselfPanel: React.FC<DreamselfPanelProps> = ({
   return (
     <div className="world-panel world-panel--full">
       <div className="world-panel-frame">
-        {/* Header */}
+                {/* Header */}
         <div className="world-panel-header">
-          <div>
-            <div className="world-panel-kicker">Dreamself</div>
-            <div className="world-panel-title">Equipment</div>
+          <div className="world-panel-header-left">
+            <span className="world-panel-header-eyebrow">Dreamself</span>
+            <span className="world-panel-header-title">Equipment</span>
           </div>
         </div>
+
 
         <div className="dreamself-layout">
           {/* LEFT: Avatar column */}

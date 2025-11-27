@@ -15,6 +15,10 @@ import { computeTraitsAndAvatar } from "./traits";
 import { WORLD_ITEMS } from "./worldItems";
 import { useJournal } from "./hooks/useJournal";
 
+import { saveGameOnline, loadGameOnline } from "./persistence/remoteStorage";
+import type { SavedGameState } from "./persistence/gameState";
+
+
 import type {
   AnswerMap,
   DreamselfProfile,
@@ -62,6 +66,13 @@ export const App: React.FC = () => {
   const [activeEncounterItem, setActiveEncounterItem] =
     useState<InventoryItem | null>(null);
 
+
+const [hasOnlineSave, setHasOnlineSave] = useState(false);
+const [loadingSave, setLoadingSave] = useState(true);
+
+
+
+
   const {
     entries: journalEntries,
     logDreamselfCreated,
@@ -108,6 +119,65 @@ export const App: React.FC = () => {
 
     return () => window.clearTimeout(id);
   }, [screen, activeEncounterItem, encounterItemName]);
+
+
+
+useEffect(() => {
+  let cancelled = false;
+
+  async function bootstrapFromOnlineSave() {
+    try {
+      const saved = await loadGameOnline();
+      if (!saved || cancelled) {
+        setLoadingSave(false);
+        return;
+      }
+
+      const { profile, inventory, journalEntries, worldTick } = saved;
+
+      setProfile(profile);
+      setInventory(inventory);
+      // your useJournal hook may need a way to hydrate from saved entries.
+      // For now, you could ignore this line and just keep new entries:
+      // hydrateJournal(journalEntries);
+      setWorldTick(worldTick);
+
+      setHasOnlineSave(true);
+    } catch (err) {
+      console.error("Error loading online save", err);
+    } finally {
+      if (!cancelled) {
+        setLoadingSave(false);
+      }
+    }
+  }
+
+  bootstrapFromOnlineSave();
+
+  return () => {
+    cancelled = true;
+  };
+}, []);
+
+
+
+useEffect(() => {
+  if (screen !== "world" || !profile) return;
+
+  const stateToSave: SavedGameState = {
+    profile,
+    inventory,
+    journalEntries,
+    worldTick,
+  };
+
+  // simple fire-and-forget; you could debounce/throttle this if you like
+  saveGameOnline(stateToSave).catch((err) => {
+    console.error("Failed to sync save online", err);
+  });
+}, [screen, profile, inventory, journalEntries, worldTick]);
+
+
 
   // ----- START SCREEN HANDLERS -----
 

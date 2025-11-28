@@ -327,14 +327,17 @@ useEffect(() => {
 
   return (
     <>
-      <div
+            <div
         className={
           "App app-root" + (screen === "world" ? " app-root--world" : "")
         }
       >
-       {screen !== "world" && screen !== "start" && screen !== "intro" && (
-        <AppHeader currentScreen={screen} />
-        )}
+        {screen !== "world" &&
+          screen !== "start" &&
+          screen !== "intro" && (
+            <AppHeader currentScreen={screen} />
+          )}
+
 
 
         <main

@@ -6167,3 +6167,22 @@ html, body {
   opacity: 1;
   transform: translateY(-50%) translateX(2px);
 }
+
+
+/* Intro screen layout: center the card on screen */
+.app-screen-intro {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Slightly tighten the intro card and keep it readable on big screens */
+.app-screen-intro .intro-card {
+  max-width: 720px;
+}
+
+/* Make the meta chips breathe a little under the body copy */
+.intro-meta {
+  margin-top: 0.4rem;
+}

@@ -1,3 +1,4 @@
+// src/App.tsx
 import React, { useEffect, useState } from "react";
 import "./App.css";
 
@@ -17,7 +18,6 @@ import { useJournal } from "./hooks/useJournal";
 
 import { saveGameOnline, loadGameOnline } from "./persistence/remoteStorage";
 import type { SavedGameState } from "./persistence/gameState";
-
 
 import type {
   AnswerMap,
@@ -66,18 +66,14 @@ export const App: React.FC = () => {
   const [activeEncounterItem, setActiveEncounterItem] =
     useState<InventoryItem | null>(null);
 
-
-const [hasOnlineSave, setHasOnlineSave] = useState(false);
-const [loadingSave, setLoadingSave] = useState(true);
-
-
-
+  const [hasOnlineSave, setHasOnlineSave] = useState(false);
+  const [loadingSave, setLoadingSave] = useState(true);
 
   const {
     entries: journalEntries,
     logDreamselfCreated,
     logItemFound,
-    logBiomeVisited, // currently unused but keep for future
+    logBiomeVisited, // currently unused but kept for future
   } = useJournal();
 
   // ----- WORLD CLOCK (ONLY RUNS IN WORLD) -----
@@ -120,64 +116,57 @@ const [loadingSave, setLoadingSave] = useState(true);
     return () => window.clearTimeout(id);
   }, [screen, activeEncounterItem, encounterItemName]);
 
+  // ----- ONLINE SAVE: BOOTSTRAP -----
+  useEffect(() => {
+    let cancelled = false;
 
+    async function bootstrapFromOnlineSave() {
+      try {
+        const saved = await loadGameOnline();
+        if (!saved || cancelled) {
+          setLoadingSave(false);
+          return;
+        }
 
-useEffect(() => {
-  let cancelled = false;
+        const { profile, inventory, journalEntries, worldTick } = saved;
 
-  async function bootstrapFromOnlineSave() {
-    try {
-      const saved = await loadGameOnline();
-      if (!saved || cancelled) {
-        setLoadingSave(false);
-        return;
-      }
-
-      const { profile, inventory, journalEntries, worldTick } = saved;
-
-      setProfile(profile);
-      setInventory(inventory);
-      // your useJournal hook may need a way to hydrate from saved entries.
-      // For now, you could ignore this line and just keep new entries:
-      // hydrateJournal(journalEntries);
-      setWorldTick(worldTick);
-
-      setHasOnlineSave(true);
-    } catch (err) {
-      console.error("Error loading online save", err);
-    } finally {
-      if (!cancelled) {
-        setLoadingSave(false);
+        setProfile(profile);
+        setInventory(inventory);
+        // If useJournal gets a hydrate function in future, call it with journalEntries
+        setWorldTick(worldTick);
+        setHasOnlineSave(true);
+      } catch (err) {
+        console.error("Error loading online save", err);
+      } finally {
+        if (!cancelled) {
+          setLoadingSave(false);
+        }
       }
     }
-  }
 
-  bootstrapFromOnlineSave();
+    bootstrapFromOnlineSave();
 
-  return () => {
-    cancelled = true;
-  };
-}, []);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
+  // ----- ONLINE SAVE: SYNC WHILE IN WORLD -----
+  useEffect(() => {
+    if (screen !== "world" || !profile) return;
 
+    const stateToSave: SavedGameState = {
+      profile,
+      inventory,
+      journalEntries,
+      worldTick,
+    };
 
-useEffect(() => {
-  if (screen !== "world" || !profile) return;
-
-  const stateToSave: SavedGameState = {
-    profile,
-    inventory,
-    journalEntries,
-    worldTick,
-  };
-
-  // simple fire-and-forget; you could debounce/throttle this if you like
-  saveGameOnline(stateToSave).catch((err) => {
-    console.error("Failed to sync save online", err);
-  });
-}, [screen, profile, inventory, journalEntries, worldTick]);
-
-
+    // Fire-and-forget; can be throttled/debounced later
+    saveGameOnline(stateToSave).catch((err) => {
+      console.error("Failed to sync save online", err);
+    });
+  }, [screen, profile, inventory, journalEntries, worldTick]);
 
   // ----- START SCREEN HANDLERS -----
 
@@ -253,8 +242,7 @@ useEffect(() => {
     // to inventory yet – that happens when WorldStep calls onResolveEncounter.
     setActiveEncounterItem(pending);
 
-    // IMPORTANT: drive world UI using the *display name*
-    // so world + inventory look up sprites from the same key.
+    // Drive world UI using the display name
     setEncounterItemName(baseItem.name);
   };
 
@@ -277,9 +265,10 @@ useEffect(() => {
     const phase = getPhaseFromTick(worldTick);
 
     if (screen === "start") {
+      // If you want a “loading save…” state, you could check loadingSave here
       return (
         <StartScreen
-          hasExistingProfile={!!profile}
+          hasExistingProfile={!!profile || hasOnlineSave}
           onNewGame={startCharacterCreation}
           onContinue={handleContinue}
           onOpenSettings={() => setShowSettings(true)}
@@ -307,6 +296,7 @@ useEffect(() => {
     }
 
     if (screen === "world" && profile) {
+      const phase = getPhaseFromTick(worldTick);
       return (
         <WorldStep
           profile={profile}
@@ -325,20 +315,18 @@ useEffect(() => {
     return <IntroStep onBegin={handleBegin} />;
   };
 
+  // Decide if we should show the global header (only on questions & summary)
+  const headerScreen =
+    screen === "questions" || screen === "summary" ? screen : null;
+
   return (
     <>
-            <div
+      <div
         className={
           "App app-root" + (screen === "world" ? " app-root--world" : "")
         }
       >
-        {screen !== "world" &&
-          screen !== "start" &&
-          screen !== "intro" && (
-            <AppHeader currentScreen={screen} />
-          )}
-
-
+        {headerScreen && <AppHeader screen={headerScreen} />}
 
         <main
           className={

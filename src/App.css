@@ -111,9 +111,8 @@ body {
 
 .start-screen-logo {
   margin: 0 0 0.4rem;
-  /* match HUD “SEER OF SHADOW” style */
-  font-size: 2rem;
-  letter-spacing: 0.28em;
+  font-size: 1.9rem;
+  letter-spacing: 0.24em;  /* a touch less, closer to SEER OF SHADOW */
   text-transform: uppercase;
   font-weight: 500;
   color: #f9fafb;
@@ -121,8 +120,8 @@ body {
 
 .start-screen-tagline {
   margin: 0;
-  font-size: 0.88rem;
-  letter-spacing: 0.16em;
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: #9ca3af;
 }
@@ -445,14 +444,17 @@ body {
 /* ---------- SUMMARY / BIRTH ---------- */
 
 .summary-hero {
-  min-height: calc(100vh - 160px);
+  min-height: 100vh;                 /* full viewport, no header */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 1.4rem;
   text-align: center;
+  padding: 3rem 0 2.5rem;            /* breathing room on tall screens */
 }
+
+
 
 .summary-chapter-label {
   font-size: 0.76rem;
@@ -4309,6 +4311,10 @@ html, body {
   width: 100vw !important;
   height: 100vh !important;
   overflow: hidden !important;
+}
+
+.app-root--frameless {
+  padding: 0;
 }
 
 

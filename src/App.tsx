@@ -257,16 +257,14 @@ export const App: React.FC = () => {
     setEncounterItemName(null);
   };
 
-  // ----- SCREEN RENDERING -----
-
+  // ----- SCREEN RENDERING (unchanged) -----
   const renderScreen = () => {
     const phase = getPhaseFromTick(worldTick);
 
     if (screen === "start") {
-      // If you want a “loading save…” state, you could check loadingSave here
       return (
         <StartScreen
-          hasExistingProfile={!!profile || hasOnlineSave}
+          hasExistingProfile={!!profile}
           onNewGame={startCharacterCreation}
           onContinue={handleContinue}
           onOpenSettings={() => setShowSettings(true)}
@@ -294,7 +292,6 @@ export const App: React.FC = () => {
     }
 
     if (screen === "world" && profile) {
-      const phaseForWorld = getPhaseFromTick(worldTick);
       return (
         <WorldStep
           profile={profile}
@@ -302,7 +299,7 @@ export const App: React.FC = () => {
           journalEntries={journalEntries as JournalEntry[]}
           onSpawnDebugItem={handleSpawnDebugItem}
           encounterItemName={encounterItemName}
-          phase={phaseForWorld}
+          phase={phase}
           activeEncounterItem={activeEncounterItem}
           onResolveEncounter={handleResolveEncounter}
         />
@@ -313,21 +310,33 @@ export const App: React.FC = () => {
     return <IntroStep onBegin={handleBegin} />;
   };
 
-  // Header only on the Dreamself summary screen now
-  const headerScreen = screen === "summary" ? "summary" : null;
+  // ----- HEADER + SHELL LAYOUT -----
+
+  // Only intro + questions use the storybook header now
+  const headerScreen: "intro" | "questions" | null =
+    screen === "intro" || screen === "questions" ? screen : null;
+
+  // Screens that should be edge-to-edge with no chrome padding
+  const isFramelessScreen =
+    screen === "start" || screen === "summary";
+
+  const isWorldScreen = screen === "world";
 
   return (
     <>
       <div
         className={
-          "App app-root" + (screen === "world" ? " app-root--world" : "")
+          "App app-root" +
+          (isWorldScreen ? " app-root--world" : "") +
+          (isFramelessScreen ? " app-root--frameless" : "")
         }
       >
-        {headerScreen && <AppHeader screen={headerScreen} />}
+        {headerScreen && <AppHeader currentScreen={headerScreen} />}
 
         <main
           className={
-            "App-main app-main" + (screen === "world" ? " app-main--world" : "")
+            "App-main app-main" +
+            (isWorldScreen ? " app-main--world" : "")
           }
         >
           {renderScreen()}

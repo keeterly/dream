@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 
-import { AppHeader } from "./components/layout/AppHeader";
 import { IntroStep } from "./components/layout/IntroStep";
 import { QuestionStep } from "./components/layout/QuestionStep";
 import { SummaryStep } from "./components/layout/SummaryStep";
@@ -63,7 +62,7 @@ export const App: React.FC = () => {
   const [activeEncounterItem, setActiveEncounterItem] =
     useState<InventoryItem | null>(null);
 
-  // ----- ONLINE SAVE STATE -----
+  // Online save flags (you can expose these in the UI later if you want)
   const [hasOnlineSave, setHasOnlineSave] = useState(false);
   const [loadingSave, setLoadingSave] = useState(true);
 
@@ -71,7 +70,7 @@ export const App: React.FC = () => {
     entries: journalEntries,
     logDreamselfCreated,
     logItemFound,
-    logBiomeVisited, // currently unused but kept for future
+    logBiomeVisited, // currently unused but keep for future
   } = useJournal();
 
   // ----- WORLD CLOCK (ONLY RUNS IN WORLD) -----
@@ -114,7 +113,7 @@ export const App: React.FC = () => {
     return () => window.clearTimeout(id);
   }, [screen, activeEncounterItem, encounterItemName]);
 
-  // ----- ONLINE SAVE: BOOTSTRAP -----
+  // ----- BOOTSTRAP FROM ONLINE SAVE ONCE -----
   useEffect(() => {
     let cancelled = false;
 
@@ -130,8 +129,9 @@ export const App: React.FC = () => {
 
         setProfile(profile);
         setInventory(inventory);
-        // If useJournal gets a hydrate function later, call it with journalEntries
+        // If you later add a journal hydrate method, call it here with journalEntries.
         setWorldTick(worldTick);
+
         setHasOnlineSave(true);
       } catch (err) {
         console.error("Error loading online save", err);
@@ -149,7 +149,7 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  // ----- ONLINE SAVE: SYNC WHILE IN WORLD -----
+  // ----- SYNC ONLINE SAVE WHEN IN WORLD -----
   useEffect(() => {
     if (screen !== "world" || !profile) return;
 
@@ -160,7 +160,7 @@ export const App: React.FC = () => {
       worldTick,
     };
 
-    // Fire-and-forget; can be throttled/debounced later
+    // fire-and-forget sync
     saveGameOnline(stateToSave).catch((err) => {
       console.error("Failed to sync save online", err);
     });
@@ -182,7 +182,7 @@ export const App: React.FC = () => {
 
   /** Continue: if we have a profile, drop back into the world; otherwise start new. */
   const handleContinue = () => {
-    if (profile || hasOnlineSave) {
+    if (profile) {
       setScreen("world");
     } else {
       startCharacterCreation();
@@ -229,42 +229,36 @@ export const App: React.FC = () => {
 
     const pending: InventoryItem = {
       ...baseItem,
-      // keep id unique per instance
       id: `${baseItem.id}_${Date.now()}_${Math.random()
         .toString(36)
         .slice(2, 6)}`,
       acquiredAt,
     };
 
-    // This is *only* the pending encounter. We do NOT add it
-    // to inventory yet – that happens when WorldStep calls onResolveEncounter.
     setActiveEncounterItem(pending);
-
-    // Drive world UI using the display name
     setEncounterItemName(baseItem.name);
   };
 
   // Called by WorldStep once the pickup animation finishes (or auto-pickup fires)
   const handleResolveEncounter = () => {
     if (activeEncounterItem) {
-      // Add to inventory *here* so timing & identity match the pickup
       setInventory((prev) => [activeEncounterItem, ...prev]);
       logItemFound(activeEncounterItem);
     }
 
-    // Clear encounter visual state
     setActiveEncounterItem(null);
     setEncounterItemName(null);
   };
 
-  // ----- SCREEN RENDERING (unchanged) -----
+  // ----- SCREEN RENDERING -----
+
   const renderScreen = () => {
     const phase = getPhaseFromTick(worldTick);
 
     if (screen === "start") {
       return (
         <StartScreen
-          hasExistingProfile={!!profile}
+          hasExistingProfile={!!profile || hasOnlineSave}
           onNewGame={startCharacterCreation}
           onContinue={handleContinue}
           onOpenSettings={() => setShowSettings(true)}
@@ -306,46 +300,25 @@ export const App: React.FC = () => {
       );
     }
 
-    // fallback
+    // Fallback – should rarely hit
     return <IntroStep onBegin={handleBegin} />;
   };
 
-  // ----- HEADER + SHELL LAYOUT -----
-
-  // Only intro + questions use the storybook header now
-  const headerScreen: "intro" | "questions" | null =
-    screen === "intro" || screen === "questions" ? screen : null;
-
-  // Screens that should be edge-to-edge with no chrome padding
-  const isFramelessScreen =
-    screen === "start" || screen === "summary";
-
-  const isWorldScreen = screen === "world";
+  const isWorld = screen === "world";
 
   return (
     <>
-      <div
-        className={
-          "App app-root" +
-          (isWorldScreen ? " app-root--world" : "") +
-          (isFramelessScreen ? " app-root--frameless" : "")
-        }
-      >
-        {headerScreen && <AppHeader currentScreen={headerScreen} />}
-
+      <div className={"App app-root" + (isWorld ? " app-root--world" : "")}>
         <main
           className={
-            "App-main app-main" +
-            (isWorldScreen ? " app-main--world" : "")
+            "App-main app-main" + (isWorld ? " app-main--world" : " app-main--creation")
           }
         >
           {renderScreen()}
         </main>
       </div>
 
-      {showSettings && (
-        <SettingsModal onClose={() => setShowSettings(false)} />
-      )}
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
     </>
   );
 };

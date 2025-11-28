@@ -384,41 +384,7 @@ body {
   opacity: 0.4;
 }
 
-/* ---------- QUESTION FLOW ---------- */
 
-.question-card {
-  display: flex;
-  flex-direction: column;
-  gap: 1.3rem;
-  padding: 1.6rem 1.9rem 2rem;
-  border-radius: 1.5rem;
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  background: radial-gradient(
-      circle at top left,
-      rgba(148, 163, 184, 0.22),
-      transparent 55%
-    ),
-    rgba(15, 23, 42, 0.95);
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.95);
-}
-
-.question-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 1.5rem;
-  align-items: center;
-}
-
-.question-step {
-  font-size: 0.78rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #94a3b8;
-}
-
-.question-step-divider {
-  margin: 0 0.1rem;
-}
 
 .phase-pill {
   display: inline-flex;
@@ -440,36 +406,7 @@ body {
   letter-spacing: 0.12em;
 }
 
-.question-progress {
-  width: 32%;
-  max-width: 220px;
-}
 
-.question-progress-bar {
-  height: 4px;
-  border-radius: 999px;
-  background: #020617;
-  overflow: hidden;
-}
-
-.question-progress-bar-fill {
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #38bdf8, #a855f7);
-  transition: width 180ms ease-out;
-}
-
-.question-prompt {
-  margin: 0;
-  font-size: 1.4rem;
-  color: #f9fafb;
-}
-
-.question-options {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
 
 .option-card {
   text-align: left;
@@ -504,11 +441,6 @@ body {
   color: #9ca3af;
 }
 
-.question-hint {
-  margin: 0.3rem 0 0;
-  font-size: 0.8rem;
-  color: #64748b;
-}
 
 /* ---------- SUMMARY / BIRTH ---------- */
 
@@ -5926,100 +5858,6 @@ html, body {
   background: radial-gradient(circle at 50% 0%, #1a2436 0, #050814 50%, #020308 100%);
 }
 
-.question-layout {
-  width: 100%;
-  max-width: 920px;
-  display: flex;
-  justify-content: center;
-}
-
-.question-card {
-  position: relative;
-  width: 100%;
-  max-width: 720px;
-  padding: 32px 40px 28px;
-  border-radius: 0;
-  border: 1px solid rgba(175, 196, 255, 0.4);
-  background: linear-gradient(135deg, rgba(9, 15, 28, 0.98), rgba(5, 9, 18, 0.98));
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.9),
-    0 32px 80px rgba(0, 0, 0, 0.9);
-}
-
-/* Question meta row (e.g. "Question 3 of 6 · Dreamself Creation") */
-.question-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 16px;
-  font-size: 11px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  opacity: 0.7;
-}
-
-.question-title {
-  margin-top: 18px;
-  font-size: 15px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-/* Answer options as slim pills */
-.question-options {
-  margin-top: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.question-option {
-  position: relative;
-  width: 100%;
-  padding: 9px 16px;
-  border-radius: 0;
-  border: 1px solid rgba(130, 147, 190, 0.7);
-  background: rgba(6, 11, 22, 0.95);
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-transform: none;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    background 130ms ease-out,
-    border-color 130ms ease-out,
-    box-shadow 130ms ease-out,
-    transform 80ms ease-out,
-    color 100ms ease-out;
-}
-
-.question-option:hover {
-  background: radial-gradient(circle at 50% 0%, rgba(130, 166, 255, 0.4), rgba(6, 11, 22, 0.98));
-  border-color: rgba(190, 208, 255, 0.9);
-  color: #f9f9ff;
-  box-shadow: 0 0 18px rgba(130, 166, 255, 0.35);
-  transform: translateY(-1px);
-}
-
-.question-option:active {
-  transform: translateY(0);
-  box-shadow: 0 0 10px rgba(130, 166, 255, 0.25);
-}
-
-/* Little progress bar under the card, optional */
-.question-progress {
-  margin-top: 18px;
-  height: 2px;
-  width: 100%;
-  background: rgba(30, 40, 60, 0.9);
-  overflow: hidden;
-}
-
-.question-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #ffe7a3, #ffd66b);
-  transform-origin: left;
-}
 
 
 .start-screen {
@@ -6185,4 +6023,167 @@ html, body {
 /* Make the meta chips breathe a little under the body copy */
 .intro-meta {
   margin-top: 0.4rem;
+}
+
+
+
+/* ============================
+   Character Creation – Questions
+   ============================ */
+
+/* Full-screen container for the questions step */
+.app-screen-questions {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 3.5rem;
+  background: radial-gradient(
+    circle at top center,
+    rgba(30, 64, 175, 0.28),
+    #020617 60%
+  );
+}
+
+/* Question card */
+.question-card {
+  max-width: 960px;
+  width: 100%;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: radial-gradient(
+      circle at top left,
+      rgba(148, 163, 184, 0.16),
+      transparent 55%
+    ),
+    rgba(15, 23, 42, 0.96);
+  box-shadow:
+    0 30px 80px rgba(15, 23, 42, 0.9),
+    0 0 0 1px rgba(15, 23, 42, 0.7);
+  padding: 2.4rem 2.7rem 2.4rem;
+}
+
+/* Top of card: step indicator + question text */
+.question-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+/* “QUESTION 1 OF 6” */
+.question-step-indicator,
+.question-step {
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.9);
+}
+
+/* Main prompt text */
+.question-title,
+.question-prompt {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.5;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #f9fafb;
+  max-width: 42rem;
+}
+
+/* Optional secondary text under the main prompt */
+.question-subtitle {
+  margin: 0.35rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: rgba(226, 232, 240, 0.9);
+  max-width: 40rem;
+}
+
+/* Options list */
+.question-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+/* Each option row – mirrors the old .option-card style, but matches TSX classes */
+.question-option,
+.option-card {
+  position: relative;
+  width: 100%;
+  border-radius: 0.75rem;
+  padding: 0.95rem 1.15rem;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 140ms ease-out,
+    background-color 140ms ease-out,
+    box-shadow 140ms ease-out,
+    transform 140ms ease-out;
+}
+
+/* Hover / focus */
+.question-option:hover,
+.option-card:hover {
+  border-color: rgba(248, 250, 252, 0.85);
+  background: rgba(15, 23, 42, 0.98);
+  box-shadow: 0 0 22px rgba(129, 140, 248, 0.45);
+  transform: translateY(-1px);
+}
+
+/* Selected state */
+.question-option--selected,
+.option-card--selected {
+  border-color: rgba(248, 250, 252, 0.98);
+  background: radial-gradient(
+      circle at left center,
+      rgba(129, 140, 248, 0.28),
+      transparent 60%
+    ),
+    rgba(15, 23, 42, 0.98);
+  box-shadow:
+    0 0 0 1px rgba(129, 140, 248, 0.45),
+    0 0 40px rgba(129, 140, 248, 0.35);
+}
+
+/* Option label text */
+.question-option-label,
+.option-label {
+  display: block;
+  font-size: 0.98rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(226, 232, 240, 0.96);
+}
+
+/* Optional body copy under an option label */
+.option-description {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: rgba(148, 163, 184, 0.95);
+}
+
+/* Small screen tweaks */
+@media (max-width: 900px) {
+  .app-screen-questions {
+    padding: 3rem 1.5rem;
+    align-items: flex-start;
+  }
+
+  .question-card {
+    padding: 1.8rem 1.6rem 2rem;
+  }
+
+  .question-title,
+  .question-prompt {
+    font-size: 1.25rem;
+    letter-spacing: 0.12em;
+  }
 }

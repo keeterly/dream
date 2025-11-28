@@ -16,47 +16,44 @@ export const StartScreen: React.FC<StartScreenProps> = ({
 }) => {
   return (
     <section className="start-screen">
-      <div className="start-screen-inner">
-        <div className="start-screen-title-block">
-          <p className="start-screen-eyebrow">Dynamic Reality Engine</p>
+      <div className="start-screen-left">
+  {/* Main title */}
+  <h1 className="start-screen-title">DREAM</h1>
 
-          <h1 className="start-screen-logo">DREAM</h1>
+  {/* Single subtitle in the small “kicker” style */}
+  <div className="start-screen-subtitle">
+    DYNAMIC REALITY ENGINEERED APPAREL MACHINE
+  </div>
 
-          <p className="start-screen-tagline">
-            Dynamic Reality Engineered Apparel Machine
-          </p>
-        </div>
+  {/* Menu */}
+  <div className="start-screen-menu">
+    <button
+      type="button"
+      className="start-screen-btn start-screen-btn--primary"
+      onClick={onNewGame}
+    >
+      New Game
+    </button>
 
-        <div className="start-screen-menu">
-          <button
-            type="button"
-            className="btn start-screen-btn-primary"
-            onClick={onNewGame}
-          >
-            New Game
-          </button>
+    <button
+      type="button"
+      className="start-screen-btn"
+      onClick={onContinue}
+      disabled={!canContinue}
+    >
+      Continue
+    </button>
 
-          <button
-            type="button"
-            className={
-              "btn btn--ghost start-screen-btn" +
-              (!hasExistingProfile ? " start-screen-btn--disabled" : "")
-            }
-            onClick={onContinue}
-            disabled={!hasExistingProfile}
-          >
-            Continue
-          </button>
+    <button
+      type="button"
+      className="start-screen-btn"
+      onClick={onOpenSettings}
+    >
+      Settings
+    </button>
+  </div>
+</div>
 
-          <button
-            type="button"
-            className="btn btn--ghost start-screen-btn"
-            onClick={onOpenSettings}
-          >
-            Settings
-          </button>
-        </div>
-      </div>
     </section>
   );
 };

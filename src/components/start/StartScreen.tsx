@@ -1,3 +1,4 @@
+// src/components/start/StartScreen.tsx
 import React from "react";
 
 interface StartScreenProps {
@@ -17,7 +18,10 @@ export const StartScreen: React.FC<StartScreenProps> = ({
     <section className="start-screen">
       <div className="start-screen-inner">
         <div className="start-screen-title-block">
+          <p className="start-screen-eyebrow">Dynamic Reality Engine</p>
+
           <h1 className="start-screen-logo">DREAM</h1>
+
           <p className="start-screen-tagline">
             Dynamic Reality Engineered Apparel Machine
           </p>
@@ -26,7 +30,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
         <div className="start-screen-menu">
           <button
             type="button"
-            className="start-screen-btn start-screen-btn--primary"
+            className="btn start-screen-btn-primary"
             onClick={onNewGame}
           >
             New Game
@@ -34,7 +38,10 @@ export const StartScreen: React.FC<StartScreenProps> = ({
 
           <button
             type="button"
-            className="start-screen-btn"
+            className={
+              "btn btn--ghost start-screen-btn" +
+              (!hasExistingProfile ? " start-screen-btn--disabled" : "")
+            }
             onClick={onContinue}
             disabled={!hasExistingProfile}
           >
@@ -43,7 +50,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
 
           <button
             type="button"
-            className="start-screen-btn"
+            className="btn btn--ghost start-screen-btn"
             onClick={onOpenSettings}
           >
             Settings

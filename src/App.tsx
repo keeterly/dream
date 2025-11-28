@@ -332,10 +332,10 @@ useEffect(() => {
           "App app-root" + (screen === "world" ? " app-root--world" : "")
         }
       >
-        {/* Hide the old header on start + world screens */}
-        {screen !== "world" && screen !== "start" && (
-          <AppHeader screen={screen} />
-        )}
+        {screen !== "world" && screen !== "start" && screen !== "intro" && (
+  <AppHeader currentScreen={screen} />
+)}
+
 
         <main
           className={

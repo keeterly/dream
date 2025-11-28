@@ -31,7 +31,6 @@ type ScreenId = "start" | "intro" | "questions" | "summary" | "world";
 const PHASES = ["Dawn", "Day", "Dusk", "Night"] as const;
 
 function getPhaseFromTick(tick: number): string {
-  // 48 ticks → full cycle (Dawn, Day, Dusk, Night)
   const segment = Math.floor((tick % 48) / 12);
   return PHASES[segment] ?? "Night";
 }
@@ -51,18 +50,12 @@ export const App: React.FC = () => {
   const [profile, setProfile] = useState<DreamselfProfile | null>(null);
 
   // ----- WORLD STATE -----
-  // Inventory is the *actual* carried relics
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
-
-  // World clock for phase tint
   const [worldTick, setWorldTick] = useState(0);
 
-  // Name of the item that’s visually on the ground in the world
   const [encounterItemName, setEncounterItemName] = useState<string | null>(
     null
   );
-
-  // The specific inventory item currently being encountered
   const [activeEncounterItem, setActiveEncounterItem] =
     useState<InventoryItem | null>(null);
 
@@ -75,6 +68,10 @@ export const App: React.FC = () => {
     logItemFound,
     logBiomeVisited, // currently unused but kept for future
   } = useJournal();
+
+  // Should we show the top AppHeader?
+  // 👉 Header is ONLY visible on the summary screen now.
+  const shouldShowHeader = screen === "summary";
 
   // ----- WORLD CLOCK (ONLY RUNS IN WORLD) -----
   useEffect(() => {
@@ -91,10 +88,8 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (screen !== "world") return;
 
-    // If an encounter is already active or visually on the ground, do nothing
     if (activeEncounterItem || encounterItemName) return;
 
-    // Random delay between 8–20 seconds before next encounter
     const delay = 8000 + Math.random() * 12000;
 
     const id = window.setTimeout(() => {
@@ -116,7 +111,7 @@ export const App: React.FC = () => {
     return () => window.clearTimeout(id);
   }, [screen, activeEncounterItem, encounterItemName]);
 
-  // ----- ONLINE SAVE: BOOTSTRAP -----
+  // ----- BOOTSTRAP FROM ONLINE SAVE -----
   useEffect(() => {
     let cancelled = false;
 
@@ -132,8 +127,10 @@ export const App: React.FC = () => {
 
         setProfile(profile);
         setInventory(inventory);
-        // If useJournal gets a hydrate function in future, call it with journalEntries
+        // TODO: hydrate journal if/when useJournal exposes that
+        // hydrateJournal(journalEntries);
         setWorldTick(worldTick);
+
         setHasOnlineSave(true);
       } catch (err) {
         console.error("Error loading online save", err);
@@ -151,7 +148,7 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  // ----- ONLINE SAVE: SYNC WHILE IN WORLD -----
+  // ----- SYNC ONLINE SAVE (WHEN IN WORLD) -----
   useEffect(() => {
     if (screen !== "world" || !profile) return;
 
@@ -162,7 +159,6 @@ export const App: React.FC = () => {
       worldTick,
     };
 
-    // Fire-and-forget; can be throttled/debounced later
     saveGameOnline(stateToSave).catch((err) => {
       console.error("Failed to sync save online", err);
     });
@@ -170,7 +166,6 @@ export const App: React.FC = () => {
 
   // ----- START SCREEN HANDLERS -----
 
-  /** Reset character creation + world state and begin a fresh run. */
   const startCharacterCreation = () => {
     setAnswers({});
     setCurrentQuestionIndex(0);
@@ -182,7 +177,6 @@ export const App: React.FC = () => {
     setScreen("intro");
   };
 
-  /** Continue: if we have a profile, drop back into the world; otherwise start new. */
   const handleContinue = () => {
     if (profile) {
       setScreen("world");
@@ -194,7 +188,6 @@ export const App: React.FC = () => {
   // ----- CHARACTER CREATION FLOW -----
 
   const handleBegin = () => {
-    // From Intro → first question
     setScreen("questions");
   };
 
@@ -211,7 +204,6 @@ export const App: React.FC = () => {
       return;
     }
 
-    // finished questionnaire → compute dreamself
     const nextProfile = computeTraitsAndAvatar("dream-seed", nextAnswers);
     setProfile(nextProfile);
     logDreamselfCreated(nextProfile);
@@ -224,37 +216,28 @@ export const App: React.FC = () => {
 
   // ----- WORLD ENCOUNTER HELPERS -----
 
-  // DEBUG: force-spawn a relic encounter immediately
   const handleSpawnDebugItem = () => {
     const baseItem = getRandomWorldItem();
     const acquiredAt = new Date().toISOString();
 
     const pending: InventoryItem = {
       ...baseItem,
-      // keep id unique per instance
       id: `${baseItem.id}_${Date.now()}_${Math.random()
         .toString(36)
         .slice(2, 6)}`,
       acquiredAt,
     };
 
-    // This is *only* the pending encounter. We do NOT add it
-    // to inventory yet – that happens when WorldStep calls onResolveEncounter.
     setActiveEncounterItem(pending);
-
-    // Drive world UI using the display name
     setEncounterItemName(baseItem.name);
   };
 
-  // Called by WorldStep once the pickup animation finishes (or auto-pickup fires)
   const handleResolveEncounter = () => {
     if (activeEncounterItem) {
-      // Add to inventory *here* so timing & identity match the pickup
       setInventory((prev) => [activeEncounterItem, ...prev]);
       logItemFound(activeEncounterItem);
     }
 
-    // Clear encounter visual state
     setActiveEncounterItem(null);
     setEncounterItemName(null);
   };
@@ -265,7 +248,6 @@ export const App: React.FC = () => {
     const phase = getPhaseFromTick(worldTick);
 
     if (screen === "start") {
-      // If you want a “loading save…” state, you could check loadingSave here
       return (
         <StartScreen
           hasExistingProfile={!!profile || hasOnlineSave}
@@ -296,7 +278,6 @@ export const App: React.FC = () => {
     }
 
     if (screen === "world" && profile) {
-      const phase = getPhaseFromTick(worldTick);
       return (
         <WorldStep
           profile={profile}
@@ -315,10 +296,6 @@ export const App: React.FC = () => {
     return <IntroStep onBegin={handleBegin} />;
   };
 
-  // Decide if we should show the global header (only on questions & summary)
-  const headerScreen =
-    screen === "questions" || screen === "summary" ? screen : null;
-
   return (
     <>
       <div
@@ -326,7 +303,7 @@ export const App: React.FC = () => {
           "App app-root" + (screen === "world" ? " app-root--world" : "")
         }
       >
-        {headerScreen && <AppHeader screen={headerScreen} />}
+        {shouldShowHeader && <AppHeader currentScreen={screen} />}
 
         <main
           className={

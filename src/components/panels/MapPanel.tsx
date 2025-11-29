@@ -1,39 +1,121 @@
 // src/components/panels/MapPanel.tsx
 import React from "react";
-import { DUSK_VALLEY_MAP, BiomeMapNode } from "../../maps/duskValleyMap";
 
 interface MapPanelProps {
   currentBiomeId: string;
   phase: string;
+
+  /** Optional – where the player is within the current biome */
+  currentLocationId?: string;
+
+  /** Optional – which locations in this biome have been discovered */
+  discoveredLocations?: string[];
+}
+
+type BiomeNodeType = "path" | "camp" | "overlook" | "hub" | "unknown";
+
+interface BiomeNode {
+  id: string;
+  label: string;
+  x: number; // 0–100 as percentage across the card
+  y: number; // 0–100 as percentage down the card
+  type: BiomeNodeType;
 }
 
 /**
- * Overworld map panel:
- * - Top: simple “biome track” (current + ??? future biomes)
- * - Below: if current biome is Dusk Valley, show a local node-based map
+ * Static layout for Dusk Valley Ruins.
+ * Once you have real progression, you can move this into data files.
  */
+const DUSK_VALLEY_NODES: BiomeNode[] = [
+  {
+    id: "cave_departure",
+    label: "Cave of Departure",
+    x: 13,
+    y: 70,
+    type: "hub",
+  },
+  {
+    id: "riverbreak_path",
+    label: "Riverbreak Path",
+    x: 32,
+    y: 58,
+    type: "path",
+  },
+  {
+    id: "valley_campfire",
+    label: "Valley Campfire",
+    x: 48,
+    y: 70,
+    type: "camp",
+  },
+  {
+    id: "shard_overlook",
+    label: "Shard Overlook",
+    x: 64,
+    y: 40,
+    type: "overlook",
+  },
+  {
+    id: "sunken_plaza",
+    label: "Sunken Plaza",
+    x: 64,
+    y: 73,
+    type: "hub",
+  },
+  {
+    id: "distant_ruin",
+    label: "???",
+    x: 82,
+    y: 52,
+    type: "unknown",
+  },
+];
+
+const OVERWORLD_BIOMES = [
+  { id: "dusk_valley", label: "Dusk Valley Ruins" },
+  { id: "nocturnal_ridge", label: "???" },
+  { id: "shore_morning", label: "???" },
+  { id: "future_city", label: "???" },
+];
+
 export const MapPanel: React.FC<MapPanelProps> = ({
   currentBiomeId,
   phase,
+  currentLocationId,
+  discoveredLocations,
 }) => {
-  const biomes = [
-    { id: "dusk_valley", label: "Dusk Valley Ruins" },
-    { id: "nocturnal_ridge", label: "???" },
-    { id: "shore_morning", label: "???" },
-    { id: "future_city", label: "???" },
+  // --- Overworld strip ------------------------------------------------------
+
+  const overworldBiomes = OVERWORLD_BIOMES;
+
+  // --- Current biome: Dusk Valley Ruins -------------------------------------
+
+  const isInDuskValley = currentBiomeId === "dusk_valley";
+
+  // Default demo state: most nodes known, last one hidden behind fog.
+  const defaultDiscovered = [
+    "cave_departure",
+    "riverbreak_path",
+    "valley_campfire",
+    "shard_overlook",
+    "sunken_plaza",
+    // "distant_ruin" intentionally omitted → stays as ???
   ];
 
-  const showDuskValleyMap = currentBiomeId === "dusk_valley";
+  const discoveredSet = new Set(
+    discoveredLocations && discoveredLocations.length > 0
+      ? discoveredLocations
+      : defaultDiscovered
+  );
 
-  const renderNodeLabel = (node: BiomeMapNode) => {
-    if (node.discovery === "hidden") return "???";
-    return node.name;
-  };
+  const effectiveCurrentLocationId =
+    currentLocationId ?? "valley_campfire"; // starting hub for now
 
   return (
     <div className="world-panel world-panel-map">
+      {/* OVERWORLD STRIP */}
       <div className="world-panel-header">
-        <div>
+        <div className="world-panel-header-left">
           <div className="world-panel-kicker">Map</div>
           <div className="world-panel-title">Overworld</div>
         </div>
@@ -44,9 +126,8 @@ export const MapPanel: React.FC<MapPanelProps> = ({
         <strong>{phase}</strong>
       </p>
 
-      {/* --- Biome track (global overworld view) --- */}
       <div className="map-track">
-        {biomes.map((biome, index) => {
+        {overworldBiomes.map((biome, index) => {
           const isActive = biome.id === currentBiomeId;
           return (
             <div
@@ -55,7 +136,9 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                 "map-node" +
                 (isActive ? " map-node--active" : "") +
                 (index === 0 ? " map-node--first" : "") +
-                (index === biomes.length - 1 ? " map-node--last" : "")
+                (index === overworldBiomes.length - 1
+                  ? " map-node--last"
+                  : "")
               }
             >
               <div className="map-node-pin" />
@@ -65,86 +148,66 @@ export const MapPanel: React.FC<MapPanelProps> = ({
         })}
       </div>
 
-      {/* --- Local biome map for Dusk Valley --- */}
-      {showDuskValleyMap && (
-        <div className="world-map-biome">
-          <div className="world-map-biome-header">
-            <div className="world-panel-kicker">Current Biome</div>
-            <div className="world-panel-title">{DUSK_VALLEY_MAP.name}</div>
-            <p className="world-panel-subtitle world-panel-subtitle--tight">
+      {/* CURRENT BIOME CARD */}
+      {isInDuskValley && (
+        <section className="map-current-biome">
+          <header className="map-current-biome-header">
+            <div className="map-current-biome-kicker">Current Biome</div>
+            <div className="map-current-biome-title">Dusk Valley Ruins</div>
+            <p className="map-current-biome-copy">
               Routes branch around a buried valley. Known locations glow softly;
               the rest are shapes in the fog.
             </p>
-          </div>
+          </header>
 
-          <div className="world-map-biome-canvas">
-            {/* Path graph lines */}
-            <svg
-              className="world-map-biome-svg"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="xMidYMid meet"
-            >
-              {DUSK_VALLEY_MAP.edges.map((edge) => {
-                const from = DUSK_VALLEY_MAP.nodes.find(
-                  (n) => n.id === edge.from
-                );
-                const to = DUSK_VALLEY_MAP.nodes.find(
-                  (n) => n.id === edge.to
-                );
-                if (!from || !to) return null;
+          <div className="map-biome-card">
+            <div className="map-biome-canvas">
+              <div className="map-biome-route" />
 
-                const isHidden =
-                  from.discovery === "hidden" && to.discovery === "hidden";
+              {DUSK_VALLEY_NODES.map((node) => {
+                const isDiscovered =
+                  node.type !== "unknown" && discoveredSet.has(node.id);
+                const isCurrent = node.id === effectiveCurrentLocationId;
+
+                const label = isDiscovered ? node.label : "???";
 
                 return (
-                  <line
-                    key={edge.id}
-                    x1={from.x}
-                    y1={from.y}
-                    x2={to.x}
-                    y2={to.y}
+                  <button
+                    key={node.id}
+                    type="button"
                     className={
-                      "world-map-edge" +
-                      (isHidden ? " world-map-edge--hidden" : "")
+                      "map-biome-node" +
+                      (isDiscovered ? " map-biome-node--known" : "") +
+                      (!isDiscovered ? " map-biome-node--hidden" : "") +
+                      (node.type === "camp" ? " map-biome-node--camp" : "") +
+                      (node.type === "hub" ? " map-biome-node--hub" : "") +
+                      (node.type === "overlook"
+                        ? " map-biome-node--overlook"
+                        : "") +
+                      (isCurrent ? " map-biome-node--current" : "")
                     }
-                  />
+                    style={{
+                      left: `${node.x}%`,
+                      top: `${node.y}%`,
+                    }}
+                    // later: hook into travel selection
+                    onClick={(e) => {
+                      e.preventDefault();
+                      // placeholder – no-op for now
+                    }}
+                  >
+                    <span className="map-biome-node-pin" />
+                    <span className="map-biome-node-label">{label}</span>
+                  </button>
                 );
               })}
-            </svg>
+            </div>
 
-            {/* Nodes */}
-            {DUSK_VALLEY_MAP.nodes.map((node) => {
-              const isKnown = node.discovery === "known";
-              const isReachable = node.discovery === "reachable";
-
-              return (
-                <button
-                  key={node.id}
-                  type="button"
-                  className={
-                    "world-map-node" +
-                    (isKnown ? " world-map-node--known" : "") +
-                    (isReachable ? " world-map-node--reachable" : "") +
-                    (node.discovery === "hidden"
-                      ? " world-map-node--hidden"
-                      : "")
-                  }
-                  style={{
-                    left: `${node.x}%`,
-                    top: `${node.y}%`,
-                  }}
-                  // travel interaction will come later — for now nodes are inert
-                  disabled={node.discovery === "hidden"}
-                >
-                  <span className="world-map-node-pin" />
-                  <span className="world-map-node-label">
-                    {renderNodeLabel(node)}
-                  </span>
-                </button>
-              );
-            })}
+            <div className="map-biome-footer">
+              <div className="map-biome-chevron" aria-hidden="true" />
+            </div>
           </div>
-        </div>
+        </section>
       )}
     </div>
   );

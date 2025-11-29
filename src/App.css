@@ -6129,3 +6129,101 @@ html, body {
   font-size: 0.8rem;
   color: #64748b;
 }
+
+
+/* --- Local biome map (Dusk Valley) -------------------------------------- */
+
+.world-map-biome {
+  margin-top: 40px;
+}
+
+.world-map-biome-header {
+  margin-bottom: 20px;
+}
+
+.world-panel-subtitle--tight {
+  margin-top: 4px;
+  max-width: 520px;
+}
+
+/* Canvas is a subtle rounded card, similar to world panels */
+.world-map-biome-canvas {
+  position: relative;
+  width: 100%;
+  padding-top: 40%; /* aspect ratio box */
+  border-radius: 14px;
+  background: radial-gradient(circle at top left, #181f33 0%, #05060c 60%);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.65);
+  overflow: hidden;
+}
+
+/* SVG path graph */
+.world-map-biome-svg {
+  position: absolute;
+  inset: 0;
+}
+
+.world-map-edge {
+  stroke: rgba(170, 188, 240, 0.42);
+  stroke-width: 0.3;
+  stroke-linecap: round;
+}
+
+.world-map-edge--hidden {
+  stroke: rgba(82, 93, 130, 0.3);
+  stroke-dasharray: 1.2 2.2;
+}
+
+/* Node buttons */
+.world-map-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: default;
+  font-family: inherit;
+}
+
+.world-map-node-pin {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(210, 215, 255, 0.28);
+  box-shadow: 0 0 0 1px rgba(171, 188, 245, 0.32),
+    0 0 12px rgba(129, 160, 255, 0.45);
+}
+
+.world-map-node-label {
+  display: block;
+  margin-top: 6px;
+  white-space: nowrap;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(225, 233, 255, 0.82);
+}
+
+/* State variants */
+
+.world-map-node--reachable .world-map-node-pin {
+  background: rgba(207, 190, 255, 0.4);
+  box-shadow: 0 0 0 1px rgba(196, 174, 255, 0.5),
+    0 0 16px rgba(206, 189, 255, 0.85);
+}
+
+.world-map-node--known .world-map-node-pin {
+  background: #fef3bd;
+  box-shadow: 0 0 0 1px rgba(247, 228, 174, 0.85),
+    0 0 18px rgba(255, 222, 140, 0.95);
+}
+
+.world-map-node--hidden .world-map-node-pin {
+  background: rgba(70, 79, 110, 0.65);
+  box-shadow: none;
+}
+
+.world-map-node--hidden .world-map-node-label {
+  color: rgba(122, 135, 170, 0.7);
+}

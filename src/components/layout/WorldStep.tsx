@@ -108,6 +108,17 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
   const closeActivePanel = () => setActivePanel(null);
 
+    // When the player picks a location on the biome map, treat it as "travel":
+  // - update the selected node in App via onSelectMapLocation
+  // - close the map HUD
+  // - softly resume auto-walk so it feels like you've set off again
+  const handleMapLocationSelect = (locationId: string) => {
+    onSelectMapLocation(locationId);
+    setActivePanel(null);       // close Map panel
+    setIsAutoWalking(true);     // optional: resume walking
+  };
+
+
   const dominantElement = profile?.traits?.dominantElement ?? null;
   const lighting = useBiomeLighting({
     phase,
@@ -499,14 +510,15 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
               {/* Map */}
                       {activePanel === "map" && (
-          <MapPanel
-            currentBiomeId={currentBiomeId}
-            phase={phase}
-            currentLocationId={currentLocationId}
-            discoveredLocations={discoveredLocations}
-            onSelectLocation={onSelectMapLocation}
-          />
-        )}
+  <MapPanel
+    currentBiomeId={currentBiomeId}
+    phase={phase}
+    currentLocationId={currentLocationId}
+    discoveredLocations={discoveredLocations}
+    onSelectLocation={handleMapLocationSelect}
+  />
+)}
+
 
 
               {/* Journal */}

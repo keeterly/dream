@@ -258,7 +258,16 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   // Encounter UI (glyph + top banner) hides once we've clicked / auto-picked
   const showEncounterUI = isEncounterActive && !isLootCollected;
 
- 
+  // --- Helper: format map location id into a nice label for the HUD ---
+  const prettyLocationName = (id: string | null | undefined): string => {
+    if (!id) return "—";
+
+    // super simple for now; you can swap in a shared lookup later
+    return id
+      .split("_")
+      .map((part) => part[0].toUpperCase() + part.slice(1))
+      .join(" ");
+  };
 
   return (
     <section className="app-screen app-screen-world">
@@ -335,6 +344,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 </span>
               </div>
 
+{/* Current location from overworld map */}
 <div className="world-hud-meta world-hud-meta--location">
   <span className="hud-label">Location</span>
   <span className="hud-value">

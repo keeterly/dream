@@ -1,4 +1,4 @@
-src/worldMap/duskValleyGraph.ts// src/worldMap/duskValleyGraph.ts
+// src/worldMap/duskValleyGraph.ts
 
 export const DUSK_VALLEY_GRAPH: Record<string, string[]> = {
   cave_of_departure: ["riverbreak_path"],

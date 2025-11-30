@@ -16,6 +16,18 @@ import { InventoryGridModal } from "../InventoryGridModal";
 type WorldPanelId = "inventory" | "character" | "map" | "journal" | "debug";
 
 
+// Helper: turn location ids like "valley_campfire" into "Valley Campfire"
+const prettyLocationName = (id?: string | null): string => {
+  if (!id) return "—";
+
+  return id
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+};
+
+
+
 interface WorldStepProps {
   profile: DreamselfProfile;
   inventory: InventoryItem[];
@@ -78,6 +90,11 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   const [hasReachedLoot, setHasReachedLoot] = useState(false);
   const [isLootCollected, setIsLootCollected] = useState(false);
 
+
+
+
+
+  
   // New spawn → simulate walk-in time from off-screen to the avatar
   useEffect(() => {
     if (!hasLootSpawned) {
@@ -357,7 +374,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
             <div className="world-hud-right">
               <div className="world-hud-phase">
                 <span className="hud-label">Phase</span>
-                <span className="hud-value">{phase}</span>
+                <span className="hud-value">{prettyLocationName(currentLocationId)}</span>
               </div>
 
               {/* Auto-walk toggle */}
@@ -526,16 +543,6 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                 />
               )}
 
-              {/* Map */}
-                      {activePanel === "map" && (
-  <MapPanel
-    currentBiomeId={currentBiomeId}
-    phase={phase}
-    currentLocationId={currentLocationId}
-    discoveredLocations={discoveredLocations}
-    onSelectLocation={onSelectMapLocation}
-  />
-)}
 
 
 

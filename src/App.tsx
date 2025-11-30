@@ -15,9 +15,8 @@ import { computeTraitsAndAvatar } from "./traits";
 import { WORLD_ITEMS } from "./worldItems";
 import { useJournal } from "./hooks/useJournal";
 
-// At the top of App.tsx with other imports
+// Overworld graph for Dusk Valley
 import { DUSK_VALLEY_GRAPH } from "./worldMap/duskValleyGraph";
-
 
 import { saveGameOnline, loadGameOnline } from "./persistence/remoteStorage";
 import type { SavedGameState } from "./persistence/gameState";
@@ -58,18 +57,20 @@ export const App: React.FC = () => {
   const [worldTick, setWorldTick] = useState(0);
 
   // ----- WORLD / MAP STATE -----
+  // Only one biome for now
   const [currentBiomeId] = useState<"dusk_valley">("dusk_valley");
 
-  // Start at the Cave, only that node discovered
-  const [currentLocationId, setCurrentLocationId] = useState<string>(
-    "cave_of_departure"
-  );
+  // Start at the Valley Campfire hub; cave + path already known
+  const [currentLocationId, setCurrentLocationId] =
+    useState<string>("valley_campfire");
+
   const [discoveredLocations, setDiscoveredLocations] = useState<string[]>([
     "cave_of_departure",
+    "riverbreak_path",
+    "valley_campfire",
   ]);
 
-
-  
+  // ----- ENCOUNTER STATE -----
   // Name of the item that’s visually on the ground in the world
   const [encounterItemName, setEncounterItemName] = useState<string | null>(
     null
@@ -79,7 +80,7 @@ export const App: React.FC = () => {
   const [activeEncounterItem, setActiveEncounterItem] =
     useState<InventoryItem | null>(null);
 
-  // Online save flags (you can expose these in the UI later if you want)
+  // Online save flags
   const [hasOnlineSave, setHasOnlineSave] = useState(false);
   const [loadingSave, setLoadingSave] = useState(true);
 
@@ -100,24 +101,6 @@ export const App: React.FC = () => {
 
     return () => window.clearInterval(id);
   }, [screen]);
-
-
-
-  // Map / biome state
-  const [currentBiomeId] = useState<string>("dusk_valley"); // only biome for now
-
-  const [currentLocationId, setCurrentLocationId] = useState<string>(
-    "valley_campfire" // starting hub
-  );
-
-  const [discoveredLocations, setDiscoveredLocations] = useState<string[]>([
-    "cave_departure",
-    "riverbreak_path",
-    "valley_campfire",
-    // shard_overlook / sunken_plaza / distant_ruin will be discovered later
-  ]);
-
-
 
   // ----- RANDOM ENCOUNTERS (ONLY RUNS IN WORLD) -----
   useEffect(() => {
@@ -201,36 +184,29 @@ export const App: React.FC = () => {
     });
   }, [screen, profile, inventory, journalEntries, worldTick]);
 
+  // ----- MAP / TRAVEL HANDLERS -----
+  const handleSelectMapLocation = (locationId: string) => {
+    // Change the “active” node in the biome map
+    setCurrentLocationId(locationId);
 
+    // Discovery rule: visiting a node reveals itself + its neighbors
+    setDiscoveredLocations((prev) => {
+      const next = new Set(prev);
 
+      // Always mark the destination itself as discovered
+      next.add(locationId);
 
-  // ----- TRAVEL HANDLERS -----
-    const handleSelectMapLocation = (locationId: string) => {
-      setCurrentLocationId(locationId);
+      const neighbors = DUSK_VALLEY_GRAPH[locationId] ?? [];
+      neighbors.forEach((id) => next.add(id));
 
-      setDiscoveredLocations((prev) => {
-        const next = new Set(prev);
+      return Array.from(next);
+    });
 
-        // Always mark the destination itself as discovered
-        next.add(locationId);
-
-        // Simple discovery rule: visiting a node reveals its neighbors
-        const neighbors = DUSK_VALLEY_GRAPH[locationId] ?? [];
-        neighbors.forEach((id) => next.add(id));
-
-        return Array.from(next);
-      });
-
-      // Later: log to journal, trigger events, etc.
-      // logLocationVisited(currentBiomeId, locationId);
-    };
-
-
-
-
+    // Later: log to journal, trigger events, etc.
+    // logBiomeVisited(currentBiomeId, locationId);
+  };
 
   // ----- START SCREEN HANDLERS -----
-
   /** Reset character creation + world state and begin a fresh run. */
   const startCharacterCreation = () => {
     setAnswers({});
@@ -247,13 +223,15 @@ export const App: React.FC = () => {
   const handleContinue = () => {
     if (profile) {
       setScreen("world");
+    } else if (!loadingSave && hasOnlineSave && profile) {
+      // (optional) later: hydrate from online save
+      setScreen("world");
     } else {
       startCharacterCreation();
     }
   };
 
   // ----- CHARACTER CREATION FLOW -----
-
   const handleBegin = () => {
     // From Intro → first question
     setScreen("questions");
@@ -283,25 +261,7 @@ export const App: React.FC = () => {
     setScreen("world");
   };
 
-
-  // ----- MAP / TRAVEL HANDLERS -----
-
-  const handleSelectMapLocation = (locationId: string) => {
-    // Change the “active” node in the biome map
-    setCurrentLocationId(locationId);
-
-    // If this node wasn't discovered yet, mark it as discovered
-    setDiscoveredLocations((prev) =>
-      prev.includes(locationId) ? prev : [...prev, locationId]
-    );
-
-    // later: you can tie this into encounter tables, background swaps, etc.
-  };
-
-
-
   // ----- WORLD ENCOUNTER HELPERS -----
-
   // DEBUG: force-spawn a relic encounter immediately
   const handleSpawnDebugItem = () => {
     const baseItem = getRandomWorldItem();
@@ -331,7 +291,6 @@ export const App: React.FC = () => {
   };
 
   // ----- SCREEN RENDERING -----
-
   const renderScreen = () => {
     const phase = getPhaseFromTick(worldTick);
 
@@ -376,7 +335,7 @@ export const App: React.FC = () => {
           phase={phase}
           activeEncounterItem={activeEncounterItem}
           onResolveEncounter={handleResolveEncounter}
-          // NEW: map-related props
+          // Map-related props
           currentBiomeId={currentBiomeId}
           currentLocationId={currentLocationId}
           discoveredLocations={discoveredLocations}
@@ -396,7 +355,8 @@ export const App: React.FC = () => {
       <div className={"App app-root" + (isWorld ? " app-root--world" : "")}>
         <main
           className={
-            "App-main app-main" + (isWorld ? " app-main--world" : " app-main--creation")
+            "App-main app-main" +
+            (isWorld ? " app-main--world" : " app-main--creation")
           }
         >
           {renderScreen()}

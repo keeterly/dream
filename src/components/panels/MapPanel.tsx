@@ -10,7 +10,11 @@ interface MapPanelProps {
 
   /** Optional – which locations in this biome have been discovered */
   discoveredLocations?: string[];
+
+  /** Called when the player clicks a known location on the map */
+  onSelectLocation?: (locationId: string) => void;
 }
+
 
 type BiomeNodeType = "path" | "camp" | "overlook" | "hub" | "unknown";
 
@@ -83,6 +87,7 @@ export const MapPanel: React.FC<MapPanelProps> = ({
   phase,
   currentLocationId,
   discoveredLocations,
+  onSelectLocation, // NEW
 }) => {
   // --- Overworld strip ------------------------------------------------------
 
@@ -190,15 +195,17 @@ export const MapPanel: React.FC<MapPanelProps> = ({
                       left: `${node.x}%`,
                       top: `${node.y}%`,
                     }}
-                    // later: hook into travel selection
+                    disabled={!isDiscovered || !onSelectLocation}
                     onClick={(e) => {
                       e.preventDefault();
-                      // placeholder – no-op for now
+                      if (!onSelectLocation || !isDiscovered) return;
+                      onSelectLocation(node.id);
                     }}
                   >
                     <span className="map-biome-node-pin" />
                     <span className="map-biome-node-label">{label}</span>
                   </button>
+
                 );
               })}
             </div>

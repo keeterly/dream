@@ -26,6 +26,11 @@ interface WorldStepProps {
   activeEncounterItem: InventoryItem | null;
   /** Clear the current encounter + add to inventory in parent */
   onResolveEncounter: () => void;
+   // NEW
+  currentBiomeId: string;
+  currentLocationId: string;
+  discoveredLocations: string[];
+  onSelectMapLocation: (locationId: string) => void;
 }
 
 export const WorldStep: React.FC<WorldStepProps> = ({
@@ -37,6 +42,13 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   phase,
   activeEncounterItem,
   onResolveEncounter,
+
+   // NEW
+  currentBiomeId,
+  currentLocationId,
+  discoveredLocations,
+  onSelectMapLocation,
+
 }) => {
   const [activePanel, setActivePanel] = useState<WorldPanelId | null>(null);
 
@@ -243,7 +255,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
         {/* WORLD LANE / PARALLAX BACKGROUND */}
         <WorldLane
           profile={profile}
-          environmentId="dusk_valley"
+          environmentId={currentBiomeId}
           phase={phase}
           encounterItemName={encounterItemName}
           isEncounterActive={showEncounterUI}
@@ -486,9 +498,16 @@ export const WorldStep: React.FC<WorldStepProps> = ({
               )}
 
               {/* Map */}
-              {activePanel === "map" && (
-                <MapPanel currentBiomeId="dusk_valley" phase={phase} />
-              )}
+                      {activePanel === "map" && (
+          <MapPanel
+            currentBiomeId={currentBiomeId}
+            phase={phase}
+            currentLocationId={currentLocationId}
+            discoveredLocations={discoveredLocations}
+            onSelectLocation={onSelectMapLocation}
+          />
+        )}
+
 
               {/* Journal */}
               {activePanel === "journal" && (

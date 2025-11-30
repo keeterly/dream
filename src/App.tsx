@@ -84,6 +84,24 @@ export const App: React.FC = () => {
     return () => window.clearInterval(id);
   }, [screen]);
 
+
+
+  // Map / biome state
+  const [currentBiomeId] = useState<string>("dusk_valley"); // only biome for now
+
+  const [currentLocationId, setCurrentLocationId] = useState<string>(
+    "valley_campfire" // starting hub
+  );
+
+  const [discoveredLocations, setDiscoveredLocations] = useState<string[]>([
+    "cave_departure",
+    "riverbreak_path",
+    "valley_campfire",
+    // shard_overlook / sunken_plaza / distant_ruin will be discovered later
+  ]);
+
+
+
   // ----- RANDOM ENCOUNTERS (ONLY RUNS IN WORLD) -----
   useEffect(() => {
     if (screen !== "world") return;
@@ -220,6 +238,23 @@ export const App: React.FC = () => {
     setScreen("world");
   };
 
+
+  // ----- MAP / TRAVEL HANDLERS -----
+
+  const handleSelectMapLocation = (locationId: string) => {
+    // Change the “active” node in the biome map
+    setCurrentLocationId(locationId);
+
+    // If this node wasn't discovered yet, mark it as discovered
+    setDiscoveredLocations((prev) =>
+      prev.includes(locationId) ? prev : [...prev, locationId]
+    );
+
+    // later: you can tie this into encounter tables, background swaps, etc.
+  };
+
+
+
   // ----- WORLD ENCOUNTER HELPERS -----
 
   // DEBUG: force-spawn a relic encounter immediately
@@ -296,6 +331,11 @@ export const App: React.FC = () => {
           phase={phase}
           activeEncounterItem={activeEncounterItem}
           onResolveEncounter={handleResolveEncounter}
+          // NEW: map-related props
+          currentBiomeId={currentBiomeId}
+          currentLocationId={currentLocationId}
+          discoveredLocations={discoveredLocations}
+          onSelectMapLocation={handleSelectMapLocation}
         />
       );
     }

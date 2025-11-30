@@ -334,6 +334,14 @@ export const WorldStep: React.FC<WorldStepProps> = ({
                   {profile.traits.primaryArchetype}
                 </span>
               </div>
+
+<div className="world-hud-meta world-hud-meta--location">
+  <span className="hud-label">Location</span>
+  <span className="hud-value">
+    {prettyLocationName(currentLocationId)}
+  </span>
+</div>
+
             </div>
 
             <div className="world-hud-right">
@@ -515,7 +523,7 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     phase={phase}
     currentLocationId={currentLocationId}
     discoveredLocations={discoveredLocations}
-    onSelectLocation={handleMapLocationSelect}
+    onSelectLocation={onSelectMapLocation}
   />
 )}
 

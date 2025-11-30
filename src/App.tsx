@@ -15,6 +15,10 @@ import { computeTraitsAndAvatar } from "./traits";
 import { WORLD_ITEMS } from "./worldItems";
 import { useJournal } from "./hooks/useJournal";
 
+// At the top of App.tsx with other imports
+import { DUSK_VALLEY_GRAPH } from "./worldMap/duskValleyGraph";
+
+
 import { saveGameOnline, loadGameOnline } from "./persistence/remoteStorage";
 import type { SavedGameState } from "./persistence/gameState";
 
@@ -53,6 +57,19 @@ export const App: React.FC = () => {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [worldTick, setWorldTick] = useState(0);
 
+  // ----- WORLD / MAP STATE -----
+  const [currentBiomeId] = useState<"dusk_valley">("dusk_valley");
+
+  // Start at the Cave, only that node discovered
+  const [currentLocationId, setCurrentLocationId] = useState<string>(
+    "cave_of_departure"
+  );
+  const [discoveredLocations, setDiscoveredLocations] = useState<string[]>([
+    "cave_of_departure",
+  ]);
+
+
+  
   // Name of the item that’s visually on the ground in the world
   const [encounterItemName, setEncounterItemName] = useState<string | null>(
     null
@@ -183,6 +200,34 @@ export const App: React.FC = () => {
       console.error("Failed to sync save online", err);
     });
   }, [screen, profile, inventory, journalEntries, worldTick]);
+
+
+
+
+  // ----- TRAVEL HANDLERS -----
+    const handleSelectMapLocation = (locationId: string) => {
+      setCurrentLocationId(locationId);
+
+      setDiscoveredLocations((prev) => {
+        const next = new Set(prev);
+
+        // Always mark the destination itself as discovered
+        next.add(locationId);
+
+        // Simple discovery rule: visiting a node reveals its neighbors
+        const neighbors = DUSK_VALLEY_GRAPH[locationId] ?? [];
+        neighbors.forEach((id) => next.add(id));
+
+        return Array.from(next);
+      });
+
+      // Later: log to journal, trigger events, etc.
+      // logLocationVisited(currentBiomeId, locationId);
+    };
+
+
+
+
 
   // ----- START SCREEN HANDLERS -----
 

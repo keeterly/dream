@@ -7,6 +7,8 @@ import { QuestionStep } from "./components/layout/QuestionStep";
 import { SummaryStep } from "./components/layout/SummaryStep";
 import { WorldStep } from "./components/layout/WorldStep";
 
+
+
 import { StartScreen } from "./components/start/StartScreen";
 import { SettingsModal } from "./components/start/SettingsModal";
 
@@ -17,6 +19,10 @@ import { useJournal } from "./hooks/useJournal";
 
 // Map graph for Dusk Valley travel
 import { DUSK_VALLEY_GRAPH } from "./worldMap/duskValleyGraph";
+
+import type { LocationEventDefinition } from "./worldEvents/duskValleyEvents";
+import { findEventForLocation } from "./worldEvents/duskValleyEvents";
+
 
 import { saveGameOnline, loadGameOnline } from "./persistence/remoteStorage";
 import type { SavedGameState } from "./persistence/gameState";
@@ -39,9 +45,14 @@ function getPhaseFromTick(tick: number): string {
   return PHASES[segment] ?? "Night";
 }
 
-function getRandomWorldItem() {
-  return WORLD_ITEMS[Math.floor(Math.random() * WORLD_ITEMS.length)];
+function getRandomWorldItem(currentLocationId: string) {
+  const table =
+    LOCATION_ITEM_TABLES[currentLocationId] ?? WORLD_ITEMS; // fallback
+
+  const pool = table.length > 0 ? table : WORLD_ITEMS;
+  return pool[Math.floor(Math.random() * pool.length)];
 }
+
 
 export const App: React.FC = () => {
   // ----- GLOBAL SCREEN STATE -----
@@ -62,6 +73,12 @@ export const App: React.FC = () => {
   const [currentBiomeId, setCurrentBiomeId] =
     useState<"dusk_valley">("dusk_valley");
 
+  // ----- LOCATION EVENTS (RUINS / DUNGEONS) -----
+  const [activeLocationEvent, setActiveLocationEvent] =
+    useState<LocationEventDefinition | null>(null);
+  const [resolvedEventIds, setResolvedEventIds] = useState<string[]>([]);
+
+    
   // Start at the Valley Campfire hub in a fresh game.
   const [currentLocationId, setCurrentLocationId] =
     useState<string>("valley_campfire");
@@ -103,11 +120,15 @@ export const App: React.FC = () => {
   }, [screen]);
 
   // ----- RANDOM ENCOUNTERS (ONLY RUNS IN WORLD) -----
-  useEffect(() => {
+    useEffect(() => {
     if (screen !== "world") return;
+
+    // Don't roll relics while a ruin / dungeon event is onscreen
+    if (activeLocationEvent) return;
 
     // If an encounter is already active or visually on the ground, do nothing
     if (activeEncounterItem || encounterItemName) return;
+
 
     // Random delay between 8–20 seconds before next encounter
     const delay = 8000 + Math.random() * 12000;
@@ -129,7 +150,27 @@ export const App: React.FC = () => {
     }, delay);
 
     return () => window.clearTimeout(id);
-  }, [screen, activeEncounterItem, encounterItemName]);
+   }, [screen, activeLocationEvent, activeEncounterItem, encounterItemName]);
+
+
+
+  // ----- LOCATION EVENTS: RUINS / DUNGEONS -----
+  useEffect(() => {
+    if (screen !== "world") return;
+
+    const event = findEventForLocation(
+      currentBiomeId,
+      currentLocationId,
+      resolvedEventIds
+    );
+
+    if (!event) return;
+
+    // Show the ruin / dungeon event panel in WorldStep
+    setActiveLocationEvent(event);
+  }, [screen, currentBiomeId, currentLocationId, resolvedEventIds]);
+
+
 
   // ----- BOOTSTRAP FROM ONLINE SAVE ONCE -----
   useEffect(() => {
@@ -248,6 +289,8 @@ export const App: React.FC = () => {
     setWorldTick(0);
     setEncounterItemName(null);
     setActiveEncounterItem(null);
+    setActiveLocationEvent(null);
+    setResolvedEventIds([]);
 
     // Reset map to fresh-state defaults
     setCurrentBiomeId("dusk_valley");
@@ -302,6 +345,24 @@ export const App: React.FC = () => {
   };
 
   // ----- WORLD ENCOUNTER HELPERS -----
+
+
+  const handleResolveLocationEvent = () => {
+    if (!activeLocationEvent) return;
+
+    setResolvedEventIds((prev) =>
+      prev.includes(activeLocationEvent.id)
+        ? prev
+        : [...prev, activeLocationEvent.id]
+    );
+
+    // Later: give rewards, push journal entries, unlock new systems, etc.
+    // logBiomeVisited(currentBiomeId, `${activeLocationEvent.locationId}_event`);
+
+    setActiveLocationEvent(null);
+  };
+
+
 
   // DEBUG: force-spawn a relic encounter immediately
   const handleSpawnDebugItem = () => {
@@ -366,7 +427,7 @@ export const App: React.FC = () => {
       return <SummaryStep profile={profile} onEnterWorld={handleEnterWorld} />;
     }
 
-    if (screen === "world" && profile) {
+        if (screen === "world" && profile) {
       return (
         <WorldStep
           profile={profile}
@@ -382,9 +443,13 @@ export const App: React.FC = () => {
           currentLocationId={currentLocationId}
           discoveredLocations={discoveredLocations}
           onSelectMapLocation={handleSelectMapLocation}
+          // Ruin / dungeon event
+          activeLocationEvent={activeLocationEvent}
+          onResolveLocationEvent={handleResolveLocationEvent}
         />
       );
     }
+
 
     // Fallback – should rarely hit
     return <IntroStep onBegin={handleBegin} />;

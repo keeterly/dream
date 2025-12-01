@@ -12,6 +12,7 @@ import { useBiomeLighting } from "../../hooks/useBiomeLighting";
 import { DreamselfPanel } from "../panels/DreamselfPanel";
 import { MapPanel } from "../panels/MapPanel";
 import { InventoryGridModal } from "../InventoryGridModal";
+import type { LocationEventDefinition } from "../../worldEvents/duskValleyEvents";
 
 
 // Simple label map so we can control naming without relying on id → title shaping.
@@ -55,6 +56,10 @@ interface WorldStepProps {
   currentLocationId: string;
   discoveredLocations: string[];
   onSelectMapLocation: (locationId: string) => void;
+
+   // Ruin / dungeon events
+  activeLocationEvent: LocationEventDefinition | null;
+  onResolveLocationEvent: () => void;
 }
 
 export const WorldStep: React.FC<WorldStepProps> = ({
@@ -72,6 +77,9 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   currentLocationId,
   discoveredLocations,
   onSelectMapLocation,
+
+  activeLocationEvent,
+  onResolveLocationEvent,
 
 }) => {
   const [activePanel, setActivePanel] = useState<WorldPanelId | null>(null);
@@ -203,8 +211,20 @@ export const WorldStep: React.FC<WorldStepProps> = ({
    * Auto-encounter roll while actually walking.
    * We don't spawn a new item if one is already walking in or active.
    */
-  useEffect(() => {
-    if (!isWalking || isEncounterActive || hasLootSpawned) return;
+    useEffect(() => {
+    if (!isWalking || isEncounterActive || hasLootSpawned || activeLocationEvent)
+      return;
+
+    // 5–10 seconds between potential drops while walking
+    const delay = 5000 + Math.random() * 5000;
+    const id = window.setTimeout(() => {
+      setWasAutoWalkingBeforeEncounter(true);
+      onSpawnDebugItem();
+    }, delay);
+
+    return () => window.clearTimeout(id);
+  }, [isWalking, isEncounterActive, hasLootSpawned, activeLocationEvent, onSpawnDebugItem]);
+
 
     // 5–10 seconds between potential drops while walking
     const delay = 5000 + Math.random() * 5000;
@@ -345,6 +365,44 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
         {/* OVERLAY: HUD + DOCK + PANELS */}
         <div className="world-overlay">
+                  {/* Location events (ruins / dungeons, etc.) */}
+          {activeLocationEvent && (
+            <div
+              className="world-panel-modal-backdrop"
+              onClick={onResolveLocationEvent}
+            >
+              <div
+                className="world-panel-modal"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="world-panel">
+                  <div className="world-panel-header">
+                    <div className="world-panel-header-left">
+                      <span className="world-panel-header-eyebrow">
+                        Ruin Discovered
+                      </span>
+                      <span className="world-panel-header-title">
+                        {activeLocationEvent.title}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="world-panel-body">
+                    <p className="world-panel-copy">
+                      {activeLocationEvent.description}
+                    </p>
+                    <button
+                      type="button"
+                      className="world-debug-pill"
+                      onClick={onResolveLocationEvent}
+                    >
+                      <span className="world-debug-pill__label">Continue</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* HUD (top) */}
           <div className="world-hud">
             <div className="world-hud-left">

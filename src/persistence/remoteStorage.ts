@@ -2,44 +2,43 @@
 import type { SavedGameState } from "./gameState";
 
 const DEFAULT_SLOT_ID = "slot-1";
-const API_BASE = "/api";
-const LOCAL_KEY = `dream-save-${DEFAULT_SLOT_ID}`;
+// In dev, Vite proxy will forward "/api" to your backend.
+// In production you can set VITE_API_BASE to your deployed server URL.
+const API_BASE =
+  (import.meta as any).env?.VITE_API_BASE && (import.meta as any).env.VITE_API_BASE !== ""
+    ? (import.meta as any).env.VITE_API_BASE
+    : "";
 
-function saveToLocal(state: SavedGameState) {
-  if (typeof window === "undefined") return;
-  try {
-    const payload = { state, savedAt: new Date().toISOString() };
-    window.localStorage.setItem(LOCAL_KEY, JSON.stringify(payload));
-  } catch (err) {
-    console.error("Failed to write local save", err);
+// ---- Player identity --------------------------------------------------
+
+// For now we use an anonymous per-browser playerId so multiple browsers
+// count as separate "players". Later you can swap this to real auth.
+const PLAYER_ID_KEY = "dream-player-id";
+
+function getPlayerId(): string {
+  if (typeof window === "undefined") return "anonymous";
+
+  let id = window.localStorage.getItem(PLAYER_ID_KEY);
+  if (!id) {
+    // simple random id for now
+    id = `anon-${crypto.randomUUID()}`;
+    window.localStorage.setItem(PLAYER_ID_KEY, id);
   }
+  return id;
 }
 
-function loadFromLocal(): SavedGameState | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(LOCAL_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    // handle both { state } and raw SavedGameState
-    return (parsed && parsed.state) || parsed || null;
-  } catch (err) {
-    console.error("Failed to read local save", err);
-    return null;
-  }
-}
+// ---- Remote Save / Load -----------------------------------------------
 
 export async function saveGameOnline(state: SavedGameState): Promise<void> {
-  // Always keep a local backup
-  saveToLocal(state);
+  const playerId = getPlayerId();
 
-  // Best-effort remote save (safe to fail)
   try {
-    const res = await fetch(`${API_BASE}/save-game`, {
+    const res = await fetch(`${API_BASE}/api/save-game`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         slotId: DEFAULT_SLOT_ID,
+        playerId,
         state,
       }),
     });
@@ -48,20 +47,21 @@ export async function saveGameOnline(state: SavedGameState): Promise<void> {
       console.error("Failed to save game (remote)", await res.text());
     }
   } catch (err) {
-    console.error("Failed to save game (network error)", err);
+    console.error("Failed to save game (network)", err);
   }
 }
 
 export async function loadGameOnline(): Promise<SavedGameState | null> {
-  // 1) Try local first – this makes everything work even without a backend
-  const local = loadFromLocal();
-  if (local) return local;
+  const playerId = getPlayerId();
 
-  // 2) If there’s a backend later, try that as well
   try {
     const res = await fetch(
-      `${API_BASE}/load-game?slotId=${encodeURIComponent(DEFAULT_SLOT_ID)}`,
-      { method: "GET" }
+      `${API_BASE}/api/load-game?slotId=${encodeURIComponent(
+        DEFAULT_SLOT_ID
+      )}&playerId=${encodeURIComponent(playerId)}`,
+      {
+        method: "GET",
+      }
     );
 
     if (!res.ok) {
@@ -70,15 +70,10 @@ export async function loadGameOnline(): Promise<SavedGameState | null> {
     }
 
     const data = await res.json();
-    const remoteState: SavedGameState | null =
-      (data && data.state) || null;
-
-   // option: cache remote save locally too
-    if (remoteState) saveToLocal(remoteState);
-
-    return remoteState;
+    // expect { ok: true, state: SavedGameState | null, ... }
+    return (data && data.state) || null;
   } catch (err) {
-    console.error("Failed to load game (network error)", err);
+    console.error("Failed to load game (network)", err);
     return null;
   }
 }

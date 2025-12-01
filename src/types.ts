@@ -110,3 +110,14 @@ export interface JournalEntry {
   body?: string;
   meta?: Record<string, unknown>;
 }
+
+
+export type LocationEventKind = "ruin" | "dungeon";
+
+export interface LocationEvent {
+  locationId: string;
+  kind: LocationEventKind;
+  title: string;
+  body: string;
+  actionLabel: string;
+}

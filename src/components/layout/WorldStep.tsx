@@ -4,6 +4,7 @@ import type {
   DreamselfProfile,
   InventoryItem,
   JournalEntry,
+   LocationEvent,
 } from "../../types";
 import WorldLane from "../WorldLane";
 import { JournalPanel } from "../panels/JournalPanel";
@@ -51,15 +52,16 @@ interface WorldStepProps {
   activeEncounterItem: InventoryItem | null;
   /** Clear the current encounter + add to inventory in parent */
   onResolveEncounter: () => void;
-   // NEW
+
+  // Map-related props
   currentBiomeId: string;
   currentLocationId: string;
   discoveredLocations: string[];
   onSelectMapLocation: (locationId: string) => void;
 
-   // Ruin / dungeon events
-  activeLocationEvent: LocationEventDefinition | null;
-  onResolveLocationEvent: () => void;
+  // Ruin / dungeon events
+  activeLocationEvent: LocationEvent | null;
+  onCloseLocationEvent: (entered: boolean) => void;
 }
 
 export const WorldStep: React.FC<WorldStepProps> = ({
@@ -72,14 +74,13 @@ export const WorldStep: React.FC<WorldStepProps> = ({
   activeEncounterItem,
   onResolveEncounter,
 
-   // NEW
   currentBiomeId,
   currentLocationId,
   discoveredLocations,
   onSelectMapLocation,
 
   activeLocationEvent,
-  onResolveLocationEvent,
+  onCloseLocationEvent,
 
 }) => {
   const [activePanel, setActivePanel] = useState<WorldPanelId | null>(null);
@@ -365,37 +366,52 @@ export const WorldStep: React.FC<WorldStepProps> = ({
 
         {/* OVERLAY: HUD + DOCK + PANELS */}
         <div className="world-overlay">
-                  {/* Location events (ruins / dungeons, etc.) */}
+                  {/* LOCATION EVENT: ruins / dungeons */}
           {activeLocationEvent && (
             <div
-              className="world-panel-modal-backdrop"
-              onClick={onResolveLocationEvent}
+              className="world-panel-modal-backdrop world-location-event-backdrop"
+              onClick={() => onCloseLocationEvent(false)}
             >
               <div
-                className="world-panel-modal"
+                className="world-panel-modal world-location-event"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="world-panel">
+                <div className="world-panel world-panel-location">
                   <div className="world-panel-header">
                     <div className="world-panel-header-left">
                       <span className="world-panel-header-eyebrow">
-                        Ruin Discovered
+                        {activeLocationEvent.kind === "dungeon"
+                          ? "Dungeon"
+                          : "Ruin"}
                       </span>
                       <span className="world-panel-header-title">
                         {activeLocationEvent.title}
                       </span>
                     </div>
+                    <button
+                      type="button"
+                      className="inventory-modal-close"
+                      onClick={() => onCloseLocationEvent(false)}
+                      aria-label="Close location event"
+                    >
+                      ×
+                    </button>
                   </div>
+
                   <div className="world-panel-body">
                     <p className="world-panel-copy">
-                      {activeLocationEvent.description}
+                      {activeLocationEvent.body}
                     </p>
+
                     <button
                       type="button"
                       className="world-debug-pill"
-                      onClick={onResolveLocationEvent}
+                      onClick={() => onCloseLocationEvent(true)}
                     >
-                      <span className="world-debug-pill__label">Continue</span>
+                      <span className="world-debug-pill__orb" />
+                      <span className="world-debug-pill__label">
+                        {activeLocationEvent.actionLabel}
+                      </span>
                     </button>
                   </div>
                 </div>

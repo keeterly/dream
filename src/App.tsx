@@ -33,11 +33,47 @@ import type {
   DreamselfProfile,
   InventoryItem,
   JournalEntry,
+  LocationEvent,       // ← add this
 } from "./types";
+
+
+type LocationEventKind = "ruin" | "dungeon";
+
+const DUSK_VALLEY_LOCATION_EVENTS: Record<string, LocationEvent> = {
+  shard_overlook: {
+    locationId: "shard_overlook",
+    kind: "ruin",
+    title: "Shard Overlook",
+    body:
+      "An abandoned watchpoint above the valley. Broken glass and hanging wires catch the light. Something still watches from the dark lenses.",
+    actionLabel: "Approach the overlook",
+  },
+  sunken_plaza: {
+    locationId: "sunken_plaza",
+    kind: "ruin",
+    title: "Sunken Plaza",
+    body:
+      "The remains of a plaza half-swallowed by earth and roots. Vending pillars, flickering signs, and a dry fountain hold relics of another age.",
+    actionLabel: "Search the plaza",
+  },
+  murmuring_faults: {
+    locationId: "murmuring_faults",
+    kind: "dungeon",
+    title: "Murmuring Faults",
+    body:
+      "A fracture in the valley floor where wind and distant machinery speak in the same low tone. Descending here will change your path.",
+    actionLabel: "Descend into the faults",
+  },
+};
+
+
 
 type ScreenId = "start" | "intro" | "questions" | "summary" | "world";
 
 const PHASES = ["Dawn", "Day", "Dusk", "Night"] as const;
+
+
+
 
 function getPhaseFromTick(tick: number): string {
   // 48 ticks → full cycle (Dawn, Day, Dusk, Night)
@@ -72,6 +108,11 @@ export const App: React.FC = () => {
   // Only one biome for now, but keep setter so we can hydrate from save later.
   const [currentBiomeId, setCurrentBiomeId] =
     useState<"dusk_valley">("dusk_valley");
+
+  // Location / dungeon event currently showing (if any)
+  const [activeLocationEvent, setActiveLocationEvent] =
+    useState<LocationEvent | null>(null);
+
 
   // ----- LOCATION EVENTS (RUINS / DUNGEONS) -----
   const [activeLocationEvent, setActiveLocationEvent] =
@@ -258,9 +299,14 @@ export const App: React.FC = () => {
   ]);
 
   // ----- TRAVEL HANDLERS -----
-  const handleSelectMapLocation = (locationId: string) => {
+    const handleSelectMapLocation = (locationId: string) => {
+    // Was this node already known before this click?
+    const wasAlreadyDiscovered = discoveredLocations.includes(locationId);
+
+    // Update which node we are “standing” at in this biome
     setCurrentLocationId(locationId);
 
+    // Update discovery fog: visiting a node reveals itself + its neighbors
     setDiscoveredLocations((prev) => {
       const next = new Set(prev);
 
@@ -274,9 +320,31 @@ export const App: React.FC = () => {
       return Array.from(next);
     });
 
-    // Later: log to journal, trigger events, etc.
+    // If this is a ruin / dungeon and it's the first time we've ever seen it,
+    // queue up a location event.
+    if (!wasAlreadyDiscovered) {
+      const def = DUSK_VALLEY_LOCATION_EVENTS[locationId];
+      if (def) {
+        setActiveLocationEvent(def);
+      }
+    }
+
+    // Later: log to journal, trigger biome events, etc.
     // logBiomeVisited(currentBiomeId, locationId);
   };
+
+
+    const handleCloseLocationEvent = (entered: boolean) => {
+    // For now we just dismiss the modal.
+    // Later you can branch on `entered` to actually enter a dungeon scene.
+    setActiveLocationEvent(null);
+
+    // Example future hook:
+    // if (entered && activeLocationEvent) {
+    //   logLocationEntered(currentBiomeId, activeLocationEvent.locationId);
+    // }
+  };
+
 
   // ----- START SCREEN HANDLERS -----
 

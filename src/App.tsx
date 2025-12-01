@@ -16,6 +16,7 @@ import { QUESTIONS } from "./questions";
 import { computeTraitsAndAvatar } from "./traits";
 import { WORLD_ITEMS } from "./worldItems";
 import { useJournal } from "./hooks/useJournal";
+import { LOCATION_ITEM_TABLES } from "./worldItemsByLocation";
 
 // Map graph for Dusk Valley travel
 import { DUSK_VALLEY_GRAPH } from "./worldMap/duskValleyGraph";
@@ -109,10 +110,6 @@ export const App: React.FC = () => {
   const [currentBiomeId, setCurrentBiomeId] =
     useState<"dusk_valley">("dusk_valley");
 
-  // Location / dungeon event currently showing (if any)
-  const [activeLocationEvent, setActiveLocationEvent] =
-    useState<LocationEvent | null>(null);
-
 
   // ----- LOCATION EVENTS (RUINS / DUNGEONS) -----
   const [activeLocationEvent, setActiveLocationEvent] =
@@ -175,7 +172,7 @@ export const App: React.FC = () => {
     const delay = 8000 + Math.random() * 12000;
 
     const id = window.setTimeout(() => {
-      const baseItem = getRandomWorldItem();
+      const baseItem = getRandomWorldItem(currentLocationId);
       const acquiredAt = new Date().toISOString();
 
       const pending: InventoryItem = {
@@ -191,7 +188,7 @@ export const App: React.FC = () => {
     }, delay);
 
     return () => window.clearTimeout(id);
-   }, [screen, activeLocationEvent, activeEncounterItem, encounterItemName]);
+   }, [screen, activeLocationEvent, activeEncounterItem, encounterItemName, currentLocationId,]);
 
 
 
@@ -203,6 +200,7 @@ export const App: React.FC = () => {
       currentBiomeId,
       currentLocationId,
       resolvedEventIds
+      
     );
 
     if (!event) return;
@@ -434,7 +432,7 @@ export const App: React.FC = () => {
 
   // DEBUG: force-spawn a relic encounter immediately
   const handleSpawnDebugItem = () => {
-    const baseItem = getRandomWorldItem();
+    const baseItem = getRandomWorldItem(currentLocationId);
     const acquiredAt = new Date().toISOString();
 
     const pending: InventoryItem = {

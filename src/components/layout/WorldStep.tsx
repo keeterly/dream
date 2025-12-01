@@ -13,6 +13,18 @@ import { DreamselfPanel } from "../panels/DreamselfPanel";
 import { MapPanel } from "../panels/MapPanel";
 import { InventoryGridModal } from "../InventoryGridModal";
 
+
+// Simple label map so we can control naming without relying on id → title shaping.
+const LOCATION_LABELS: Record<string, string> = {
+  cave_of_departure: "Cave of Departure",
+  riverbreak_path: "Riverbreak Path",
+  valley_campfire: "Valley Campfire",
+  shard_overlook: "Shard Overlook",
+  sunken_plaza: "Sunken Plaza",
+  murmuring_faults: "Murmuring Faults",
+};
+
+
 type WorldPanelId = "inventory" | "character" | "map" | "journal" | "debug";
 
 

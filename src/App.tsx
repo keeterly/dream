@@ -15,7 +15,7 @@ import { computeTraitsAndAvatar } from "./traits";
 import { WORLD_ITEMS } from "./worldItems";
 import { useJournal } from "./hooks/useJournal";
 
-// Overworld graph for Dusk Valley
+// Map graph for Dusk Valley travel
 import { DUSK_VALLEY_GRAPH } from "./worldMap/duskValleyGraph";
 
 import { saveGameOnline, loadGameOnline } from "./persistence/remoteStorage";
@@ -57,10 +57,11 @@ export const App: React.FC = () => {
   const [worldTick, setWorldTick] = useState(0);
 
   // ----- WORLD / MAP STATE -----
-  // Only one biome for now
-  const [currentBiomeId] = useState<"dusk_valley">("dusk_valley");
+  // Only one biome for now, but keep setter so we can hydrate from save later.
+  const [currentBiomeId, setCurrentBiomeId] =
+    useState<"dusk_valley">("dusk_valley");
 
-  // Start at the Valley Campfire hub; cave + path already known
+  // Start at the Valley Campfire hub in a fresh game.
   const [currentLocationId, setCurrentLocationId] =
     useState<string>("valley_campfire");
 
@@ -68,15 +69,13 @@ export const App: React.FC = () => {
     "cave_of_departure",
     "riverbreak_path",
     "valley_campfire",
+    // shard_overlook / sunken_plaza / murmuring_faults discovered as you travel
   ]);
 
-  // ----- ENCOUNTER STATE -----
-  // Name of the item that’s visually on the ground in the world
+  // ----- ENCOUNTERS -----
   const [encounterItemName, setEncounterItemName] = useState<string | null>(
     null
   );
-
-  // The specific inventory item currently being encountered
   const [activeEncounterItem, setActiveEncounterItem] =
     useState<InventoryItem | null>(null);
 
@@ -143,12 +142,31 @@ export const App: React.FC = () => {
           return;
         }
 
-        const { profile, inventory, journalEntries, worldTick } = saved;
+        const {
+          profile: savedProfile,
+          inventory: savedInventory,
+          journalEntries: savedJournalEntries,
+          worldTick: savedWorldTick,
+          currentBiomeId: savedBiomeId,
+          currentLocationId: savedLocationId,
+          discoveredLocations: savedDiscoveredLocations,
+        } = saved as SavedGameState;
 
-        setProfile(profile);
-        setInventory(inventory);
-        // If you later add a journal hydrate method, call it here with journalEntries.
-        setWorldTick(worldTick);
+        setProfile(savedProfile);
+        setInventory(savedInventory);
+        // If you later add a journal hydrate method, call it here with savedJournalEntries.
+        setWorldTick(savedWorldTick);
+
+        // Map state with safe fallbacks for older saves
+        if (savedBiomeId) {
+          setCurrentBiomeId(savedBiomeId as "dusk_valley");
+        }
+        if (savedLocationId) {
+          setCurrentLocationId(savedLocationId);
+        }
+        if (Array.isArray(savedDiscoveredLocations)) {
+          setDiscoveredLocations(savedDiscoveredLocations);
+        }
 
         setHasOnlineSave(true);
       } catch (err) {
@@ -176,26 +194,37 @@ export const App: React.FC = () => {
       inventory,
       journalEntries,
       worldTick,
+      currentBiomeId,
+      currentLocationId,
+      discoveredLocations,
     };
 
     // fire-and-forget sync
     saveGameOnline(stateToSave).catch((err) => {
       console.error("Failed to sync save online", err);
     });
-  }, [screen, profile, inventory, journalEntries, worldTick]);
+  }, [
+    screen,
+    profile,
+    inventory,
+    journalEntries,
+    worldTick,
+    currentBiomeId,
+    currentLocationId,
+    discoveredLocations,
+  ]);
 
-  // ----- MAP / TRAVEL HANDLERS -----
+  // ----- TRAVEL HANDLERS -----
   const handleSelectMapLocation = (locationId: string) => {
-    // Change the “active” node in the biome map
     setCurrentLocationId(locationId);
 
-    // Discovery rule: visiting a node reveals itself + its neighbors
     setDiscoveredLocations((prev) => {
       const next = new Set(prev);
 
       // Always mark the destination itself as discovered
       next.add(locationId);
 
+      // Simple discovery rule: visiting a node reveals its neighbors
       const neighbors = DUSK_VALLEY_GRAPH[locationId] ?? [];
       neighbors.forEach((id) => next.add(id));
 
@@ -207,6 +236,7 @@ export const App: React.FC = () => {
   };
 
   // ----- START SCREEN HANDLERS -----
+
   /** Reset character creation + world state and begin a fresh run. */
   const startCharacterCreation = () => {
     setAnswers({});
@@ -216,6 +246,16 @@ export const App: React.FC = () => {
     setWorldTick(0);
     setEncounterItemName(null);
     setActiveEncounterItem(null);
+
+    // Reset map to fresh-state defaults
+    setCurrentBiomeId("dusk_valley");
+    setCurrentLocationId("valley_campfire");
+    setDiscoveredLocations([
+      "cave_of_departure",
+      "riverbreak_path",
+      "valley_campfire",
+    ]);
+
     setScreen("intro");
   };
 
@@ -223,15 +263,13 @@ export const App: React.FC = () => {
   const handleContinue = () => {
     if (profile) {
       setScreen("world");
-    } else if (!loadingSave && hasOnlineSave && profile) {
-      // (optional) later: hydrate from online save
-      setScreen("world");
     } else {
       startCharacterCreation();
     }
   };
 
   // ----- CHARACTER CREATION FLOW -----
+
   const handleBegin = () => {
     // From Intro → first question
     setScreen("questions");
@@ -262,6 +300,7 @@ export const App: React.FC = () => {
   };
 
   // ----- WORLD ENCOUNTER HELPERS -----
+
   // DEBUG: force-spawn a relic encounter immediately
   const handleSpawnDebugItem = () => {
     const baseItem = getRandomWorldItem();
@@ -291,6 +330,7 @@ export const App: React.FC = () => {
   };
 
   // ----- SCREEN RENDERING -----
+
   const renderScreen = () => {
     const phase = getPhaseFromTick(worldTick);
 

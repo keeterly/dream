@@ -1,10 +1,23 @@
 // src/persistence/gameState.ts
-import type { DreamselfProfile, InventoryItem, JournalEntry } from "../types";
+import type {
+  DreamselfProfile,
+  InventoryItem,
+  JournalEntry,
+} from "../types";
 
-export type SavedGameState = {
+/**
+ * Shape of the state we persist to the remote storage.
+ * You can evolve this over time – just make sure you handle
+ * missing fields gracefully when loading older saves.
+ */
+export interface SavedGameState {
   profile: DreamselfProfile;
   inventory: InventoryItem[];
   journalEntries: JournalEntry[];
   worldTick: number;
-  // add more later if you need (phase overrides, settings, etc.)
-};
+
+  // NEW: map / overworld state
+  currentBiomeId: string;
+  currentLocationId: string;
+  discoveredLocations: string[];
+}

@@ -7,8 +7,6 @@ import { QuestionStep } from "./components/layout/QuestionStep";
 import { SummaryStep } from "./components/layout/SummaryStep";
 import { WorldStep } from "./components/layout/WorldStep";
 
-
-
 import { StartScreen } from "./components/start/StartScreen";
 import { SettingsModal } from "./components/start/SettingsModal";
 
@@ -16,14 +14,16 @@ import { QUESTIONS } from "./questions";
 import { computeTraitsAndAvatar } from "./traits";
 import { WORLD_ITEMS } from "./worldItems";
 import { useJournal } from "./hooks/useJournal";
-import { LOCATION_ITEM_TABLES } from "./worldItemsByLocation";
 
 // Map graph for Dusk Valley travel
 import { DUSK_VALLEY_GRAPH } from "./worldMap/duskValleyGraph";
 
+// Ruin / dungeon event definitions
 import type { LocationEventDefinition } from "./worldEvents/duskValleyEvents";
 import { findEventForLocation } from "./worldEvents/duskValleyEvents";
 
+// Per-location loot tables
+import { getItemTableForLocation } from "./worldItemsByLocation";
 
 import { saveGameOnline, loadGameOnline } from "./persistence/remoteStorage";
 import type { SavedGameState } from "./persistence/gameState";
@@ -34,38 +34,11 @@ import type {
   DreamselfProfile,
   InventoryItem,
   JournalEntry,
-  LocationEvent,       // ← add this
+  // NOTE: remove LocationEvent import – we don't use it anymore
 } from "./types";
 
 
-type LocationEventKind = "ruin" | "dungeon";
 
-const DUSK_VALLEY_LOCATION_EVENTS: Record<string, LocationEvent> = {
-  shard_overlook: {
-    locationId: "shard_overlook",
-    kind: "ruin",
-    title: "Shard Overlook",
-    body:
-      "An abandoned watchpoint above the valley. Broken glass and hanging wires catch the light. Something still watches from the dark lenses.",
-    actionLabel: "Approach the overlook",
-  },
-  sunken_plaza: {
-    locationId: "sunken_plaza",
-    kind: "ruin",
-    title: "Sunken Plaza",
-    body:
-      "The remains of a plaza half-swallowed by earth and roots. Vending pillars, flickering signs, and a dry fountain hold relics of another age.",
-    actionLabel: "Search the plaza",
-  },
-  murmuring_faults: {
-    locationId: "murmuring_faults",
-    kind: "dungeon",
-    title: "Murmuring Faults",
-    body:
-      "A fracture in the valley floor where wind and distant machinery speak in the same low tone. Descending here will change your path.",
-    actionLabel: "Descend into the faults",
-  },
-};
 
 
 
@@ -83,9 +56,7 @@ function getPhaseFromTick(tick: number): string {
 }
 
 function getRandomWorldItem(currentLocationId: string) {
-  const table =
-    LOCATION_ITEM_TABLES[currentLocationId] ?? WORLD_ITEMS; // fallback
-
+  const table = getItemTableForLocation(currentLocationId);
   const pool = table.length > 0 ? table : WORLD_ITEMS;
   return pool[Math.floor(Math.random() * pool.length)];
 }
@@ -158,37 +129,41 @@ export const App: React.FC = () => {
   }, [screen]);
 
   // ----- RANDOM ENCOUNTERS (ONLY RUNS IN WORLD) -----
-    useEffect(() => {
-    if (screen !== "world") return;
+useEffect(() => {
+  if (screen !== "world") return;
 
-    // Don't roll relics while a ruin / dungeon event is onscreen
-    if (activeLocationEvent) return;
+  // Don't roll relics while a ruin / dungeon event is onscreen
+  if (activeLocationEvent) return;
 
-    // If an encounter is already active or visually on the ground, do nothing
-    if (activeEncounterItem || encounterItemName) return;
+  // If an encounter is already active or visually on the ground, do nothing
+  if (activeEncounterItem || encounterItemName) return;
 
+  const delay = 8000 + Math.random() * 12000;
 
-    // Random delay between 8–20 seconds before next encounter
-    const delay = 8000 + Math.random() * 12000;
+  const id = window.setTimeout(() => {
+    const baseItem = getRandomWorldItem(currentLocationId);
+    const acquiredAt = new Date().toISOString();
 
-    const id = window.setTimeout(() => {
-      const baseItem = getRandomWorldItem(currentLocationId);
-      const acquiredAt = new Date().toISOString();
+    const pending: InventoryItem = {
+      ...baseItem,
+      id: `${baseItem.id}_${Date.now()}_${Math.random()
+        .toString(36)
+        .slice(2, 6)}`,
+      acquiredAt,
+    };
 
-      const pending: InventoryItem = {
-        ...baseItem,
-        id: `${baseItem.id}_${Date.now()}_${Math.random()
-          .toString(36)
-          .slice(2, 6)}`,
-        acquiredAt,
-      };
+    setActiveEncounterItem(pending);
+    setEncounterItemName(baseItem.name);
+  }, delay);
 
-      setActiveEncounterItem(pending);
-      setEncounterItemName(baseItem.name);
-    }, delay);
-
-    return () => window.clearTimeout(id);
-   }, [screen, activeLocationEvent, activeEncounterItem, encounterItemName, currentLocationId,]);
+  return () => window.clearTimeout(id);
+}, [
+  screen,
+  activeLocationEvent,
+  activeEncounterItem,
+  encounterItemName,
+  currentLocationId,
+]);
 
 
 
@@ -297,39 +272,31 @@ export const App: React.FC = () => {
   ]);
 
   // ----- TRAVEL HANDLERS -----
-    const handleSelectMapLocation = (locationId: string) => {
-    // Was this node already known before this click?
-    const wasAlreadyDiscovered = discoveredLocations.includes(locationId);
+const handleSelectMapLocation = (locationId: string) => {
+  // Was this node already known before this click?
+  const wasAlreadyDiscovered = discoveredLocations.includes(locationId);
 
-    // Update which node we are “standing” at in this biome
-    setCurrentLocationId(locationId);
+  // Update which node we are “standing” at in this biome
+  setCurrentLocationId(locationId);
 
-    // Update discovery fog: visiting a node reveals itself + its neighbors
-    setDiscoveredLocations((prev) => {
-      const next = new Set(prev);
+  // Update discovery fog: visiting a node reveals itself + its neighbors
+  setDiscoveredLocations((prev) => {
+    const next = new Set(prev);
 
-      // Always mark the destination itself as discovered
-      next.add(locationId);
+    // Always mark the destination itself as discovered
+    next.add(locationId);
 
-      // Simple discovery rule: visiting a node reveals its neighbors
-      const neighbors = DUSK_VALLEY_GRAPH[locationId] ?? [];
-      neighbors.forEach((id) => next.add(id));
+    // Simple discovery rule: visiting a node reveals its neighbors
+    const neighbors = DUSK_VALLEY_GRAPH[locationId] ?? [];
+    neighbors.forEach((id) => next.add(id));
 
-      return Array.from(next);
-    });
+    return Array.from(next);
+  });
 
-    // If this is a ruin / dungeon and it's the first time we've ever seen it,
-    // queue up a location event.
-    if (!wasAlreadyDiscovered) {
-      const def = DUSK_VALLEY_LOCATION_EVENTS[locationId];
-      if (def) {
-        setActiveLocationEvent(def);
-      }
-    }
+  // (No direct setActiveLocationEvent here; the effect using
+  //   findEventForLocation() will decide whether to show an event.)
+};
 
-    // Later: log to journal, trigger biome events, etc.
-    // logBiomeVisited(currentBiomeId, locationId);
-  };
 
 
     const handleCloseLocationEvent = (entered: boolean) => {
@@ -432,20 +399,21 @@ export const App: React.FC = () => {
 
   // DEBUG: force-spawn a relic encounter immediately
   const handleSpawnDebugItem = () => {
-    const baseItem = getRandomWorldItem(currentLocationId);
-    const acquiredAt = new Date().toISOString();
+  const baseItem = getRandomWorldItem(currentLocationId);
+  const acquiredAt = new Date().toISOString();
 
-    const pending: InventoryItem = {
-      ...baseItem,
-      id: `${baseItem.id}_${Date.now()}_${Math.random()
-        .toString(36)
-        .slice(2, 6)}`,
-      acquiredAt,
-    };
-
-    setActiveEncounterItem(pending);
-    setEncounterItemName(baseItem.name);
+  const pending: InventoryItem = {
+    ...baseItem,
+    id: `${baseItem.id}_${Date.now()}_${Math.random()
+      .toString(36)
+      .slice(2, 6)}`,
+    acquiredAt,
   };
+
+  setActiveEncounterItem(pending);
+  setEncounterItemName(baseItem.name);
+};
+
 
   // Called by WorldStep once the pickup animation finishes (or auto-pickup fires)
   const handleResolveEncounter = () => {

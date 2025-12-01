@@ -208,13 +208,15 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     }
   }, [isEncounterActive, isAutoWalking, isAutoPickup]);
 
-  /**
+    /**
    * Auto-encounter roll while actually walking.
-   * We don't spawn a new item if one is already walking in or active.
+   * We don't spawn a new item if one is already walking in or active
+   * or if a location event is currently active.
    */
-    useEffect(() => {
-    if (!isWalking || isEncounterActive || hasLootSpawned || activeLocationEvent)
+  useEffect(() => {
+    if (!isWalking || isEncounterActive || hasLootSpawned || activeLocationEvent) {
       return;
+    }
 
     // 5–10 seconds between potential drops while walking
     const delay = 5000 + Math.random() * 5000;
@@ -224,18 +226,14 @@ export const WorldStep: React.FC<WorldStepProps> = ({
     }, delay);
 
     return () => window.clearTimeout(id);
-  }, [isWalking, isEncounterActive, hasLootSpawned, activeLocationEvent, onSpawnDebugItem]);
+  }, [
+    isWalking,
+    isEncounterActive,
+    hasLootSpawned,
+    activeLocationEvent,
+    onSpawnDebugItem,
+  ]);
 
-
-    // 5–10 seconds between potential drops while walking
-    const delay = 5000 + Math.random() * 5000;
-    const id = window.setTimeout(() => {
-      setWasAutoWalkingBeforeEncounter(true);
-      onSpawnDebugItem();
-    }, delay);
-
-    return () => window.clearTimeout(id);
-  }, [isWalking, isEncounterActive, hasLootSpawned, onSpawnDebugItem]);
 
   /**
    * Player clicks the "Relic Found" banner.

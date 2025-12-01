@@ -8,6 +8,9 @@ import type {
 
 export type BiomeId = "dusk_valley"; // later: | "ashen_city" | ...
 
+// ✅ new – current schema version for saves
+export const CURRENT_SAVE_VERSION = 1;
+
 export interface SavedGameState {
   /** Schema version so you can migrate old saves later */
   version: number;

@@ -20,6 +20,7 @@ import { DUSK_VALLEY_GRAPH } from "./worldMap/duskValleyGraph";
 
 import { saveGameOnline, loadGameOnline } from "./persistence/remoteStorage";
 import type { SavedGameState } from "./persistence/gameState";
+import { CURRENT_SAVE_VERSION } from "./persistence/gameState";
 
 import type {
   AnswerMap,
@@ -190,6 +191,7 @@ export const App: React.FC = () => {
     if (screen !== "world" || !profile) return;
 
     const stateToSave: SavedGameState = {
+      version: CURRENT_SAVE_VERSION,     // ✅ add this line
       profile,
       inventory,
       journalEntries,
